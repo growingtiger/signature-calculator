@@ -559,6 +559,30 @@ footer b { color: var(--ink-2); font-weight: 600; }
     return dose * bw / 24; // mgkgday
   }
 
+  // 제조사 공개 자료에서 원문 확인한 값. 배합 변경이 잦으므로 포장 라벨과 대조할 것.
+  // 힐스: hillspet.co.kr(한국 공식) · 로얄캐닌: royalcanin.com/us(한국 페이지는 열량 미게시)
+  // sp — dog | cat | both,  u — kgm(kcal/kg) | can(kcal/캔)
+  var FOODS = [
+    { label: "힐스 프리스크립션 다이어트 · 한국 공식 자료", items: [
+      { id: "h-d-kd-dry",  n: "k/d 반려견 건사료",                    sp: "dog", v: 3991,  u: "kgm" },
+      { id: "h-d-kd-354",  n: "k/d 반려견 습식 치킨&야채 스튜 · 354 g 캔", sp: "dog", v: 352, u: "can", perkg: 995 },
+      { id: "h-d-kd-156",  n: "k/d 반려견 습식 치킨&야채 스튜 · 156 g 캔", sp: "dog", v: 155.2, u: "can", perkg: 995 },
+      { id: "h-c-kd-dry",  n: "k/d 반려묘 건사료 치킨",                sp: "cat", v: 4083,  u: "kgm" },
+      { id: "h-d-id-dry",  n: "i/d 반려견 건사료 치킨",                sp: "dog", v: 3589,  u: "kgm" }
+    ] },
+    { label: "로얄캐닌 수의사 처방식 · 미국 라인 자료", items: [
+      { id: "r-d-rs-a", n: "캐나인 Renal Support A · 건식",           sp: "dog",  v: 3868, u: "kgm" },
+      { id: "r-d-rs-s", n: "캐나인 Renal Support S · 건식",           sp: "dog",  v: 3879, u: "kgm" },
+      { id: "r-d-rs-f", n: "캐나인 Renal Support F · 건식",           sp: "dog",  v: 3779, u: "kgm" },
+      { id: "r-c-rs-a", n: "펠라인 Renal Support A · 건식",           sp: "cat",  v: 3811, u: "kgm" },
+      { id: "r-c-rs-s", n: "펠라인 Renal Support S · 건식",           sp: "cat",  v: 4054, u: "kgm" },
+      { id: "r-c-rs-d", n: "펠라인 Renal Support D 그레이비 · 85 g 캔", sp: "cat",  v: 98,  u: "can", perkg: 1149 },
+      { id: "r-recov",  n: "Recovery 울트라 소프트 무스 · 145 g 캔",   sp: "both", v: 149, u: "can", perkg: 1025 }
+    ] }
+  ];
+  var FOOD_BY_ID = {};
+  FOODS.forEach(function (g) { g.items.forEach(function (it) { FOOD_BY_ID[it.id] = it; }); });
+
   var EMERG = [
     { n: "에피네프린 (저용량)", c: "1 mg/mL (1:1000)", d: 0.01, u: "mg/kg", conc: 1, note: "IV/IO · 심정지 1차, 3–5분마다" },
     { n: "에피네프린 (고용량)", c: "1 mg/mL", d: 0.1, u: "mg/kg", conc: 1, note: "장시간 CPR에서만 고려" },
@@ -1753,9 +1777,39 @@ footer b { color: var(--ink-2); font-weight: 600; }
         { v: "growth", t: "성장기 (개 2.0 · 고양이 2.5)" },
         { v: "work", t: "활동견 (3.0 ×)" }
       ] },
-      { k: "kcal", label: "사료 열량", unit: "kcal/100 g 또는 kcal/캔", def: 100, step: 5 },
+      { k: "food", label: "사료 선택", span: true, type: "select", def: "custom",
+        groups: [{ bare: true, options: [{ v: "custom", t: "직접 입력 — 포장 라벨의 값 사용" }] }].concat(
+          FOODS.map(function (g) {
+            return { label: g.label, options: g.items.map(function (it) { return { v: it.id, t: it.n }; }) };
+          })) },
+      { k: "kcal", label: "사료 열량", unit: "", def: 350, step: 5 },
+      { k: "kcalUnit", label: "열량 단위", type: "select", def: "g100",
+        options: [{ v: "kgm", t: "kcal/kg" }, { v: "g100", t: "kcal/100 g" }, { v: "can", t: "kcal/캔·팩" }, { v: "cup", t: "kcal/컵" }] },
       { k: "meals", label: "1일 급여 횟수", unit: "회", def: 3, step: 1 }
     ],
+    hook: function (k, v, set) {
+      if (k !== "food") return;
+      var f = FOOD_BY_ID[v.food];
+      if (f) { set("kcal", f.v); set("kcalUnit", f.u); }
+    },
+    onContext: function (nodes, values, setVal) {
+      var sel = nodes.food;
+      if (!sel) return;
+      // 현재 선택된 종에 해당하지 않는 제품은 숨긴다
+      Array.prototype.forEach.call(sel.getElementsByTagName("optgroup"), function (og) {
+        var anyShown = false;
+        Array.prototype.forEach.call(og.getElementsByTagName("option"), function (o) {
+          var f = FOOD_BY_ID[o.value];
+          var show = !f || f.sp === "both" || f.sp === S.sp;
+          o.hidden = !show;
+          o.disabled = !show;
+          if (show) anyShown = true;
+        });
+        og.hidden = !anyShown;
+      });
+      var cur = FOOD_BY_ID[values.food];
+      if (cur && cur.sp !== "both" && cur.sp !== S.sp) setVal("food", "custom");
+    },
     compute: function (v) {
       var bw = S.bw;
       if (!ok(bw)) return { flags: needWeight() };
@@ -1770,27 +1824,50 @@ footer b { color: var(--ink-2); font-weight: 600; }
         default:       f = 3.0;
       }
       var mer = rer * f;
-      var kcal = num(v.kcal), meals = Math.max(1, num(v.meals));
-      var amount = ok(kcal) ? mer / kcal * 100 : NaN;
+      var kcal = num(v.kcal), meals = Math.max(1, num(v.meals)), unit = v.kcalUnit;
+      var food = FOOD_BY_ID[v.food];
+
+      // 단위별로 1일 급여량을 그 단위에 맞는 자연스러운 형태로 환산한다
+      var perDay = NaN, unitTxt = "", perKg = NaN, dec = 0;
+      if (ok(kcal)) {
+        if (unit === "kgm")      { perDay = mer / kcal * 1000; unitTxt = "g";     perKg = kcal; }
+        else if (unit === "g100"){ perDay = mer / kcal * 100;  unitTxt = "g";     perKg = kcal * 10; }
+        else if (unit === "can") { perDay = mer / kcal;        unitTxt = "캔";     dec = 2; perKg = food && food.perkg ? food.perkg : NaN; }
+        else                     { perDay = mer / kcal;        unitTxt = "컵";     dec = 2; }
+      }
+
       var flags = [];
+      if (food) {
+        flags.push(F("info", food.n + " — " + sf(food.v, 1) + (food.u === "kgm" ? " kcal/kg" : " kcal/캔") +
+          (food.perkg ? " (약 " + sf(food.perkg, 0) + " kcal/kg)" : "") +
+          ". 제조사 공개값이며 배합이 바뀔 수 있으니 포장 라벨과 대조하십시오."));
+      }
       if (v.state === "hosp") flags.push(F("info", "입원 환자는 RER의 100%에서 시작합니다. 과거의 질병 계수(illness factor)는 과급여와 재급여 증후군 위험 때문에 현재는 권장되지 않습니다."));
       flags.push(F("warn", "3–5일 이상 금식한 환자는 재급여 증후군 위험이 있습니다. 목표량의 25–33%에서 시작해 3–4일에 걸쳐 증량하고 인·칼륨·마그네슘을 매일 확인하십시오."));
       flags.push(F("info", "48–72시간 이상 자발 섭취가 없으면 비식도관·비위관 등 영양관 설치를 적극적으로 검토하십시오. 만성신장병 환자에서 영양 유지는 생존기간과 직결됩니다."));
+
       var rows = [
         R("적용 계수", sf(f, 1) + " × RER", ""),
         R("체중당 열량", sf(mer / bw, 0), "kcal/kg/day")
       ];
       if (ok(kcal)) {
-        rows.push(R("1일 급여량", sf(amount, 0), "g 또는 " + sf(mer / kcal, 2) + " 캔"));
-        rows.push(R("1회 급여량 (" + sf(meals, 0) + "회 분할)", sf(amount / meals, 0), "g"));
+        rows.push(R("1일 급여량", sf(perDay, dec), unitTxt));
+        rows.push(R("1회 급여량 (" + sf(meals, 0) + "회 분할)", sf(perDay / meals, unit === "can" || unit === "cup" ? 2 : 0), unitTxt));
+        if (ok(perKg)) rows.push(R("열량 밀도", sf(perKg, 0), "kcal/kg"));
+        if (v.state !== "hosp") rows.push(R("입원 시작량 (RER 100%)", sf(rer / kcal * (unit === "kgm" ? 1000 : unit === "g100" ? 100 : 1), dec), unitTxt));
       }
       return {
-        primary: [P("RER", sf(rer, 0), "kcal/day"), P("목표 열량", sf(mer, 0), "kcal/day"), ok(kcal) ? P("1일 급여량", sf(amount, 0), "g") : null].filter(Boolean),
+        primary: [
+          P("RER", sf(rer, 0), "kcal/day"),
+          P("목표 열량", sf(mer, 0), "kcal/day"),
+          ok(kcal) ? P("1일 급여량", sf(perDay, dec), unitTxt) : null,
+          ok(kcal) ? P("1회 급여량", sf(perDay / meals, unit === "can" || unit === "cup" ? 2 : 0), unitTxt) : null
+        ].filter(Boolean),
         rows: rows,
         flags: flags
       };
     },
-    note: "RER = 70 × 체중(kg)^0.75. 습식 사료는 캔당 kcal, 건사료는 100 g당 kcal를 입력하십시오(제품 라벨 또는 제조사 자료 확인). 신장 처방식은 단백·인 제한으로 열량 밀도가 다를 수 있습니다."
+    note: "RER = 70 × 체중(kg)^0.75. 사료를 선택하면 제조사 공개 열량이 자동 입력되며, 목록에 없으면 직접 입력을 선택해 포장 라벨의 값을 넣으십시오. 출처 — 힐스: 한국 공식 자료(hillspet.co.kr) · 로얄캐닌: 미국 라인 자료(royalcanin.com/us, 한국 페이지는 열량 미게시). 제조사는 배합을 수시로 변경하므로 실제 급여 전 포장 라벨과 대조하는 것을 권장합니다."
   });
 
   CALCS.push({
@@ -1892,6 +1969,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
   var rail = document.getElementById("rail");
   var chips = document.getElementById("chips");
   var refresh = [];
+  var ctxSync = [];
 
   function buildField(calc, inp) {
     var wrap = el("div", "f" + (inp.span ? " span2" : ""));
@@ -1905,12 +1983,25 @@ footer b { color: var(--ink-2); font-weight: 600; }
     var node;
     if (inp.type === "select") {
       node = el("select");
-      inp.options.forEach(function (o) {
-        var opt = el("option", null, o.t);
-        opt.value = o.v;
-        if (String(o.v) === String(inp.def)) opt.selected = true;
-        node.appendChild(opt);
-      });
+      var addOpts = function (list, parent) {
+        list.forEach(function (o) {
+          var opt = el("option", null, o.t);
+          opt.value = o.v;
+          if (String(o.v) === String(inp.def)) opt.selected = true;
+          parent.appendChild(opt);
+        });
+      };
+      if (inp.groups) {
+        inp.groups.forEach(function (g) {
+          if (g.bare) { addOpts(g.options, node); return; }
+          var og = el("optgroup");
+          og.label = g.label;
+          addOpts(g.options, og);
+          node.appendChild(og);
+        });
+      } else {
+        addOpts(inp.options, node);
+      }
       node.value = String(inp.def);
     } else {
       node = el("input");
@@ -2022,6 +2113,12 @@ footer b { color: var(--ink-2); font-weight: 600; }
       nt.innerHTML = "<b>참고 —</b> " + esc(calc.note);
       card.appendChild(nt);
     }
+    // 종·체중이 바뀌면 선택지 자체가 달라져야 하는 계산기를 위한 훅
+    if (calc.onContext) {
+      ctxSync.push(function () { calc.onContext(nodes, values, setVal); });
+      calc.onContext(nodes, values, setVal);
+    }
+
     refresh.push(run);
     run();
     return card;
@@ -2073,7 +2170,11 @@ footer b { color: var(--ink-2); font-weight: 600; }
     });
   }
 
-  function recomputeAll() { refresh.forEach(function (fn) { try { fn(); } catch (e) {} }); renderChips(); }
+  function recomputeAll() {
+    ctxSync.forEach(function (fn) { try { fn(); } catch (e) {} });
+    refresh.forEach(function (fn) { try { fn(); } catch (e) {} });
+    renderChips();
+  }
 
   var bwInput = document.getElementById("bw");
   var bwUnit = document.getElementById("bwUnit");
