@@ -38,6 +38,11 @@
 
   --f-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   --f-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 스크립트가 실측해 덮어씁니다 — 값이 없을 때를 대비한 기본값 */
+  --pad: clamp(14px, 3vw, 32px);
+  --top-h: 108px;
+  --rail-h: 46px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -90,7 +95,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.shell { max-width: 1200px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 32px); }
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 var(--pad); }
 
 /* ---------- top bar ---------- */
 .top {
@@ -200,7 +205,11 @@ body {
   align-items: start;
   padding: 30px 0 72px;
 }
-.rail { position: sticky; top: 118px; display: flex; flex-direction: column; gap: 2px; }
+.rail {
+  position: sticky; top: calc(var(--top-h) + 14px);
+  display: flex; flex-direction: column; gap: 2px;
+  max-height: calc(100vh - var(--top-h) - 28px); overflow-y: auto;
+}
 .rail a {
   display: flex; align-items: baseline; gap: 8px;
   padding: 6px 10px; border-radius: 6px;
@@ -227,6 +236,7 @@ body {
   display: flex; align-items: baseline; gap: 12px;
   margin: 26px 0 2px; padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
+  scroll-margin-top: calc(var(--top-h) + 18px);
 }
 .sec-head:first-child { margin-top: 0; }
 .sec-head h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.015em; }
@@ -391,13 +401,24 @@ footer b { color: var(--ink-2); font-weight: 600; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
 @media (max-width: 900px) {
-  .main { grid-template-columns: 1fr; padding-top: 18px; gap: 18px; }
+  .main { grid-template-columns: 1fr; padding-top: 0; gap: 14px; }
   .rail {
-    position: static; flex-direction: row; gap: 6px;
-    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+    position: sticky; top: var(--top-h); z-index: 45;
+    flex-direction: row; gap: 6px;
+    max-height: none; overflow-y: visible;
+    overflow-x: auto; scrollbar-width: none;
+    background: var(--bg);
+    margin-inline: calc(-1 * var(--pad));
+    padding: 9px var(--pad) 10px;
+    border-bottom: 1px solid var(--line);
   }
-  .rail a { white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+  .rail::-webkit-scrollbar { display: none; }
+  .rail a {
+    white-space: nowrap; border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 12px; background: var(--surface);
+  }
   .rail a small, .rail hr, .rail p { display: none; }
+  .sec-head { scroll-margin-top: calc(var(--top-h) + var(--rail-h) + 14px); }
   .chips { margin-left: 0; }
   .pri b { font-size: 22px; }
 }
@@ -530,6 +551,12 @@ footer b { color: var(--ink-2); font-weight: 600; }
     furo:     { label: "푸로세미드",   dose: 0.5,  unit: "mgkghr",   conc: 10,   hint: "0.1–1 mg/kg/hr · 10 mg/mL" },
     metoclo:  { label: "메토클로프라마이드", dose: 1.5, unit: "mgkgday", conc: 5, hint: "1–2 mg/kg/day · 5 mg/mL" },
     dilt:     { label: "딜티아젬",     dose: 5,    unit: "mcgkgmin", conc: 5,    hint: "1–10 µg/kg/min · 5 mg/mL" },
+    nitro:    { label: "니트로프루시드 나트륨", dose: 1, unit: "mcgkgmin", conc: 25, hint: "0.5–10 µg/kg/min · 25 mg/mL 원액 · 1–2에서 시작해 혈압 보며 적정",
+      warns: [
+        ["crit", "동맥압 지속 감시가 필수인 약물입니다. 5–10분마다 혈압을 확인하며 적정하고, 급격한 저혈압 시 즉시 감량·중단하십시오. 반감기가 매우 짧아 중단하면 수 분 내 혈압이 회복됩니다."],
+        ["crit", "시안화물·티오시안산 축적 위험이 있습니다. 10 µg/kg/min 초과 투여나 24–48시간을 넘는 지속 투여는 피하고, 신부전·간부전 환자에서는 티오시안산 배설이 지연되므로 더 낮은 용량과 짧은 기간으로 제한하십시오."],
+        ["warn", "광분해되므로 수액백과 라인을 차광하고, 5% 포도당으로 희석해 24시간마다 새로 조제하십시오. 용액이 청색·녹색·적갈색으로 변하면 폐기합니다."]
+      ] },
     mannitol: { label: "만니톨 20%",   dose: 1,    unit: "mgkghr",   conc: 200,  hint: "볼루스 0.5–1 g/kg 20–30분, CRI는 프로토콜 확인" }
   };
   var CRI_UNITS = [
@@ -1598,6 +1625,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
 
       var flags = [];
       if (p && p.hint) flags.push(F("info", p.label + " — 일반 범위 " + p.hint + "."));
+      if (p && p.warns) p.warns.forEach(function (wn) { flags.push(F(wn[0], wn[1])); });
       if (drugML > bag * 0.2) flags.push(F("warn", "약물 부피 " + sf(drugML, 1) + " mL가 백 용량의 20%를 초과합니다. 최종 농도가 크게 달라지므로 동일 부피의 수액을 먼저 빼내십시오."));
       if (neatRate < 0.1) flags.push(F("warn", "원액 속도 " + sf(neatRate, 3) + " mL/hr — 대부분의 시린지 펌프 최소 정밀도 이하입니다. 희석 조제를 사용하십시오."));
       else flags.push(F("good", "시린지 펌프로 원액 " + sf(neatRate, 2) + " mL/hr, 또는 희석백을 " + sf(rate, 0) + " mL/hr로 투여합니다."));
@@ -2106,19 +2134,65 @@ footer b { color: var(--ink-2); font-weight: 600; }
       if (shown) anyVisible = true;
     });
     emptyMsg.style.display = anyVisible ? "none" : "";
+    queueActive();
   });
 
   /* ============ nav highlight ============ */
+  // 고정 헤더 바로 아래에 가상의 기준선을 두고, 그 선을 지나간 마지막 섹션을 활성으로 본다.
+  // IntersectionObserver의 rootMargin 방식은 밴드 높이가 뷰포트 높이에 비례해
+  // 화면이 낮은 창에서 밴드가 사라지므로 쓰지 않는다.
   var links = Array.prototype.slice.call(rail.querySelectorAll("a"));
-  if ("IntersectionObserver" in window) {
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        var id = e.target.id.replace("s-", "");
-        links.forEach(function (a) { a.classList.toggle("on", a.dataset.cat === id); });
-      });
-    }, { rootMargin: "-120px 0px -70% 0px" });
-    CATS.forEach(function (c) { obs.observe(document.getElementById("s-" + c.id)); });
+  var mobileMQ = window.matchMedia("(max-width: 900px)");
+
+  function updateActive() {
+    var chrome = document.querySelector(".top").getBoundingClientRect().height;
+    if (mobileMQ.matches) chrome += rail.getBoundingClientRect().height;
+    var line = chrome + 24;
+
+    var current = null;
+    CATS.forEach(function (c) {
+      var sec = document.getElementById("s-" + c.id);
+      if (sec.style.display === "none") return;
+      if (current === null) current = c.id;
+      if (sec.getBoundingClientRect().top <= line) current = c.id;
+    });
+    // 페이지 최하단에서는 마지막 섹션을 활성으로 고정한다
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+      for (var i = CATS.length - 1; i >= 0; i--) {
+        var s = document.getElementById("s-" + CATS[i].id);
+        if (s.style.display !== "none") { current = CATS[i].id; break; }
+      }
+    }
+    links.forEach(function (a) { a.classList.toggle("on", a.dataset.cat === current); });
+  }
+
+  var activeQueued = false;
+  function queueActive() {
+    if (activeQueued) return;
+    activeQueued = true;
+    requestAnimationFrame(function () { activeQueued = false; updateActive(); });
+  }
+  window.addEventListener("scroll", queueActive, { passive: true });
+  window.addEventListener("resize", queueActive);
+  updateActive();
+
+  /* ============ sticky chrome measurement ============ */
+  // 상단 바는 창 폭에 따라 줄바꿈되어 높이가 달라진다. 실측값을 CSS 변수로 넘겨야
+  // 분류 레일이 항상 상단 바 바로 아래에 붙고, 앵커 이동 시 제목이 가리지 않는다.
+  function measureChrome() {
+    var topEl = document.querySelector(".top");
+    var r = document.documentElement;
+    if (topEl) r.style.setProperty("--top-h", Math.round(topEl.getBoundingClientRect().height) + "px");
+    if (rail) r.style.setProperty("--rail-h", Math.round(rail.getBoundingClientRect().height) + "px");
+  }
+  measureChrome();
+  window.addEventListener("resize", function () {
+    clearTimeout(measureChrome._t);
+    measureChrome._t = setTimeout(measureChrome, 120);
+  });
+  if ("ResizeObserver" in window) {
+    var ro = new ResizeObserver(measureChrome);
+    ro.observe(document.querySelector(".top"));
   }
 
   /* ============ theme + print ============ */
