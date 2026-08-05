@@ -1,0 +1,2138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등 29종을 종과 체중 한 번 입력으로 계산합니다.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="시그니처 동물의료센터 · 수의 임상 계산기">
+<meta property="og:description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등 29종을 종과 체중 한 번 입력으로 계산합니다.">
+<meta name="twitter:card" content="summary">
+<title>시그니처 동물의료센터 · 수의 임상 계산기</title>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  color-scheme: light dark;
+
+  --bg:        #F2F4F3;
+  --surface:   #FFFFFF;
+  --surface-2: #E8EDEC;
+  --ink:       #10181A;
+  --ink-2:     #48575A;
+  --ink-3:     #7A8A8C;
+  --line:      #D6DEDD;
+  --line-2:    #C2CDCB;
+  --accent:    #0C6B66;
+  --accent-2:  #084F4B;
+  --accent-soft:#E2EEEC;
+  --good:      #2C7A55;
+  --good-soft: #E3F0E9;
+  --warn:      #915E0C;
+  --warn-soft: #F7EDDA;
+  --crit:      #A63A32;
+  --crit-soft: #F7E5E3;
+  --shadow:    0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.28);
+
+  --f-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #0C1112;
+    --surface:   #141B1C;
+    --surface-2: #1B2425;
+    --ink:       #E7EDEC;
+    --ink-2:     #9FB0AF;
+    --ink-3:     #6D7F7E;
+    --line:      #242F2E;
+    --line-2:    #33413F;
+    --accent:    #3FBFB2;
+    --accent-2:  #6FD8CB;
+    --accent-soft:#11292A;
+    --good:      #55B487;
+    --good-soft: #12261D;
+    --warn:      #D3A24A;
+    --warn-soft: #2A2114;
+    --crit:      #E3796F;
+    --crit-soft: #2C1917;
+    --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#0C1112; --surface:#141B1C; --surface-2:#1B2425; --ink:#E7EDEC; --ink-2:#9FB0AF;
+  --ink-3:#6D7F7E; --line:#242F2E; --line-2:#33413F; --accent:#3FBFB2; --accent-2:#6FD8CB;
+  --accent-soft:#11292A; --good:#55B487; --good-soft:#12261D; --warn:#D3A24A; --warn-soft:#2A2114;
+  --crit:#E3796F; --crit-soft:#2C1917;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E8EDEC; --ink:#10181A; --ink-2:#48575A;
+  --ink-3:#7A8A8C; --line:#D6DEDD; --line-2:#C2CDCB; --accent:#0C6B66; --accent-2:#084F4B;
+  --accent-soft:#E2EEEC; --good:#2C7A55; --good-soft:#E3F0E9; --warn:#915E0C; --warn-soft:#F7EDDA;
+  --crit:#A63A32; --crit-soft:#F7E5E3;
+  --shadow:0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.28);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 clamp(14px, 3vw, 32px); }
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky; top: 0; z-index: 60;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.top-a {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 0 11px;
+}
+.brand { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.brand b {
+  font-size: 15px; font-weight: 650; letter-spacing: -.012em;
+  white-space: nowrap;
+}
+.brand span {
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.top-tools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.search {
+  position: relative; display: flex; align-items: center;
+}
+.search input {
+  width: clamp(150px, 26vw, 260px);
+  padding: 7px 11px 7px 30px;
+  font: inherit; font-size: 13.5px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid transparent; border-radius: 7px;
+  transition: border-color .15s, background .15s;
+}
+.search input::placeholder { color: var(--ink-3); }
+.search input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.search svg { position: absolute; left: 9px; width: 14px; height: 14px; color: var(--ink-3); pointer-events: none; }
+.icon-btn {
+  display: grid; place-items: center;
+  width: 32px; height: 32px; padding: 0;
+  background: var(--surface-2); color: var(--ink-2);
+  border: 1px solid transparent; border-radius: 7px;
+  cursor: pointer;
+}
+.icon-btn:hover { color: var(--ink); border-color: var(--line-2); }
+.icon-btn svg { width: 16px; height: 16px; }
+
+/* patient bar */
+.top-b {
+  display: flex; align-items: center; gap: 18px;
+  padding: 0 0 12px;
+  overflow-x: auto; scrollbar-width: thin;
+}
+.pfield { display: flex; align-items: center; gap: 8px; flex: none; }
+.pfield > label {
+  font-family: var(--f-sans); font-size: 11px; font-weight: 500;
+  letter-spacing: .01em; color: var(--ink-3);
+}
+.seg { display: flex; background: var(--surface-2); border-radius: 7px; padding: 2px; }
+.seg button {
+  font: inherit; font-size: 13px; font-weight: 550;
+  padding: 4px 13px; border: 0; border-radius: 5px;
+  background: transparent; color: var(--ink-2); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+
+.wt { display: flex; align-items: center; }
+.wt input {
+  width: 84px; padding: 6px 9px;
+  font-family: var(--f-mono); font-size: 15px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink); background: var(--surface-2);
+  border: 1px solid transparent; border-right: 0;
+  border-radius: 7px 0 0 7px;
+}
+.wt input:focus { outline: none; border-color: var(--accent); }
+.wt select {
+  font-family: var(--f-mono); font-size: 12px;
+  padding: 6px 6px; color: var(--ink-2);
+  background: var(--surface-2); border: 1px solid transparent;
+  border-radius: 0 7px 7px 0; cursor: pointer;
+}
+.wt select:focus { outline: none; border-color: var(--accent); }
+
+.chips { display: flex; gap: 7px; flex: none; margin-left: auto; }
+.chip {
+  display: flex; flex-direction: column; gap: 0;
+  padding: 4px 11px; border-radius: 7px;
+  background: var(--accent-soft); border: 1px solid transparent;
+  white-space: nowrap;
+}
+.chip i {
+  font-family: var(--f-sans); font-size: 10px; font-style: normal; font-weight: 500;
+  letter-spacing: .01em; color: var(--accent);
+  opacity: .8;
+}
+.chip b {
+  font-family: var(--f-mono); font-size: 13.5px; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--accent);
+}
+.chip b em { font-style: normal; font-size: 10px; font-weight: 500; margin-left: 2px; opacity: .75; }
+
+/* ---------- layout ---------- */
+.main {
+  display: grid; grid-template-columns: 178px minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+  padding: 30px 0 72px;
+}
+.rail { position: sticky; top: 118px; display: flex; flex-direction: column; gap: 2px; }
+.rail a {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 6px 10px; border-radius: 6px;
+  font-size: 13.5px; color: var(--ink-2); text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color .15s, background .15s;
+}
+.rail a small {
+  font-family: var(--f-mono); font-size: 10px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums; margin-left: auto;
+}
+.rail a:hover { background: var(--surface-2); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.rail a.on small { color: var(--accent); }
+.rail hr { border: 0; border-top: 1px solid var(--line); margin: 10px 4px; }
+.rail p {
+  margin: 0; padding: 0 10px;
+  font-size: 11.5px; line-height: 1.5; color: var(--ink-3);
+}
+
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.sec-head {
+  display: flex; align-items: baseline; gap: 12px;
+  margin: 26px 0 2px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.sec-head:first-child { margin-top: 0; }
+.sec-head h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.015em; }
+.sec-head span {
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-3); margin-left: auto;
+}
+
+/* ---------- calculator card ---------- */
+.calc {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.calc > header { padding: 15px 18px 13px; }
+.calc h3 { margin: 0; font-size: 15.5px; font-weight: 640; letter-spacing: -.012em; }
+.calc h3 + p { margin: 3px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px 14px; padding: 0 18px 16px;
+}
+.f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.f > label {
+  font-size: 11.5px; font-weight: 500; color: var(--ink-2);
+  line-height: 1.4;
+}
+.f > label em {
+  font-family: var(--f-mono); font-style: normal; font-size: 10px;
+  color: var(--ink-3); letter-spacing: .04em; margin-left: 5px;
+}
+.f input, .f select {
+  width: 100%; padding: 7px 9px;
+  font-family: var(--f-mono); font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink); background: var(--surface-2);
+  border: 1px solid transparent; border-radius: 7px;
+  transition: border-color .15s, background .15s;
+}
+.f select { font-family: var(--f-sans); font-size: 13px; cursor: pointer; }
+.f input:focus, .f select:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.f input:disabled { color: var(--ink-3); cursor: not-allowed; }
+.f.span2 { grid-column: span 2; }
+
+/* ---------- output ---------- */
+.out {
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 14px 18px 15px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.pris { display: flex; flex-wrap: wrap; gap: 10px 26px; }
+.pri { display: flex; flex-direction: column; gap: 1px; }
+.pri i {
+  font-family: var(--f-sans); font-style: normal; font-size: 11px; font-weight: 500;
+  letter-spacing: .01em; color: var(--ink-3);
+}
+.pri b {
+  font-family: var(--f-mono); font-size: 25px; font-weight: 600;
+  letter-spacing: -.02em; line-height: 1.15;
+  font-variant-numeric: tabular-nums; color: var(--accent);
+}
+.pri b em {
+  font-style: normal; font-size: 12px; font-weight: 500;
+  margin-left: 3px; color: var(--ink-2); letter-spacing: 0;
+}
+.pri.t-good b { color: var(--good); }
+.pri.t-warn b { color: var(--warn); }
+.pri.t-crit b { color: var(--crit); }
+
+.rows { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0 22px; }
+.row {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 4px 0; border-bottom: 1px dotted var(--line-2);
+  font-size: 12.5px;
+}
+.row > span { color: var(--ink-2); }
+.row > b {
+  margin-left: auto; font-family: var(--f-mono); font-size: 13px; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--ink);
+  text-align: right; min-width: 0;
+}
+.row > b em {
+  font-style: normal; font-size: 10.5px; font-weight: 500;
+  color: var(--ink-3); margin-left: 3px; white-space: nowrap;
+}
+
+.flags { display: flex; flex-direction: column; gap: 6px; }
+.flag {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 8px 11px; border-radius: 8px;
+  font-size: 12.5px; line-height: 1.5;
+}
+.flag::before {
+  content: ""; flex: none; width: 3px; align-self: stretch;
+  border-radius: 2px; margin: 1px 0;
+}
+.flag.info { background: var(--accent-soft); color: var(--accent-2); }
+.flag.info::before { background: var(--accent); }
+.flag.good { background: var(--good-soft); color: var(--good); }
+.flag.good::before { background: var(--good); }
+.flag.warn { background: var(--warn-soft); color: var(--warn); }
+.flag.warn::before { background: var(--warn); }
+.flag.crit { background: var(--crit-soft); color: var(--crit); }
+.flag.crit::before { background: var(--crit); }
+:root[data-theme="dark"] .flag.info,
+:root:not([data-theme="light"]) .flag.info { color: var(--accent); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  font-family: var(--f-mono); font-size: 13px; font-weight: 650;
+  letter-spacing: .02em;
+  background: var(--accent); color: var(--surface);
+}
+.badge.t-good { background: var(--good); }
+.badge.t-warn { background: var(--warn); }
+.badge.t-crit { background: var(--crit); }
+.badge.t-neutral { background: var(--line-2); color: var(--ink); }
+
+.note {
+  margin: 0; padding: 10px 18px 13px;
+  font-size: 11.5px; line-height: 1.55; color: var(--ink-3);
+  border-top: 1px solid var(--line);
+}
+.note b { color: var(--ink-2); font-weight: 600; }
+
+.scrollx { overflow-x: auto; margin: 0 -18px; padding: 0 18px; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 520px; }
+table.tbl th {
+  text-align: left; padding: 6px 10px 6px 0;
+  font-family: var(--f-sans); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .01em; color: var(--ink-3);
+  border-bottom: 1px solid var(--line-2); white-space: nowrap;
+}
+table.tbl td {
+  padding: 6px 10px 6px 0; border-bottom: 1px dotted var(--line-2);
+  vertical-align: baseline;
+}
+table.tbl td.n {
+  font-family: var(--f-mono); font-variant-numeric: tabular-nums;
+  font-weight: 600; color: var(--accent); white-space: nowrap;
+}
+table.tbl td.m { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.tbl td.s { font-size: 11.5px; color: var(--ink-3); }
+table.tbl tr:last-child td { border-bottom: 0; }
+
+.empty {
+  padding: 40px 0; text-align: center; color: var(--ink-3); font-size: 13.5px;
+}
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 22px 0 40px;
+  font-size: 11.5px; line-height: 1.6; color: var(--ink-3);
+}
+footer p { margin: 0 0 6px; max-width: 68ch; }
+footer b { color: var(--ink-2); font-weight: 600; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; padding-top: 18px; gap: 18px; }
+  .rail {
+    position: static; flex-direction: row; gap: 6px;
+    overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+  }
+  .rail a { white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; }
+  .rail a small, .rail hr, .rail p { display: none; }
+  .chips { margin-left: 0; }
+  .pri b { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media print {
+  .top-tools, .rail, .search { display: none !important; }
+  .top { position: static; }
+  body { background: #fff; }
+  .calc { break-inside: avoid; box-shadow: none; }
+  .main { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="shell">
+    <div class="top-a">
+      <div class="brand">
+        <b>시그니처 동물의료센터</b>
+        <span>Veterinary Clinical Calculators</span>
+      </div>
+      <div class="top-tools">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input id="q" type="search" placeholder="계산기 검색 (예: 수혈, Kt/V, CRI)" autocomplete="off">
+        </div>
+        <button class="icon-btn" id="themeBtn" type="button" title="라이트/다크 전환" aria-label="라이트/다크 전환">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+        </button>
+        <button class="icon-btn" id="printBtn" type="button" title="인쇄" aria-label="인쇄">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"></path><rect x="3" y="9" width="18" height="8" rx="2"></rect><path d="M6 15h12v6H6z"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div class="top-b">
+      <div class="pfield">
+        <label id="spLbl">종</label>
+        <div class="seg" role="group" aria-labelledby="spLbl">
+          <button type="button" data-sp="dog" aria-pressed="true">개</button>
+          <button type="button" data-sp="cat" aria-pressed="false">고양이</button>
+        </div>
+      </div>
+      <div class="pfield">
+        <label for="bw">체중</label>
+        <div class="wt">
+          <input id="bw" type="text" inputmode="decimal" value="10" aria-label="체중">
+          <select id="bwUnit" aria-label="체중 단위">
+            <option value="kg">kg</option>
+            <option value="lb">lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="main">
+    <nav class="rail" id="rail" aria-label="계산기 분류"></nav>
+    <div class="col" id="col"></div>
+  </div>
+  <footer>
+    <p><b>참고용 도구입니다.</b> 모든 결과는 담당 수의사의 임상 판단을 보조하기 위한 계산 결과이며, 환자의 상태·동반 질환·투여 중인 약물에 따라 반드시 개별적으로 검증한 뒤 적용하십시오. 특히 응급 약물 용량과 투석 처방은 투여 전 이중 확인을 권장합니다.</p>
+    <p>참조 기준: IRIS CKD Staging / AKI Grading Guidelines, Daugirdas 2세대 spKt/V, WSAVA Global Nutrition Guidelines, RECOVER CPR Guidelines. 임계값은 일반적으로 인용되는 범위이며 센터 프로토콜이 우선합니다.</p>
+    <p>시그니처 동물의료센터 · 혈액투석 신장비뇨기센터 / 응급중환자센터</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============ state ============ */
+  var S = { sp: "dog", bw: 10 };
+  try {
+    var saved = JSON.parse(localStorage.getItem("sig-vet-calc") || "null");
+    if (saved && saved.sp) { S.sp = saved.sp; S.bw = saved.bw || 10; }
+  } catch (e) {}
+  function persist() { try { localStorage.setItem("sig-vet-calc", JSON.stringify(S)); } catch (e) {} }
+
+  var isDog = function () { return S.sp === "dog"; };
+  var spName = function () { return isDog() ? "개" : "고양이"; };
+  var BV_PER_KG = function () { return isDog() ? 90 : 60; };   // 총 혈액량 mL/kg
+
+  /* ============ helpers ============ */
+  function sf(x, d) {
+    if (x === null || x === undefined || typeof x !== "number" || !isFinite(x)) return "—";
+    var a = Math.abs(x);
+    if (d === null || d === undefined) d = a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : a >= 0.1 ? 2 : 3;
+    return new Intl.NumberFormat("ko-KR", { minimumFractionDigits: 0, maximumFractionDigits: d }).format(x);
+  }
+  function num(v) { var x = parseFloat(String(v).replace(/,/g, "")); return isFinite(x) ? x : NaN; }
+  function ok(x) { return typeof x === "number" && isFinite(x) && x > 0; }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt !== undefined) n.textContent = txt;
+    return n;
+  }
+  function P(label, value, unit, tone) { return { label: label, value: value, unit: unit, tone: tone }; }
+  function R(label, value, unit) { return { label: label, value: value, unit: unit }; }
+  function F(tone, text) { return { tone: tone, text: text }; }
+  function needWeight() { return [F("warn", "상단 환자 바에 체중을 입력하면 계산됩니다.")]; }
+
+  /* ============ categories ============ */
+  var CATS = [
+    { id: "fluid", name: "수액 · 응급", eyebrow: "Fluids & Emergency" },
+    { id: "lyte",  name: "전해질 · 산염기", eyebrow: "Electrolytes & Acid-Base" },
+    { id: "drug",  name: "약물 · 용량", eyebrow: "Drug Dosing" },
+    { id: "misc",  name: "영양 · 일반", eyebrow: "Nutrition & General" },
+    { id: "renal", name: "신장 · 투석", eyebrow: "Nephrology & Dialysis" }
+  ];
+
+  /* ============ shared reference data ============ */
+  var CRI_PRESETS = {
+    custom:   { label: "직접 입력", dose: 1,    unit: "mgkghr", conc: 10,   hint: "" },
+    dopamine: { label: "도파민",       dose: 5,    unit: "mcgkgmin", conc: 40,   hint: "2–10 µg/kg/min · 40 mg/mL 원액" },
+    dobut:    { label: "도부타민",     dose: 5,    unit: "mcgkgmin", conc: 12.5, hint: "개 2–10, 고양이 1–5 µg/kg/min · 12.5 mg/mL" },
+    norepi:   { label: "노르에피네프린", dose: 0.2, unit: "mcgkgmin", conc: 1,   hint: "0.05–1 µg/kg/min · 1 mg/mL" },
+    fentanyl: { label: "펜타닐",       dose: 3,    unit: "mcgkghr",  conc: 0.05, hint: "2–5 µg/kg/hr · 50 µg/mL" },
+    ketamine: { label: "케타민",       dose: 5,    unit: "mcgkgmin", conc: 100,  hint: "2–10 µg/kg/min · 100 mg/mL" },
+    lido:     { label: "리도카인 (개)", dose: 40,  unit: "mcgkgmin", conc: 20,   hint: "25–50 µg/kg/min · 2% (20 mg/mL) · 고양이 주의" },
+    furo:     { label: "푸로세미드",   dose: 0.5,  unit: "mgkghr",   conc: 10,   hint: "0.1–1 mg/kg/hr · 10 mg/mL" },
+    metoclo:  { label: "메토클로프라마이드", dose: 1.5, unit: "mgkgday", conc: 5, hint: "1–2 mg/kg/day · 5 mg/mL" },
+    dilt:     { label: "딜티아젬",     dose: 5,    unit: "mcgkgmin", conc: 5,    hint: "1–10 µg/kg/min · 5 mg/mL" },
+    mannitol: { label: "만니톨 20%",   dose: 1,    unit: "mgkghr",   conc: 200,  hint: "볼루스 0.5–1 g/kg 20–30분, CRI는 프로토콜 확인" }
+  };
+  var CRI_UNITS = [
+    { v: "mcgkgmin", t: "µg/kg/min" },
+    { v: "mcgkghr",  t: "µg/kg/hr" },
+    { v: "mgkghr",   t: "mg/kg/hr" },
+    { v: "mgkgday",  t: "mg/kg/day" }
+  ];
+  function doseToMgPerHr(dose, unit, bw) {
+    if (unit === "mcgkgmin") return dose * bw * 60 / 1000;
+    if (unit === "mcgkghr")  return dose * bw / 1000;
+    if (unit === "mgkghr")   return dose * bw;
+    return dose * bw / 24; // mgkgday
+  }
+
+  var EMERG = [
+    { n: "에피네프린 (저용량)", c: "1 mg/mL (1:1000)", d: 0.01, u: "mg/kg", conc: 1, note: "IV/IO · 심정지 1차, 3–5분마다" },
+    { n: "에피네프린 (고용량)", c: "1 mg/mL", d: 0.1, u: "mg/kg", conc: 1, note: "장시간 CPR에서만 고려" },
+    { n: "아트로핀", c: "0.5 mg/mL", d: 0.04, u: "mg/kg", conc: 0.5, note: "IV/IO · 미주신경성 무수축·서맥" },
+    { n: "바소프레신", c: "20 U/mL", d: 0.8, u: "U/kg", conc: 20, note: "IV/IO · 에피네프린 대체 가능" },
+    { n: "날록손", c: "0.4 mg/mL", d: 0.04, u: "mg/kg", conc: 0.4, note: "오피오이드 역전" },
+    { n: "플루마제닐", c: "0.1 mg/mL", d: 0.01, u: "mg/kg", conc: 0.1, note: "벤조디아제핀 역전" },
+    { n: "리도카인", c: "2% (20 mg/mL)", d: null, dDog: 2, dCat: 0.25, u: "mg/kg", conc: 20, note: "심실빈맥 · 고양이는 저용량 서서히" },
+    { n: "아미오다론", c: "50 mg/mL", d: 5, u: "mg/kg", conc: 50, note: "제세동 불응성 VF" },
+    { n: "디아제팜", c: "5 mg/mL", d: 0.5, u: "mg/kg", conc: 5, note: "발작 · IV" },
+    { n: "미다졸람", c: "5 mg/mL", d: 0.2, u: "mg/kg", conc: 5, note: "발작 · IV/IM" },
+    { n: "프로포폴", c: "10 mg/mL", d: 4, u: "mg/kg", conc: 10, note: "효과 발현까지 적정 투여" },
+    { n: "푸로세미드", c: "10 mg/mL", d: 2, u: "mg/kg", conc: 10, note: "폐부종 · 신전성 탈수 배제 후" },
+    { n: "만니톨 20%", c: "200 mg/mL", d: 500, u: "mg/kg", conc: 200, note: "0.5 g/kg 20–30분 IV · 필터 라인" },
+    { n: "50% 포도당", c: "500 mg/mL", d: 250, u: "mg/kg", conc: 500, note: "0.5 mL/kg를 1:2–1:4 희석" },
+    { n: "10% 글루콘산칼슘", c: "100 mg/mL", d: 100, u: "mg/kg", conc: 100, note: "고칼륨혈증 심독성 · ECG 하에 서서히" },
+    { n: "탄산수소나트륨 8.4%", c: "1 mEq/mL", d: 1, u: "mEq/kg", conc: 1, note: "장시간 정지·중증 산증에 한해" }
+  ];
+
+  /* ============ calculators ============ */
+  var CALCS = [];
+
+  /* ---------- FLUIDS ---------- */
+  CALCS.push({
+    id: "fluid-plan", cat: "fluid", name: "수액 처방 계산기",
+    desc: "유지 요구량 + 탈수 결핍 + 지속 손실을 합산해 시간당 속도와 낙하 속도를 산출합니다.",
+    keys: "수액 fluid therapy 유지 탈수 dehydration 결핍 drip gtt 낙하",
+    inputs: [
+      { k: "method", label: "유지량 산출법", type: "select", def: "bw",
+        options: [{ v: "bw", t: "체중 기반 (개 60 · 고양이 50 mL/kg/day)" }, { v: "met", t: "대사 체중 (70 × BW^0.75 mL/day)" }, { v: "man", t: "직접 입력 (mL/kg/hr)" }] },
+      { k: "manRate", label: "직접 입력 속도", unit: "mL/kg/hr", def: 3, step: 0.5 },
+      { k: "dehyd", label: "탈수 정도", unit: "%", def: 5, step: 0.5 },
+      { k: "hrs", label: "결핍 보정 시간", unit: "hr", def: 12, step: 1 },
+      { k: "ongoing", label: "지속 손실 (구토·설사 등)", unit: "mL/day", def: 0, step: 10 },
+      { k: "gtt", label: "수액 세트", type: "select", def: "20",
+        options: [{ v: "10", t: "10 gtt/mL (성인용)" }, { v: "15", t: "15 gtt/mL" }, { v: "20", t: "20 gtt/mL" }, { v: "60", t: "60 gtt/mL (미세)" }] }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var maintDay;
+      if (v.method === "bw") maintDay = bw * (isDog() ? 60 : 50);
+      else if (v.method === "met") maintDay = 70 * Math.pow(bw, 0.75);
+      else maintDay = num(v.manRate) * bw * 24;
+
+      var deficit = bw * num(v.dehyd) * 10;
+      var hrs = Math.max(1, num(v.hrs));
+      var maintHr = maintDay / 24;
+      var defHr = deficit / hrs;
+      var onHr = num(v.ongoing) / 24;
+      var total = maintHr + defHr + onHr;
+      var perKg = total / bw;
+      var gtt = total * num(v.gtt) / 60;
+
+      var flags = [];
+      if (perKg > 6) flags.push(F("warn", "시간당 " + sf(perKg) + " mL/kg — 유지 속도의 2배를 넘습니다. 심장·신장 질환, 저알부민혈증 환자에서는 감량 및 빈번한 재평가가 필요합니다."));
+      if (!isDog() && perKg > 5) flags.push(F("warn", "고양이는 용량 과부하에 취약합니다. 호흡수·체중·청진을 4–6시간 간격으로 확인하십시오."));
+      if (perKg <= 6 && perKg >= 2) flags.push(F("good", "일반적인 입원 환자 수액 속도 범위(2–6 mL/kg/hr) 내입니다."));
+      flags.push(F("info", "결핍 보정 완료(" + sf(hrs, 0) + "시간) 후에는 유지 " + sf(maintHr) + " mL/hr + 지속 손실로 감속하십시오."));
+
+      return {
+        primary: [P("총 주입 속도", sf(total), "mL/hr"), P("체중당", sf(perKg), "mL/kg/hr"), P("낙하 속도", sf(gtt), "gtt/min")],
+        rows: [
+          R("유지량", sf(maintDay, 0) + " mL/day", "= " + sf(maintHr) + " mL/hr"),
+          R("탈수 결핍 총량", sf(deficit, 0), "mL"),
+          R("결핍 보정 속도", sf(defHr), "mL/hr"),
+          R("지속 손실", sf(onHr), "mL/hr"),
+          R("24시간 총 투여량", sf(total * 24, 0), "mL"),
+          R("낙하 간격", sf(60 / gtt, 1), "초당 1방울")
+        ],
+        flags: flags
+      };
+    },
+    note: "탈수 추정: 5% 경도(점막 건조, 피부 탄력 약간 저하) · 7% 중등도(피부 탄력 뚜렷한 저하, 안구 함몰 시작) · 10–12% 중증(쇼크 징후 동반). 5% 미만은 신체검사로 감지되지 않습니다."
+  });
+
+  CALCS.push({
+    id: "shock", cat: "fluid", name: "쇼크 수액 볼루스",
+    desc: "저혈량성 쇼크에서 제제별 볼루스 용량과 전량 소생 용량을 계산합니다.",
+    keys: "쇼크 shock 볼루스 bolus 콜로이드 colloid 고장성 hypertonic 소생",
+    inputs: [],
+    compute: function () {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var full = bw * (isDog() ? 85 : 52);
+      var q = full / 4;
+      var colloid = bw * (isDog() ? 5 : 2.5);
+      var hts = bw * (isDog() ? 4 : 3);
+      return {
+        primary: [P("1/4 볼루스", sf(q, 0), "mL"), P("전량 소생 용량", sf(full, 0), "mL")],
+        rows: [
+          R("등장성 결정질 (전량)", sf(full, 0) + " mL", isDog() ? "80–90 mL/kg" : "50–55 mL/kg"),
+          R("결정질 1/4 볼루스", sf(q, 0) + " mL", "15–20분 투여"),
+          R("합성 콜로이드 볼루스", sf(colloid, 0) + " mL", isDog() ? "5 mL/kg" : "2–3 mL/kg"),
+          R("7.2% 고장성 식염수", sf(hts, 0) + " mL", isDog() ? "4 mL/kg · 10–15분" : "2–4 mL/kg · 10–15분")
+        ],
+        flags: [
+          F("info", "1/4씩 나누어 투여하고 매 볼루스 후 심박수·혈압·점막·젖산을 재평가한 뒤 반복 여부를 결정하십시오."),
+          F("warn", "합성 콜로이드(HES)는 급성 신손상 및 응고장애 위험이 보고되어 있어 신장 질환 환자에서는 신중히 선택하십시오."),
+          F("crit", "심장성·폐색성 쇼크, 심각한 심장 질환, 두개내압 상승, 무뇨성 AKI에서는 전량 볼루스가 금기이거나 대폭 감량이 필요합니다.")
+        ]
+      };
+    },
+    note: "고장성 식염수는 탈수가 심하거나 고나트륨혈증이 있는 환자에게 사용하지 않으며, 투여 후 반드시 등장성 결정질로 이어서 보충합니다."
+  });
+
+  CALCS.push({
+    id: "freewater", cat: "fluid", name: "자유수분 결핍 · Na 교정 속도",
+    desc: "고나트륨/저나트륨혈증에서 결핍량과 안전한 교정 시간·속도를 계산합니다.",
+    keys: "자유수분 free water deficit 나트륨 sodium 고나트륨 저나트륨 hypernatremia hyponatremia 교정",
+    inputs: [
+      { k: "cur", label: "현재 Na", unit: "mEq/L", def: 170, step: 1 },
+      { k: "tgt", label: "목표 Na", unit: "mEq/L · 개 145 · 고양이 152", def: 148, step: 1 },
+      { k: "chron", label: "발생 경과", type: "select", def: "chronic",
+        options: [{ v: "chronic", t: "만성 / 불명 (48시간 초과)" }, { v: "acute", t: "급성 (48시간 이내 확인됨)" }] },
+      { k: "tbw", label: "총체수분 계수", unit: "× 체중", def: 0.6, step: 0.05 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var cur = num(v.cur), tgt = num(v.tgt), tbw = num(v.tbw);
+      if (!isFinite(cur) || !isFinite(tgt) || cur === tgt) return { flags: [F("info", "현재 Na와 목표 Na를 입력하십시오.")] };
+      var maxRate = v.chron === "acute" ? 1.0 : 0.5;
+      var delta = Math.abs(cur - tgt);
+      var hours = delta / maxRate;
+      var flags = [];
+
+      if (cur > tgt) {
+        var fwd = tbw * bw * (cur / tgt - 1);
+        var rate = fwd * 1000 / hours;
+        flags.push(F(v.chron === "acute" ? "info" : "warn", "교정 속도 상한 " + sf(maxRate, 1) + " mEq/L/hr (" + sf(maxRate * 24, 0) + " mEq/L/day). 이보다 빠르면 뇌부종 위험이 있습니다."));
+        flags.push(F("info", "자유수분은 유지 수액과 별도로 계산됩니다. 지속 손실이 있으면 추가 보충이 필요하며, 4–6시간마다 Na를 재측정해 속도를 조정하십시오."));
+        return {
+          primary: [P("자유수분 결핍", sf(fwd * 1000, 0), "mL", "warn"), P("최소 교정 시간", sf(hours, 0), "hr"), P("자유수분 속도", sf(rate, 0), "mL/hr")],
+          rows: [
+            R("Na 감소 목표", sf(delta, 0), "mEq/L"),
+            R("5% 포도당 (자유수분 100%)", sf(rate, 0), "mL/hr"),
+            R("0.45% 식염수 (자유수분 50%)", sf(rate * 2, 0), "mL/hr"),
+            R("시간당 허용 Na 변화", sf(maxRate, 1), "mEq/L"),
+            R("총체수분 추정", sf(tbw * bw, 1), "L")
+          ],
+          flags: flags
+        };
+      } else {
+        var need = tbw * bw * (tgt - cur);
+        var hts3 = need / 0.513;
+        flags.push(F("crit", "저나트륨혈증의 급속 교정은 삼투성 탈수초증후군을 유발할 수 있습니다. 24시간 내 " + sf(maxRate * 24, 0) + " mEq/L 이내로 제한하십시오."));
+        flags.push(F("info", "무증상 만성 저나트륨혈증은 원인 교정과 등장성 수액만으로 서서히 회복되는 경우가 많습니다. 고장성 식염수는 신경증상이 있을 때 한정합니다."));
+        return {
+          primary: [P("Na 부족량", sf(need, 0), "mEq", "warn"), P("최소 교정 시간", sf(hours, 0), "hr"), P("3% NaCl 필요량", sf(hts3, 0), "mL")],
+          rows: [
+            R("Na 상승 목표", sf(delta, 0), "mEq/L"),
+            R("3% NaCl 주입 속도", sf(hts3 / hours, 1), "mL/hr"),
+            R("0.9% NaCl 환산 (154 mEq/L)", sf(need / 0.154, 0), "mL"),
+            R("시간당 허용 Na 변화", sf(maxRate, 1), "mEq/L")
+          ],
+          flags: flags
+        };
+      }
+    },
+    note: "총체수분 계수는 성체 0.6, 신생·어린 동물 0.7, 비만 환자 0.5를 사용합니다. 교정 중에는 최소 4–6시간 간격으로 혈청 Na를 추적하십시오."
+  });
+
+  CALCS.push({
+    id: "kcl", cat: "fluid", name: "칼륨 보충 (Scott 슬라이딩 스케일)",
+    desc: "혈청 K에 따른 보충 농도와 최대 허용 수액 속도를 계산합니다.",
+    keys: "칼륨 potassium KCl 저칼륨 hypokalemia 보충 sliding scale",
+    inputs: [
+      { k: "k", label: "혈청 K", unit: "mEq/L", def: 2.8, step: 0.1 },
+      { k: "bag", label: "수액백 용량", unit: "mL", def: 1000, step: 100 },
+      { k: "rate", label: "계획 수액 속도", unit: "mL/hr", def: 40, step: 5 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var k = num(v.k);
+      var mEqL, band;
+      if (k >= 5.0)      { mEqL = 0;  band = "보충 불필요 — 정상 또는 고칼륨혈증"; }
+      else if (k >= 3.5) { mEqL = 20; band = "3.5–5.0 mEq/L"; }
+      else if (k >= 3.0) { mEqL = 30; band = "3.0–3.4 mEq/L"; }
+      else if (k >= 2.5) { mEqL = 40; band = "2.5–2.9 mEq/L"; }
+      else if (k >= 2.0) { mEqL = 60; band = "2.0–2.4 mEq/L"; }
+      else               { mEqL = 80; band = "2.0 mEq/L 미만"; }
+
+      if (mEqL === 0) {
+        return {
+          primary: [P("보충 불필요", "—", "")],
+          rows: [R("혈청 K", sf(k, 1), "mEq/L")],
+          flags: [F(k > 5.5 ? "crit" : "good", k > 5.5 ? "고칼륨혈증입니다. 칼륨을 함유하지 않은 수액을 사용하고 ECG·심전도 이상 여부를 확인하십시오." : "정상 범위입니다.")]
+        };
+      }
+
+      var totalMEq = mEqL * num(v.bag) / 1000;
+      var kclML = totalMEq / 2;                      // KCl 2 mEq/mL 기준
+      var maxRate = (0.5 * bw) / mEqL * 1000;        // 0.5 mEq/kg/hr 상한
+      var plan = num(v.rate);
+      var actual = mEqL * plan / 1000 / bw;
+
+      var flags = [];
+      if (plan > maxRate) flags.push(F("crit", "계획 속도 " + sf(plan, 0) + " mL/hr는 상한 " + sf(maxRate, 0) + " mL/hr를 초과합니다. 실제 " + sf(actual, 2) + " mEq/kg/hr가 투여되어 심정지 위험이 있습니다. 속도를 낮추거나 농도를 조정하십시오."));
+      else flags.push(F("good", "계획 속도에서 " + sf(actual, 2) + " mEq/kg/hr — 상한 0.5 mEq/kg/hr 이내입니다."));
+      flags.push(F("info", "K 보충에 반응하지 않으면 저마그네슘혈증을 의심하십시오. Mg 보정 없이는 저칼륨혈증이 교정되지 않는 경우가 많습니다."));
+
+      return {
+        primary: [P("보충 농도", sf(mEqL, 0), "mEq/L"), P("최대 수액 속도", sf(maxRate, 0), "mL/hr", plan > maxRate ? "crit" : "good")],
+        rows: [
+          R("해당 구간", band, ""),
+          R("수액백에 추가할 K", sf(totalMEq, 0), "mEq"),
+          R("KCl (2 mEq/mL) 용량", sf(kclML, 1), "mL"),
+          R("계획 속도에서 실투여량", sf(actual, 3), "mEq/kg/hr"),
+          R("허용 상한", "0.5", "mEq/kg/hr")
+        ],
+        flags: flags
+      };
+    },
+    note: "칼륨은 반드시 수액백에 희석해 균일하게 혼합한 뒤 투여하며, 절대 볼루스로 주지 않습니다. 무뇨·핍뇨 환자에서는 보충 전 요량을 확인하십시오."
+  });
+
+  CALCS.push({
+    id: "bicarb", cat: "fluid", name: "중탄산 결핍",
+    desc: "대사성 산증에서 필요한 NaHCO3 양과 초기 투여분을 계산합니다.",
+    keys: "중탄산 bicarbonate 산증 acidosis base deficit HCO3",
+    inputs: [
+      { k: "cur", label: "측정 HCO3", unit: "mEq/L", def: 10, step: 0.5 },
+      { k: "tgt", label: "목표 HCO3", unit: "mEq/L", def: 15, step: 0.5 },
+      { k: "f", label: "분포 계수", unit: "× 체중", def: 0.3, step: 0.05 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var d = num(v.tgt) - num(v.cur);
+      if (!(d > 0)) return { flags: [F("info", "목표 HCO3가 측정값보다 높아야 계산됩니다.")] };
+      var total = num(v.f) * bw * d;
+      var initial = total / 3;
+      return {
+        primary: [P("총 결핍량", sf(total, 1), "mEq"), P("초기 투여분 (1/3)", sf(initial, 1), "mEq")],
+        rows: [
+          R("8.4% NaHCO3 (1 mEq/mL) — 총량", sf(total, 1), "mL"),
+          R("8.4% NaHCO3 — 초기분", sf(initial, 1), "mL"),
+          R("잔여분 (수액에 희석, 4–6시간)", sf(total - initial, 1), "mEq"),
+          R("HCO3 상승 목표", sf(d, 1), "mEq/L")
+        ],
+        flags: [
+          F("warn", "초기 1/3만 20–30분에 걸쳐 천천히 정주하고, 나머지는 수액에 섞어 4–6시간에 나누어 투여한 뒤 혈액가스를 재평가하십시오."),
+          F("crit", "환기가 불충분하면 CO2가 축적되어 역설적 세포내 산증과 두개내 산증을 유발합니다. 환기 상태를 먼저 확인하십시오."),
+          F("info", "일반적으로 pH < 7.1 또는 HCO3 < 12 mEq/L이면서 수액·관류 개선에 반응하지 않는 경우에 한해 고려합니다. 칼슘 함유 수액과 같은 라인으로 투여하지 마십시오.")
+        ]
+      };
+    },
+    note: "젖산산증과 케톤산증은 원인 치료와 관류 회복만으로 대개 교정되며, 중탄산 투여는 저칼륨혈증·이온화 칼슘 감소·나트륨 부하를 동반합니다."
+  });
+
+  CALCS.push({
+    id: "transfusion", cat: "fluid", name: "수혈량 계산",
+    desc: "목표 PCV 도달에 필요한 혈액 제제 용량과 투여 속도를 산출합니다.",
+    keys: "수혈 transfusion 전혈 pRBC PCV 헤마토크릿 blood",
+    inputs: [
+      { k: "cur", label: "환자 현재 PCV", unit: "%", def: 12, step: 1 },
+      { k: "tgt", label: "목표 PCV", unit: "%", def: 25, step: 1 },
+      { k: "prod", label: "혈액 제제", type: "select", def: "wb",
+        options: [{ v: "wb", t: "전혈 (PCV ~40%)" }, { v: "prbc", t: "농축적혈구 (PCV ~65%)" }, { v: "cust", t: "직접 입력" }] },
+      { k: "donor", label: "제제 PCV", unit: "%", def: 40, step: 1 },
+      { k: "cardiac", label: "심장·신장 질환", type: "select", def: "no",
+        options: [{ v: "no", t: "없음 — 표준 속도" }, { v: "yes", t: "있음 — 감속 필요" }] }
+    ],
+    hook: function (k, v, set) {
+      if (k === "prod") { if (v.prod === "wb") set("donor", 40); else if (v.prod === "prbc") set("donor", 65); }
+    },
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var cur = num(v.cur), tgt = num(v.tgt), donor = num(v.donor);
+      if (!(tgt > cur)) return { flags: [F("info", "목표 PCV가 현재 PCV보다 높아야 합니다.")] };
+      var bv = bw * BV_PER_KG();
+      var vol = bw * BV_PER_KG() * (tgt - cur) / donor;
+      var maxRate = v.cardiac === "yes" ? 3 : (isDog() ? 10 : 5);
+      var startRate = bw * 0.5;
+      var runRate = bw * maxRate;
+      var hrs = vol / runRate;
+      var flags = [];
+      flags.push(F("info", "처음 15–30분은 " + sf(startRate, 1) + " mL/hr (0.25–1 mL/kg/hr)로 시작하고, 급성 용혈·발열·구토 등 반응이 없으면 " + sf(runRate, 0) + " mL/hr까지 올립니다."));
+      if (vol / bv > 0.25) flags.push(F("warn", "필요량이 환자 총 혈액량의 " + sf(vol / bv * 100, 0) + "%에 해당합니다. 대량 수혈에 따른 응고장애·저칼슘혈증·저체온을 감시하십시오."));
+      if (hrs > 4) flags.push(F("crit", "예상 소요 " + sf(hrs, 1) + "시간 — 개봉 후 4시간을 초과하면 세균 증식 위험이 있습니다. 분할 투여하거나 속도를 재검토하십시오."));
+      else flags.push(F("good", "예상 소요 " + sf(hrs, 1) + "시간 — 4시간 이내 완료 가능합니다."));
+      flags.push(F("info", "고양이는 수혈 전 반드시 혈액형 검사가 필요합니다(AB형 자연항체). 개도 2회차 이상이면 교차적합시험을 시행하십시오."));
+
+      return {
+        primary: [P("필요 수혈량", sf(vol, 0), "mL"), P("본 투여 속도", sf(runRate, 0), "mL/hr"), P("예상 소요", sf(hrs, 1), "hr")],
+        rows: [
+          R("환자 총 혈액량", sf(bv, 0), "mL (" + BV_PER_KG() + " mL/kg)"),
+          R("PCV 상승 목표", sf(tgt - cur, 0), "%p"),
+          R("체중당 수혈량", sf(vol / bw, 1), "mL/kg"),
+          R("초기 시험 속도 (15–30분)", sf(startRate, 1), "mL/hr"),
+          R("최대 속도 기준", sf(maxRate, 1), "mL/kg/hr")
+        ],
+        flags: flags
+      };
+    },
+    note: "경험칙: 전혈 2 mL/kg 또는 농축적혈구 1 mL/kg가 PCV를 약 1% 상승시킵니다. 수혈 중에는 15분간, 이후 30분마다 체온·심박수·호흡수·점막색을 기록하십시오."
+  });
+
+  CALCS.push({
+    id: "donor", cat: "fluid", name: "공혈 채혈량",
+    desc: "공혈 동물에서 안전하게 채취 가능한 혈액량과 항응고제 양을 계산합니다.",
+    keys: "공혈 donor 채혈 헌혈 CPDA 항응고",
+    inputs: [
+      { k: "perkg", label: "채혈 기준", unit: "mL/kg", def: 16, step: 1 },
+      { k: "fluid", label: "채혈 후 수액 보충", type: "select", def: "yes",
+        options: [{ v: "yes", t: "예 — 채혈량의 2–3배 결정질" }, { v: "no", t: "아니오" }] }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var lim = isDog() ? 20 : 12;
+      var perkg = Math.min(num(v.perkg), lim);
+      var vol = bw * perkg;
+      var acd = vol / 9;      // 항응고제 1 : 혈액 9
+      var bv = bw * BV_PER_KG();
+      var flags = [];
+      if (num(v.perkg) > lim) flags.push(F("crit", spName() + "의 1회 안전 채혈 상한은 약 " + lim + " mL/kg입니다. 입력값을 상한으로 제한해 계산했습니다."));
+      flags.push(F("info", "채혈량은 총 혈액량의 " + sf(vol / bv * 100, 0) + "%입니다. 채혈 간격은 최소 3–4주를 유지하십시오."));
+      if (v.fluid === "yes") flags.push(F("good", "채혈 직후 결정질 " + sf(vol * 2, 0) + "–" + sf(vol * 3, 0) + " mL를 투여해 혈량을 회복시키십시오."));
+      flags.push(F("warn", "공혈 전 PCV(개 ≥40%, 고양이 ≥35%), 체중(개 ≥25 kg, 고양이 ≥4 kg), 감염성 질환 스크리닝을 확인하십시오."));
+      return {
+        primary: [P("채혈 가능량", sf(vol, 0), "mL"), P("항응고제 (CPDA-1)", sf(acd, 1), "mL")],
+        rows: [
+          R("적용 기준", sf(perkg, 0) + " mL/kg", "상한 " + lim + " mL/kg"),
+          R("총 혈액량", sf(bv, 0), "mL"),
+          R("채혈 후 보충 수액", sf(vol * 2, 0) + "–" + sf(vol * 3, 0), "mL"),
+          R("최종 채혈백 총량", sf(vol + acd, 0), "mL")
+        ],
+        flags: flags
+      };
+    },
+    note: "항응고제는 혈액 9 mL당 1 mL(CPDA-1) 비율로 계산했습니다. 채혈 백의 규격 항응고제 용량과 실제 채혈량이 맞지 않으면 초과분을 제거해야 응고 또는 희석 오차를 피할 수 있습니다."
+  });
+
+  CALCS.push({
+    id: "oxy", cat: "fluid", name: "산소화 지표 (P/F · A-a)",
+    desc: "동맥혈가스로 산소화 장애 정도를 평가합니다.",
+    keys: "산소 oxygen PaO2 FiO2 P/F ratio A-a gradient ARDS 산소화",
+    inputs: [
+      { k: "pao2", label: "PaO₂", unit: "mmHg", def: 90, step: 1 },
+      { k: "fio2", label: "FiO₂", unit: "0.21 – 1.0", def: 0.21, step: 0.01 },
+      { k: "paco2", label: "PaCO₂", unit: "mmHg", def: 35, step: 1 },
+      { k: "patm", label: "대기압", unit: "mmHg", def: 760, step: 5 }
+    ],
+    compute: function (v) {
+      var pao2 = num(v.pao2), fio2 = num(v.fio2), paco2 = num(v.paco2), patm = num(v.patm);
+      if (!ok(pao2) || !ok(fio2)) return { flags: [F("info", "PaO₂와 FiO₂를 입력하십시오.")] };
+      var pf = pao2 / fio2;
+      var pAO2 = fio2 * (patm - 47) - paco2 / 0.8;
+      var aa = pAO2 - pao2;
+      var tone, txt;
+      if (pf >= 400)      { tone = "good"; txt = "정상 범위의 산소화입니다."; }
+      else if (pf >= 300) { tone = "info"; txt = "경도 산소화 장애 — 추세를 관찰하십시오."; }
+      else if (pf >= 200) { tone = "warn"; txt = "중등도 장애 — 급성 폐손상(ALI)에 해당하는 범위입니다."; }
+      else if (pf >= 100) { tone = "crit"; txt = "중증 장애 — ARDS 범주. 산소 보충 상향 및 환기 보조를 검토하십시오."; }
+      else                { tone = "crit"; txt = "매우 중증 — 기계 환기 적응증을 즉시 평가하십시오."; }
+      var flags = [F(tone, "P/F " + sf(pf, 0) + " — " + txt)];
+      if (aa > 25) flags.push(F("warn", "A-a 차이 " + sf(aa, 0) + " mmHg — 확산 장애, 환기·관류 불균형 또는 션트를 시사합니다."));
+      else if (fio2 <= 0.22) flags.push(F("good", "실내공기 기준 A-a 차이 " + sf(aa, 0) + " mmHg — 정상 범위(10–15 mmHg 이하)입니다."));
+      if (paco2 > 50) flags.push(F("crit", "PaCO₂ " + sf(paco2, 0) + " mmHg — 저환기가 동반되어 있습니다."));
+      return {
+        primary: [P("P/F 비", sf(pf, 0), "", tone), P("A-a 차이", sf(aa, 0), "mmHg")],
+        rows: [
+          R("폐포 산소분압 PAO₂", sf(pAO2, 0), "mmHg"),
+          R("FiO₂", sf(fio2 * 100, 0), "%"),
+          R("판정 기준", "정상 >400 · ALI <300 · ARDS <200", "")
+        ],
+        flags: flags
+      };
+    },
+    note: "호흡지수(A-a/PaO₂)와 함께 해석하면 산소 보충 중인 환자에서 더 안정적입니다. 해수면 기준 대기압 760 mmHg, 수증기압 47 mmHg, 호흡지수 0.8을 적용했습니다."
+  });
+
+  /* ---------- NEPHROLOGY ---------- */
+  CALCS.push({
+    id: "iris-ckd", cat: "renal", name: "IRIS 만성신장병 스테이징",
+    desc: "크레아티닌 · SDMA로 병기를 판정하고 UPC · 혈압으로 하위 분류하며, 병기별 인 목표를 제시합니다.",
+    keys: "IRIS CKD 만성신장병 스테이징 staging 크레아티닌 creatinine SDMA UPC 단백뇨 혈압 인 phosphorus",
+    inputs: [
+      { k: "cr", label: "크레아티닌", unit: "", def: 2.0, step: 0.1 },
+      { k: "crU", label: "단위", type: "select", def: "mgdl",
+        options: [{ v: "mgdl", t: "mg/dL" }, { v: "umol", t: "µmol/L" }] },
+      { k: "sdma", label: "SDMA", unit: "µg/dL · 선택", def: 0, step: 1 },
+      { k: "upc", label: "UPC", unit: "선택", def: 0, step: 0.1 },
+      { k: "sbp", label: "수축기 혈압", unit: "mmHg · 선택", def: 0, step: 5 },
+      { k: "p", label: "혈청 인", unit: "mg/dL · 선택", def: 0, step: 0.1 }
+    ],
+    compute: function (v) {
+      var cr = num(v.cr);
+      if (v.crU === "umol") cr = cr / 88.4;
+      if (!ok(cr)) return { flags: [F("info", "크레아티닌 값을 입력하십시오.")] };
+      var dog = isDog();
+      var stage, tone;
+      if (dog) {
+        if (cr < 1.4) { stage = 1; } else if (cr <= 2.8) { stage = 2; } else if (cr <= 5.0) { stage = 3; } else { stage = 4; }
+      } else {
+        if (cr < 1.6) { stage = 1; } else if (cr <= 2.8) { stage = 2; } else if (cr <= 5.0) { stage = 3; } else { stage = 4; }
+      }
+      tone = stage === 1 ? "good" : stage === 2 ? "info" : stage === 3 ? "warn" : "crit";
+
+      var sdma = num(v.sdma), sdmaStage = null, sdmaTxt = "—";
+      if (ok(sdma)) {
+        if (sdma < 18) sdmaStage = 1; else if (sdma <= 35) sdmaStage = 2; else if (sdma <= 54) sdmaStage = 3; else sdmaStage = 4;
+        sdmaTxt = sf(sdma, 0) + " µg/dL → Stage " + sdmaStage;
+      }
+
+      var upc = num(v.upc), upcTxt = "—", upcTone = null;
+      if (ok(upc)) {
+        var b1 = dog ? 0.2 : 0.2, b2 = dog ? 0.5 : 0.4;
+        if (upc < b1) { upcTxt = "비단백뇨 (NP)"; upcTone = "good"; }
+        else if (upc <= b2) { upcTxt = "경계 단백뇨 (BP)"; upcTone = "warn"; }
+        else { upcTxt = "단백뇨 (P)"; upcTone = "crit"; }
+        upcTxt = sf(upc, 2) + " — " + upcTxt;
+      }
+
+      var sbp = num(v.sbp), sbpTxt = "—", sbpTone = null;
+      if (ok(sbp)) {
+        if (sbp < 140) { sbpTxt = "정상혈압 · 위험 최소"; sbpTone = "good"; }
+        else if (sbp < 160) { sbpTxt = "고혈압 전단계 · 위험 낮음"; sbpTone = "info"; }
+        else if (sbp < 180) { sbpTxt = "고혈압 · 위험 중등도"; sbpTone = "warn"; }
+        else { sbpTxt = "중증 고혈압 · 위험 높음"; sbpTone = "crit"; }
+        sbpTxt = sf(sbp, 0) + " mmHg — " + sbpTxt;
+      }
+
+      var pTargets = { 1: [2.7, 4.6], 2: [2.7, 4.6], 3: [2.7, 5.0], 4: [2.7, 6.0] };
+      var pt = pTargets[stage];
+      var pVal = num(v.p);
+
+      var flags = [];
+      flags.push(F(tone, "IRIS CKD Stage " + stage + " — 크레아티닌 " + sf(cr, 2) + " mg/dL (" + sf(cr * 88.4, 0) + " µmol/L), " + spName() + " 기준."));
+      if (sdmaStage !== null && sdmaStage !== stage) {
+        flags.push(F("warn", "SDMA 기준 병기(" + sdmaStage + ")가 크레아티닌 기준(" + stage + ")과 다릅니다. 근육량이 적은 환자에서는 크레아티닌이 신기능을 과대평가할 수 있어, 더 높은 병기에 준해 치료를 고려하십시오."));
+      }
+      if (ok(upc)) {
+        var needsTx = dog ? upc > 0.5 : upc > 0.4;
+        if (needsTx) flags.push(F("crit", "지속적 단백뇨(UPC " + sf(upc, 2) + ")는 신기능 악화와 생존기간 단축의 독립 위험인자입니다. 활동성 요침사·감염을 배제한 뒤 ACE 억제제 또는 ARB, 신장 처방식을 검토하십시오."));
+      }
+      if (ok(sbp)) {
+        if (sbp >= 160) flags.push(F("crit", "수축기 혈압 " + sf(sbp, 0) + " mmHg — 표적장기 손상 위험이 있어 항고혈압 치료 적응증입니다(고양이 암로디핀, 개 텔미사르탄/암로디핀 등). 안저·신경증상을 확인하십시오."));
+        else if (sbp >= 150) flags.push(F("warn", "표적장기 손상(망막병증, 좌심실 비대, 신경증상)이 확인되면 150 mmHg 이상에서도 치료를 시작합니다."));
+      }
+      if (ok(pVal)) {
+        if (pVal > pt[1]) flags.push(F("warn", "혈청 인 " + sf(pVal, 1) + " mg/dL — Stage " + stage + " 목표(" + pt[0] + "–" + pt[1] + " mg/dL)를 초과합니다. 신장 처방식 우선, 4–6주 후 재평가에도 높으면 인 결합제를 추가하십시오."));
+        else flags.push(F("good", "혈청 인 " + sf(pVal, 1) + " mg/dL — Stage " + stage + " 목표 범위(" + pt[0] + "–" + pt[1] + ") 내입니다."));
+      }
+      flags.push(F("info", "병기는 수분 상태가 안정된 상태에서 2주 이상 간격으로 2회 이상 측정한 값으로 판정합니다. 단 1회 측정으로 병기를 확정하지 마십시오."));
+
+      return {
+        badge: { text: "IRIS CKD Stage " + stage, tone: tone },
+        primary: [P("크레아티닌", sf(cr, 2), "mg/dL", tone), P("= " + sf(cr * 88.4, 0), "", "µmol/L")],
+        rows: [
+          R("SDMA 기준 병기", sdmaTxt, ""),
+          R("단백뇨 하위분류", upcTxt, ""),
+          R("혈압 하위분류", sbpTxt, ""),
+          R("Stage " + stage + " 인 목표", pt[0] + "–" + pt[1], "mg/dL"),
+          R("적용 기준", spName() + " · IRIS 2023", "")
+        ],
+        flags: flags
+      };
+    },
+    note: "병기 경계값 — 개: Stage 1 <1.4, 2 = 1.4–2.8, 3 = 2.9–5.0, 4 >5.0 mg/dL · 고양이: Stage 1 <1.6, 2 = 1.6–2.8, 3 = 2.9–5.0, 4 >5.0 mg/dL. SDMA: <18 / 18–35 / 36–54 / >54 µg/dL."
+  });
+
+  CALCS.push({
+    id: "iris-aki", cat: "renal", name: "IRIS 급성신손상 등급",
+    desc: "크레아티닌 변화와 요량으로 AKI 등급 및 핍뇨 하위분류를 판정합니다.",
+    keys: "IRIS AKI 급성신손상 등급 grading 요량 핍뇨 무뇨 oliguria",
+    inputs: [
+      { k: "cr", label: "현재 크레아티닌", unit: "", def: 3.0, step: 0.1 },
+      { k: "crU", label: "단위", type: "select", def: "mgdl",
+        options: [{ v: "mgdl", t: "mg/dL" }, { v: "umol", t: "µmol/L" }] },
+      { k: "base", label: "기저 크레아티닌", unit: "동일 단위 · 선택", def: 0, step: 0.1 },
+      { k: "uo", label: "요량", unit: "mL/kg/hr", def: 1.0, step: 0.1 },
+      { k: "rrt", label: "신대체요법", type: "select", def: "no",
+        options: [{ v: "no", t: "시행하지 않음" }, { v: "yes", t: "시행 중 (하위분류 D)" }] }
+    ],
+    compute: function (v) {
+      var cr = num(v.cr), base = num(v.base);
+      if (v.crU === "umol") { cr = cr / 88.4; if (ok(base)) base = base / 88.4; }
+      if (!ok(cr)) return { flags: [F("info", "크레아티닌 값을 입력하십시오.")] };
+      var g, tone;
+      if (cr < 1.6)      { g = "I";   tone = "info"; }
+      else if (cr <= 2.5){ g = "II";  tone = "warn"; }
+      else if (cr <= 5.0){ g = "III"; tone = "crit"; }
+      else if (cr <= 10) { g = "IV";  tone = "crit"; }
+      else               { g = "V";   tone = "crit"; }
+
+      var uo = num(v.uo);
+      var sub = uo < 0.1 ? "무뇨 (A)" : uo < 1.0 ? "핍뇨 (O)" : "비핍뇨 (NO)";
+      var subTone = uo < 0.1 ? "crit" : uo < 1.0 ? "warn" : "good";
+      if (v.rrt === "yes") sub += " · 신대체요법 시행 (D)";
+
+      var flags = [];
+      var grades = { "I": "비질소혈증성 AKI — 크레아티닌은 정상 범위이나 신손상 근거(핍뇨, 요침사 이상, 바이오마커 상승, 진행성 크레아티닌 상승)가 있는 상태", "II": "경도 질소혈증성 AKI", "III": "중등도 이상 질소혈증성 AKI", "IV": "중증 질소혈증성 AKI", "V": "최중증 질소혈증성 AKI" };
+      flags.push(F(tone, "IRIS AKI Grade " + g + " — " + grades[g] + "."));
+      if (ok(base)) {
+        var d = cr - base;
+        if (d >= 0.3) flags.push(F("crit", "48시간 이내 크레아티닌이 " + sf(d, 2) + " mg/dL 상승했다면 AKI 진단 기준(≥0.3 mg/dL)을 충족합니다. 절대값이 정상 범위여도 진행성 손상으로 취급하십시오."));
+        else flags.push(F("good", "기저 대비 상승폭 " + sf(d, 2) + " mg/dL — AKI 진단 역치(0.3 mg/dL) 미만입니다."));
+      }
+      if (uo < 0.1) flags.push(F("crit", "무뇨 상태입니다. 혈량·요로 폐색·요누출을 즉시 배제하고, 수액 반응이 없으면 신대체요법 적응을 검토하십시오."));
+      else if (uo < 1.0) flags.push(F("warn", "요량 " + sf(uo, 2) + " mL/kg/hr — 핍뇨 범위입니다. 6시간 이상 지속되면 용량 과부하 위험을 고려해 수액을 재계산하십시오."));
+      if (g === "IV" || g === "V") flags.push(F("crit", "생명을 위협하는 고칼륨혈증, 중증 산증, 용량 과부하, 요독성 뇌증, 무뇨가 동반되면 내과 치료의 반응을 기다리지 말고 혈액투석·CRRT를 조기에 적용하십시오."));
+
+      return {
+        badge: { text: "IRIS AKI Grade " + g, tone: tone },
+        primary: [P("크레아티닌", sf(cr, 2), "mg/dL", tone), P("요량", sf(uo, 2), "mL/kg/hr", subTone)],
+        rows: [
+          R("하위분류", sub, ""),
+          R("µmol/L 환산", sf(cr * 88.4, 0), "µmol/L"),
+          R("등급 경계", "I <1.6 · II 1.7–2.5 · III 2.6–5.0 · IV 5.1–10.0 · V >10.0", "mg/dL")
+        ],
+        flags: flags
+      };
+    },
+    note: "AKI 등급은 하루에도 변할 수 있으므로 반복 측정하며 추세로 판단합니다. 만성신장병 위에 급성 악화가 겹친 경우(AoC)도 동일한 등급 체계로 기술합니다."
+  });
+
+  CALCS.push({
+    id: "ktv", cat: "renal", name: "투석 적정성 (Kt/V · URR)",
+    desc: "Daugirdas 2세대 식으로 single-pool Kt/V와 요소 감소율을 계산합니다.",
+    keys: "KtV Kt/V URR 투석 적정성 dialysis adequacy 요소감소율 BUN Daugirdas 불균형증후군",
+    inputs: [
+      { k: "pre", label: "투석 전 BUN", unit: "mg/dL", def: 120, step: 1 },
+      { k: "post", label: "투석 후 BUN", unit: "mg/dL", def: 45, step: 1 },
+      { k: "t", label: "세션 시간", unit: "hr", def: 4, step: 0.25 },
+      { k: "uf", label: "초여과량", unit: "L", def: 0.3, step: 0.05 },
+      { k: "wpost", label: "투석 후 체중", unit: "kg (비우면 상단 체중)", def: 0, step: 0.1 },
+      { k: "session", label: "세션 회차", type: "select", def: "first",
+        options: [{ v: "first", t: "초회 (1–3회차)" }, { v: "maint", t: "유지 투석" }] }
+    ],
+    compute: function (v) {
+      var pre = num(v.pre), post = num(v.post), t = num(v.t), uf = num(v.uf);
+      var w = ok(num(v.wpost)) ? num(v.wpost) : S.bw;
+      if (!ok(pre) || !ok(post) || !ok(t) || !ok(w)) return { flags: [F("info", "투석 전후 BUN, 세션 시간, 체중을 입력하십시오.")] };
+      if (post >= pre) return { flags: [F("crit", "투석 후 BUN이 투석 전보다 높습니다. 채혈 시점과 검체를 확인하십시오.")] };
+      var Rr = post / pre;
+      var urr = (1 - Rr) * 100;
+      var ktv = -Math.log(Rr - 0.008 * t) + (4 - 3.5 * Rr) * (uf / w);
+      var simple = -Math.log(Rr);
+
+      var flags = [];
+      if (v.session === "first") {
+        if (urr > 50) flags.push(F("crit", "초회 세션에서 URR " + sf(urr, 0) + "% — 요소 제거가 과도합니다. 투석 불균형 증후군(구토, 진전, 발작, 혼미) 위험이 높으므로 다음 세션은 혈류 속도·투석 시간·투석기 표면적을 줄여 목표 제거율을 낮추십시오."));
+        else flags.push(F("good", "초회 세션 URR " + sf(urr, 0) + "% — 점진적 제거 전략에 부합합니다. 회차를 거듭하며 단계적으로 상향하십시오."));
+        flags.push(F("info", "초회 투석은 '충분히'가 아니라 '천천히'가 목표입니다. 요소 농도를 급격히 낮추면 뇌부종이 발생할 수 있습니다."));
+      } else {
+        if (ktv >= 1.2) flags.push(F("good", "유지 투석 spKt/V " + sf(ktv, 2) + " — 일반적으로 인용되는 적정 목표를 충족합니다."));
+        else if (ktv >= 0.8) flags.push(F("warn", "spKt/V " + sf(ktv, 2) + " — 목표에 다소 못 미칩니다. 세션 시간 연장, 혈류 속도 상향, 투석기 교체, 혈관 접근로 재순환 여부를 점검하십시오."));
+        else flags.push(F("crit", "spKt/V " + sf(ktv, 2) + " — 투석량이 부족합니다. 카테터 기능 부전이나 재순환을 먼저 의심하십시오."));
+      }
+      flags.push(F("info", "투석 후 BUN은 요소 반동을 피하기 위해 혈류를 낮추고(예: 50–100 mL/min) 15–30초 뒤, 또는 종료 후 지연 채혈 프로토콜에 맞춰 채취해야 합니다."));
+
+      return {
+        primary: [P("URR", sf(urr, 1), "%"), P("spKt/V", sf(ktv, 2), ""), P("요소 감소비 R", sf(Rr, 2), "")],
+        rows: [
+          R("투석 전 → 후 BUN", sf(pre, 0) + " → " + sf(post, 0), "mg/dL"),
+          R("제거된 BUN 농도", sf(pre - post, 0), "mg/dL"),
+          R("세션 시간", sf(t, 2), "hr"),
+          R("초여과량 / 체중", sf(uf, 2) + " L / " + sf(w, 1) + " kg", ""),
+          R("단순 대수 Kt/V (−ln R)", sf(simple, 2), "UF 미보정")
+        ],
+        flags: flags
+      };
+    },
+    note: "spKt/V = −ln(R − 0.008 × t) + (4 − 3.5 × R) × UF/W (Daugirdas 2세대). 수의 혈액투석에서는 초회 세션의 요소 제거를 의도적으로 제한하고 회차에 따라 점진적으로 늘리는 전략이 표준이며, 목표치는 센터 프로토콜을 따릅니다."
+  });
+
+  CALCS.push({
+    id: "ecv", cat: "renal", name: "체외순환 회로 용적 안전성",
+    desc: "회로 용적이 환자 혈액량에서 차지하는 비율을 계산해 프라이밍 방식을 판단합니다.",
+    keys: "체외순환 ECV 회로 프라이밍 priming 혈액량 dialyzer 투석 혈액투석 투석기 소형견 고양이",
+    inputs: [
+      { k: "circuit", label: "회로 총 용적", unit: "mL (투석기 + 튜빙)", def: 60, step: 5 },
+      { k: "hct", label: "환자 Hct", unit: "% · 선택", def: 30, step: 1 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var ecv = num(v.circuit);
+      if (!ok(ecv)) return { flags: [F("info", "회로 용적을 입력하십시오.")] };
+      var bv = bw * BV_PER_KG();
+      var pct = ecv / bv * 100;
+      var tone, prime, msg;
+      if (pct < 10) { tone = "good"; prime = "결정질 프라이밍 가능"; msg = "회로 용적이 혈액량의 10% 미만으로 일반적으로 결정질 프라이밍이 가능합니다."; }
+      else if (pct <= 20) { tone = "warn"; prime = "콜로이드·알부민 프라이밍 고려"; msg = "회로 용적이 혈액량의 " + sf(pct, 0) + "%입니다. 개시 시 저혈압 위험이 있어 콜로이드 프라이밍, 저속 개시, 승압 대비를 권장합니다."; }
+      else { tone = "crit"; prime = "전혈 프라이밍 권장"; msg = "회로 용적이 혈액량의 " + sf(pct, 0) + "%에 달합니다. 전혈 프라이밍 없이 개시하면 급성 저혈량 쇼크가 발생할 수 있습니다."; }
+
+      var hct = num(v.hct);
+      var rows = [
+        R("환자 총 혈액량", sf(bv, 0), "mL (" + BV_PER_KG() + " mL/kg)"),
+        R("회로 용적 비율", sf(pct, 1), "%"),
+        R("혈액량의 10% (안전 기준)", sf(bv * 0.1, 0), "mL"),
+        R("혈액량의 20% (전혈 프라임 기준)", sf(bv * 0.2, 0), "mL")
+      ];
+      if (ok(hct)) rows.push(R("회로 내 적혈구량", sf(ecv * hct / 100, 1), "mL"));
+
+      return {
+        badge: { text: prime, tone: tone },
+        primary: [P("회로 / 혈액량", sf(pct, 1), "%", tone), P("환자 혈액량", sf(bv, 0), "mL")],
+        rows: rows,
+        flags: [
+          F(tone, msg),
+          F("info", "소형견·고양이에서는 소용적 투석기와 소아용 튜빙 세트 선택이 회로 용적을 결정합니다. 종료 시 회로 반환(rinse-back) 용량도 수액 수지에 포함시키십시오."),
+          F("warn", "전혈 프라이밍 시에는 저체온, 시트르산 축적에 의한 이온화 칼슘 저하, 칼륨 부하를 함께 감시하십시오.")
+        ]
+      };
+    },
+    note: "혈액량 추정치는 개 90 mL/kg, 고양이 60 mL/kg를 적용했습니다. 실제 임계값은 환자의 심혈관 예비능과 개시 프로토콜에 따라 조정하십시오."
+  });
+
+  CALCS.push({
+    id: "ufr", cat: "renal", name: "초여과 목표 · 초여과율",
+    desc: "제거해야 할 총 수분량과 시간당 초여과율(mL/kg/hr)을 산출합니다.",
+    keys: "초여과 투석 혈액투석 UF ultrafiltration UFR 건체중 dry weight 제수 저혈압",
+    inputs: [
+      { k: "dry", label: "목표(건) 체중", unit: "kg", def: 9.5, step: 0.1 },
+      { k: "t", label: "세션 시간", unit: "hr", def: 4, step: 0.25 },
+      { k: "infus", label: "세션 중 투여 수액·약물", unit: "mL", def: 0, step: 10 },
+      { k: "rinse", label: "회로 반환 세척액", unit: "mL", def: 0, step: 10 }
+    ],
+    compute: function (v) {
+      var bw = S.bw, dry = num(v.dry), t = num(v.t);
+      if (!ok(bw)) return { flags: needWeight() };
+      if (!ok(t)) return { flags: [F("info", "세션 시간을 입력하십시오.")] };
+      var excess = (bw - dry) * 1000;
+      var total = excess + num(v.infus) + num(v.rinse);
+      var ufr = total / bw / t;
+      var flags = [];
+      if (excess < 0) flags.push(F("warn", "현재 체중이 목표 체중보다 낮습니다. 건체중 재평가가 필요하며, 이 상태에서 초여과는 저혈압을 유발합니다."));
+      if (ufr > 20) flags.push(F("crit", "초여과율 " + sf(ufr, 1) + " mL/kg/hr — 매우 높습니다. 세션 중 저혈압, 경련, 잔여 신기능 손상 위험이 큽니다. 세션 시간을 연장하거나 목표를 분할하십시오."));
+      else if (ufr > 10) flags.push(F("warn", "초여과율 " + sf(ufr, 1) + " mL/kg/hr — 주의 구간입니다. 혈압을 15–30분 간격으로 측정하고 필요 시 순차적 초여과나 목표 하향을 검토하십시오."));
+      else flags.push(F("good", "초여과율 " + sf(ufr, 1) + " mL/kg/hr — 일반적으로 내약성이 양호한 범위입니다."));
+      flags.push(F("info", "세션 중 투여한 수액·약물과 회로 반환 세척액은 모두 제거 목표에 더해야 실제 체중 감소 목표에 도달합니다."));
+      return {
+        primary: [P("총 초여과 목표", sf(total, 0), "mL"), P("초여과율", sf(ufr, 1), "mL/kg/hr", ufr > 20 ? "crit" : ufr > 10 ? "warn" : "good"), P("시간당 UF", sf(total / t, 0), "mL/hr")],
+        rows: [
+          R("체중 초과분", sf(excess, 0), "mL (" + sf(bw, 1) + " → " + sf(dry, 1) + " kg)"),
+          R("세션 중 투여량", sf(num(v.infus), 0), "mL"),
+          R("회로 반환 세척액", sf(num(v.rinse), 0), "mL"),
+          R("세션 시간", sf(t, 2), "hr")
+        ],
+        flags: flags
+      };
+    },
+    note: "건체중은 부종·복수·흉수가 없고 혈압이 안정된 상태의 체중으로, 세션마다 재평가합니다. 세션 중 저혈압이 반복되면 초여과율 감량, 등장성 볼루스, 투석액 나트륨·온도 조정을 검토하십시오."
+  });
+
+  CALCS.push({
+    id: "crrt", cat: "renal", name: "CRRT 처방 (배액량 · 여과분율)",
+    desc: "지속적 신대체요법의 배액량 용량과 필터 응고 위험 지표인 여과분율을 계산합니다.",
+    keys: "CRRT 투석 지속신대체요법 배액량 effluent 여과분율 filtration fraction CVVH CVVHDF 혈류속도 항응고",
+    inputs: [
+      { k: "qd", label: "투석액 유량 Qd", unit: "mL/hr", def: 300, step: 25 },
+      { k: "qr", label: "보충액 유량 Qr", unit: "mL/hr", def: 200, step: 25 },
+      { k: "quf", label: "순 초여과 Qnet", unit: "mL/hr", def: 20, step: 5 },
+      { k: "qb", label: "혈류 속도 Qb", unit: "mL/min", def: 30, step: 5 },
+      { k: "hct", label: "Hct", unit: "%", def: 30, step: 1 },
+      { k: "mode", label: "보충액 위치", type: "select", def: "post",
+        options: [{ v: "post", t: "후희석 (post-dilution)" }, { v: "pre", t: "전희석 (pre-dilution)" }] }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var qd = num(v.qd), qr = num(v.qr), quf = num(v.quf), qb = num(v.qb), hct = num(v.hct);
+      var eff = qd + qr + quf;
+      var dose = eff / bw;
+      var plasma = qb * 60 * (1 - hct / 100);
+      var ff = v.mode === "post" ? (qr + quf) / plasma * 100 : (qr + quf) / (plasma + qr) * 100;
+      var qbkg = qb / bw;
+
+      var flags = [];
+      if (ff > 25) flags.push(F("crit", "여과분율 " + sf(ff, 1) + "% — 필터 내 혈액 농축으로 조기 응고 위험이 매우 높습니다. 혈류 속도를 올리거나, 보충액을 전희석으로 전환하거나, 보충액 유량을 낮추십시오."));
+      else if (ff > 20) flags.push(F("warn", "여과분율 " + sf(ff, 1) + "% — 권장 상한(20–25%)에 근접합니다. 필터 수명과 정맥압 추이를 감시하십시오."));
+      else flags.push(F("good", "여과분율 " + sf(ff, 1) + "% — 필터 응고 위험이 낮은 범위입니다."));
+      flags.push(F("info", "배액량 용량 " + sf(dose, 0) + " mL/kg/hr. 사람에서 20–25 mL/kg/hr가 표준 처방이며, 수의 환자에서는 대사 상태와 목표 제거율에 맞춰 조정합니다. 처방량과 실제 전달량은 필터 정지·경보로 인해 차이가 나므로 실제 배액량을 기록하십시오."));
+      if (qbkg > 5) flags.push(F("warn", "혈류 속도 " + sf(qbkg, 1) + " mL/kg/min — 소형 환자에서는 회로 용적 대비 부담이 큽니다. 카테터 기능과 혈압을 확인하십시오."));
+
+      return {
+        primary: [P("배액량 용량", sf(dose, 0), "mL/kg/hr"), P("여과분율", sf(ff, 1), "%", ff > 25 ? "crit" : ff > 20 ? "warn" : "good"), P("총 배액량", sf(eff, 0), "mL/hr")],
+        rows: [
+          R("혈장 유량", sf(plasma, 0), "mL/hr"),
+          R("혈류 속도 (체중당)", sf(qbkg, 2), "mL/kg/min"),
+          R("24시간 배액량", sf(eff * 24 / 1000, 1), "L"),
+          R("24시간 순 제거량", sf(quf * 24, 0), "mL"),
+          R("보충액 위치", v.mode === "post" ? "후희석" : "전희석", "")
+        ],
+        flags: flags
+      };
+    },
+    note: "전희석은 여과분율을 낮춰 필터 수명을 늘리지만 용질 제거 효율이 떨어져 같은 청소율을 얻으려면 더 높은 유량이 필요합니다. 항응고 전략(헤파린 vs 국소 시트르산)에 따라 허용 여과분율이 달라집니다."
+  });
+
+  CALCS.push({
+    id: "pd", cat: "renal", name: "복막투석 교환",
+    desc: "1회 주입량, 하루 총 교환량, 저류 스케줄을 계산합니다.",
+    keys: "복막투석 PD peritoneal dialysis 교환 저류 dwell 주입량",
+    inputs: [
+      { k: "perkg", label: "1회 주입량", unit: "mL/kg", def: 30, step: 5 },
+      { k: "n", label: "하루 교환 횟수", unit: "회", def: 8, step: 1 },
+      { k: "dwell", label: "저류 시간", unit: "분", def: 40, step: 5 },
+      { k: "phase", label: "치료 단계", type: "select", def: "init",
+        options: [{ v: "init", t: "초기 (카테터 삽입 직후)" }, { v: "maint", t: "유지" }] }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var perkg = num(v.perkg), n = num(v.n);
+      var each = bw * perkg;
+      var daily = each * n;
+      var cycle = num(v.dwell) + 30; // 주입 + 배액 약 30분
+      var flags = [];
+      if (v.phase === "init" && perkg > 20) flags.push(F("warn", "카테터 삽입 직후에는 누출과 통증을 줄이기 위해 10–20 mL/kg의 소량 교환으로 시작해 수일에 걸쳐 증량하는 것이 안전합니다."));
+      if (perkg > 40) flags.push(F("crit", "주입량 " + sf(perkg, 0) + " mL/kg — 복압 상승으로 호흡곤란, 역류, 카테터 주변 누출이 발생할 수 있습니다."));
+      if (n * cycle / 60 > 24) flags.push(F("crit", "교환 " + sf(n, 0) + "회 × 사이클 " + sf(cycle, 0) + "분 = " + sf(n * cycle / 60, 1) + "시간으로 24시간을 초과합니다. 저류 시간이나 교환 횟수를 조정하십시오."));
+      else flags.push(F("good", "1일 소요 시간 약 " + sf(n * cycle / 60, 1) + "시간 — 스케줄이 성립합니다."));
+      flags.push(F("info", "배액량이 주입량보다 지속적으로 적으면 카테터 폐색, 대망 감입, 복강 내 누출을 확인하십시오. 매 교환마다 배액 성상(혼탁도)을 기록해 복막염을 조기에 발견합니다."));
+      return {
+        primary: [P("1회 주입량", sf(each, 0), "mL"), P("하루 총량", sf(daily, 0), "mL"), P("1 사이클", sf(cycle, 0), "분")],
+        rows: [
+          R("주입 기준", sf(perkg, 0), "mL/kg"),
+          R("교환 횟수", sf(n, 0), "회/일"),
+          R("저류 시간", sf(num(v.dwell), 0), "분"),
+          R("1일 소요 시간", sf(n * cycle / 60, 1), "시간"),
+          R("체중당 하루 교환량", sf(daily / bw, 0), "mL/kg/day")
+        ],
+        flags: flags
+      };
+    },
+    note: "투석액 포도당 농도(1.5% / 2.5% / 4.25%)가 높을수록 제수 효과는 크지만 고혈당과 복막 손상 위험이 커집니다. 저류 중 혈당·전해질·알부민을 추적하십시오(단백 손실이 상당합니다)."
+  });
+
+  CALCS.push({
+    id: "fena", cat: "renal", name: "나트륨 분획배설률 (FENa · FEK)",
+    desc: "신전성 질소혈증과 내인성 신손상 감별에 사용하는 분획배설률을 계산합니다.",
+    keys: "FENa FEK 분획배설률 fractional excretion 신전성 prerenal 감별",
+    inputs: [
+      { k: "una", label: "요 Na", unit: "mEq/L", def: 20, step: 1 },
+      { k: "pna", label: "혈청 Na", unit: "mEq/L", def: 145, step: 1 },
+      { k: "ucr", label: "요 크레아티닌", unit: "mg/dL", def: 200, step: 5 },
+      { k: "pcr", label: "혈청 크레아티닌", unit: "mg/dL", def: 3.0, step: 0.1 },
+      { k: "uk", label: "요 K", unit: "mEq/L · 선택", def: 0, step: 1 },
+      { k: "pk", label: "혈청 K", unit: "mEq/L · 선택", def: 0, step: 0.1 }
+    ],
+    compute: function (v) {
+      var una = num(v.una), pna = num(v.pna), ucr = num(v.ucr), pcr = num(v.pcr);
+      if (!ok(una) || !ok(pna) || !ok(ucr) || !ok(pcr)) return { flags: [F("info", "요와 혈청의 Na · 크레아티닌을 모두 입력하십시오.")] };
+      var fena = (una * pcr) / (pna * ucr) * 100;
+      var rows = [
+        R("요/혈청 크레아티닌 비", sf(ucr / pcr, 1), ""),
+        R("요 Na", sf(una, 0), "mEq/L")
+      ];
+      var fek = null;
+      if (ok(num(v.uk)) && ok(num(v.pk))) {
+        fek = (num(v.uk) * pcr) / (num(v.pk) * ucr) * 100;
+        rows.push(R("FEK", sf(fek, 1), "%"));
+      }
+      var tone, msg;
+      if (fena < 1) { tone = "info"; msg = "FENa " + sf(fena, 2) + "% — 신전성(혈량 감소성) 질소혈증에 부합합니다. 수액 공급에 반응할 가능성이 높습니다."; }
+      else { tone = "warn"; msg = "FENa " + sf(fena, 2) + "% — 내인성 신손상(급성 세뇨관 손상)에 부합하는 범위입니다."; }
+      return {
+        primary: [P("FENa", sf(fena, 2), "%", tone), fek !== null ? P("FEK", sf(fek, 1), "%") : null].filter(Boolean),
+        rows: rows,
+        flags: [
+          F(tone, msg),
+          F("crit", "이뇨제(특히 푸로세미드) 투여 후, 대량 수액 투여 중, 만성신장병 기저 환자에서는 FENa 해석이 무효화됩니다. 이뇨제 사용 중이라면 요소 분획배설률(FEUrea)이 더 유용합니다."),
+          F("info", "요 비중, 요침사, 요당, 요단백을 함께 해석해야 합니다. 등장뇨(1.008–1.012)에서 질소혈증이 있으면 신성 손상을 강하게 시사합니다.")
+        ]
+      };
+    },
+    note: "FENa = (요Na × 혈청Cr) / (혈청Na × 요Cr) × 100. 요와 혈청 검체는 같은 시점에 채취해야 하며, 단위는 서로 일치시키기만 하면 됩니다."
+  });
+
+  CALCS.push({
+    id: "bp", cat: "renal", name: "혈압 평가 (MAP · 고혈압 분류)",
+    desc: "평균동맥압을 계산하고 ACVIM/IRIS 기준으로 표적장기 손상 위험을 분류합니다.",
+    keys: "혈압 blood pressure MAP 고혈압 hypertension 도플러 표적장기",
+    inputs: [
+      { k: "sbp", label: "수축기 혈압", unit: "mmHg", def: 165, step: 5 },
+      { k: "dbp", label: "이완기 혈압", unit: "mmHg · 선택", def: 95, step: 5 },
+      { k: "tod", label: "표적장기 손상", type: "select", def: "no",
+        options: [{ v: "no", t: "확인되지 않음" }, { v: "yes", t: "있음 (망막병증·신경증상·좌심실비대)" }] }
+    ],
+    compute: function (v) {
+      var s = num(v.sbp), d = num(v.dbp);
+      if (!ok(s)) return { flags: [F("info", "수축기 혈압을 입력하십시오.")] };
+      var map = ok(d) ? (s + 2 * d) / 3 : NaN;
+      var cat, tone;
+      if (s < 140) { cat = "정상혈압 · 위험 최소 (N)"; tone = "good"; }
+      else if (s < 160) { cat = "고혈압 전단계 · 위험 낮음 (L)"; tone = "info"; }
+      else if (s < 180) { cat = "고혈압 · 위험 중등도 (M)"; tone = "warn"; }
+      else { cat = "중증 고혈압 · 위험 높음 (H)"; tone = "crit"; }
+
+      var flags = [F(tone, "수축기 " + sf(s, 0) + " mmHg — " + cat + ".")];
+      if (s >= 180) flags.push(F("crit", "즉각적인 표적장기 손상 위험이 있습니다. 망막 박리·출혈, 급성 신경증상 여부를 확인하고 항고혈압 치료를 지체 없이 시작하십시오."));
+      else if (s >= 160) flags.push(F("warn", "2회 이상 별도 측정에서 확인되면 항고혈압 치료 적응증입니다. 고양이는 암로디핀, 개는 텔미사르탄 또는 ACE 억제제를 우선 고려합니다."));
+      else if (s >= 150 && v.tod === "yes") flags.push(F("warn", "표적장기 손상이 있으면 150 mmHg 이상에서도 치료를 시작합니다."));
+      if (ok(map) && map < 60) flags.push(F("crit", "평균동맥압 " + sf(map, 0) + " mmHg — 신장 관류 자동조절 하한(약 60–65 mmHg) 미만으로 허혈성 신손상 위험이 있습니다."));
+      flags.push(F("info", "백의 고혈압을 피하려면 조용한 환경에서 5–10분 순응 후 5–7회 측정해 첫 값을 버리고 평균을 사용하십시오. 커프 폭은 사지 둘레의 30–40%가 적절합니다."));
+      return {
+        primary: [P("수축기", sf(s, 0), "mmHg", tone), ok(map) ? P("평균동맥압", sf(map, 0), "mmHg", map < 60 ? "crit" : null) : null].filter(Boolean),
+        rows: [
+          R("분류", cat, ""),
+          R("맥압", ok(d) ? sf(s - d, 0) + " mmHg" : "—", ""),
+          R("치료 역치", "≥160 mmHg (표적장기 손상 시 ≥150)", "")
+        ],
+        flags: flags
+      };
+    },
+    note: "도플러법은 개에서 수축기압, 고양이에서는 평균동맥압에 가까운 값을 낸다는 보고가 있습니다. 측정 방법(도플러/오실로메트릭), 부위, 자세를 매번 동일하게 기록해 추세를 비교하십시오."
+  });
+
+  /* ---------- ELECTROLYTES ---------- */
+  CALCS.push({
+    id: "na-glu", cat: "lyte", name: "고혈당 보정 Na",
+    desc: "고혈당에 의한 희석성 저나트륨혈증을 보정한 실제 Na를 계산합니다.",
+    keys: "보정 나트륨 corrected sodium 고혈당 hyperglycemia DKA 가성저나트륨",
+    inputs: [
+      { k: "na", label: "측정 Na", unit: "mEq/L", def: 135, step: 1 },
+      { k: "glu", label: "혈당", unit: "mg/dL", def: 500, step: 10 },
+      { k: "f", label: "보정 계수", type: "select", def: "1.6",
+        options: [{ v: "1.6", t: "1.6 (일반)" }, { v: "2.4", t: "2.4 (혈당 400 mg/dL 초과 시)" }] }
+    ],
+    compute: function (v) {
+      var na = num(v.na), glu = num(v.glu), f = parseFloat(v.f);
+      if (!ok(na) || !ok(glu)) return { flags: [F("info", "Na와 혈당을 입력하십시오.")] };
+      var corr = na + f * (glu - 100) / 100;
+      var delta = corr - na;
+      var flags = [];
+      if (corr > 155) flags.push(F("crit", "보정 Na " + sf(corr, 1) + " mEq/L — 실제로는 고나트륨혈증(고삼투압) 상태입니다. 혈당을 낮추면 Na가 급격히 드러나므로 자유수분 결핍 계산기를 함께 사용하십시오."));
+      else if (corr > 150) flags.push(F("warn", "보정 Na " + sf(corr, 1) + " mEq/L — 자유수분 결핍이 동반되어 있습니다."));
+      else flags.push(F("good", "보정 Na " + sf(corr, 1) + " mEq/L — 정상 범위에 가깝습니다."));
+      flags.push(F("info", "혈당 100 mg/dL 상승당 Na가 약 " + sf(f, 1) + " mEq/L 낮게 측정됩니다. DKA·HHS 치료 중에는 혈당 하강에 따라 측정 Na가 상승하는 것이 정상 경과입니다."));
+      return {
+        primary: [P("보정 Na", sf(corr, 1), "mEq/L", corr > 155 ? "crit" : corr > 150 ? "warn" : "good"), P("보정폭", "+" + sf(delta, 1), "mEq/L")],
+        rows: [
+          R("측정 Na", sf(na, 0), "mEq/L"),
+          R("혈당", sf(glu, 0), "mg/dL"),
+          R("정상 범위", isDog() ? "개 140–150" : "고양이 148–156", "mEq/L")
+        ],
+        flags: flags
+      };
+    },
+    note: "혈당이 400 mg/dL를 넘으면 1.6보다 2.4 계수가 실제 값에 더 근접한다는 보고가 있습니다. 심한 고지혈증·고단백혈증에서도 가성 저나트륨혈증이 발생할 수 있습니다."
+  });
+
+  CALCS.push({
+    id: "ag", cat: "lyte", name: "음이온차 (Anion Gap)",
+    desc: "측정되지 않는 산의 축적 여부를 평가합니다.",
+    keys: "음이온차 anion gap AG 산증 대사성 젖산 케톤",
+    inputs: [
+      { k: "na", label: "Na", unit: "mEq/L", def: 145, step: 1 },
+      { k: "k", label: "K", unit: "mEq/L", def: 4.0, step: 0.1 },
+      { k: "cl", label: "Cl", unit: "mEq/L", def: 110, step: 1 },
+      { k: "hco3", label: "HCO₃", unit: "mEq/L", def: 15, step: 0.5 },
+      { k: "alb", label: "알부민", unit: "g/dL · 선택", def: 0, step: 0.1 }
+    ],
+    compute: function (v) {
+      var na = num(v.na), k = num(v.k), cl = num(v.cl), hco3 = num(v.hco3);
+      if (!ok(na) || !ok(cl) || !ok(hco3)) return { flags: [F("info", "Na · Cl · HCO₃를 입력하십시오.")] };
+      var ag = (na + (isFinite(k) ? k : 0)) - (cl + hco3);
+      var lo = isDog() ? 12 : 13, hi = isDog() ? 24 : 27;
+      var rows = [
+        R("정상 범위", lo + "–" + hi, "mEq/L (" + spName() + ")"),
+        R("Na + K", sf(na + k, 1), "mEq/L"),
+        R("Cl + HCO₃", sf(cl + hco3, 1), "mEq/L")
+      ];
+      var agc = null;
+      var alb = num(v.alb);
+      if (ok(alb)) {
+        var normAlb = isDog() ? 3.0 : 3.0;
+        agc = ag + 2.5 * (normAlb - alb);
+        rows.push(R("알부민 보정 AG", sf(agc, 1), "mEq/L"));
+      }
+      var use = agc !== null ? agc : ag;
+      var tone, msg;
+      if (use > hi) { tone = "crit"; msg = "음이온차 증가 — 젖산산증, 케톤산증, 요독증, 에틸렌글리콜·살리실산 중독을 감별하십시오."; }
+      else if (use < lo) { tone = "warn"; msg = "음이온차 감소 — 저알부민혈증이 가장 흔한 원인이며, 고면역글로불린혈증·검사 오류도 고려하십시오."; }
+      else { tone = "good"; msg = "음이온차 정상 — 산증이 있다면 고염소성(정상 음이온차) 산증에 해당합니다(설사, 신세뇨관성 산증, 과다 식염수 투여)."; }
+      var flags = [F(tone, "AG " + sf(use, 1) + " mEq/L — " + msg)];
+      if (ok(alb) && alb < 2.5) flags.push(F("warn", "저알부민혈증(" + sf(alb, 1) + " g/dL)에서는 알부민 1 g/dL 감소당 AG가 약 2.5 mEq/L 낮아져 산 축적이 가려질 수 있습니다. 보정값을 사용하십시오."));
+      return {
+        primary: [P("Anion Gap", sf(ag, 1), "mEq/L", agc === null ? tone : null), agc !== null ? P("알부민 보정", sf(agc, 1), "mEq/L", tone) : null].filter(Boolean),
+        rows: rows,
+        flags: flags
+      };
+    },
+    note: "AG = (Na + K) − (Cl + HCO₃). K를 제외하는 계산식을 쓰는 검사실도 있으므로 원내 기준 범위와 산식을 일치시키십시오."
+  });
+
+  CALCS.push({
+    id: "osm", cat: "lyte", name: "혈장 삼투압 · 삼투압차",
+    desc: "계산 삼투압과 측정값의 차이로 외인성 삼투 물질을 탐지합니다.",
+    keys: "삼투압 osmolality osmolar gap 삼투압차 에틸렌글리콜 만니톨",
+    inputs: [
+      { k: "na", label: "Na", unit: "mEq/L", def: 145, step: 1 },
+      { k: "k", label: "K", unit: "mEq/L", def: 4.0, step: 0.1 },
+      { k: "glu", label: "혈당", unit: "mg/dL", def: 100, step: 5 },
+      { k: "bun", label: "BUN", unit: "mg/dL", def: 20, step: 1 },
+      { k: "meas", label: "측정 삼투압", unit: "mOsm/kg · 선택", def: 0, step: 1 }
+    ],
+    compute: function (v) {
+      var na = num(v.na), k = num(v.k), glu = num(v.glu), bun = num(v.bun);
+      if (!ok(na)) return { flags: [F("info", "전해질 값을 입력하십시오.")] };
+      var calc = 2 * (na + k) + glu / 18 + bun / 2.8;
+      var eff = 2 * (na + k) + glu / 18;
+      var rows = [
+        R("유효 삼투압 (긴장도)", sf(eff, 0), "mOsm/kg"),
+        R("포도당 기여분", sf(glu / 18, 1), "mOsm/kg"),
+        R("요소 기여분", sf(bun / 2.8, 1), "mOsm/kg"),
+        R("정상 범위", "290–310", "mOsm/kg")
+      ];
+      var flags = [];
+      var meas = num(v.meas), gap = null;
+      if (ok(meas)) {
+        gap = meas - calc;
+        rows.push(R("삼투압차", sf(gap, 1), "mOsm/kg"));
+        if (gap > 10) flags.push(F("crit", "삼투압차 " + sf(gap, 1) + " mOsm/kg — 에틸렌글리콜, 만니톨, 메탄올, 이소프로판올 등 외인성 삼투 물질의 존재를 강력히 시사합니다. 중독 이력을 확인하고 즉시 해독을 검토하십시오."));
+        else flags.push(F("good", "삼투압차 " + sf(gap, 1) + " mOsm/kg — 정상 범위(10 미만)입니다."));
+      }
+      if (calc > 330) flags.push(F("crit", "계산 삼투압 " + sf(calc, 0) + " mOsm/kg — 고삼투압 상태입니다. 급격한 교정은 뇌부종을 유발하므로 자유수분 결핍 계산기로 속도를 제한하십시오."));
+      else if (calc < 280) flags.push(F("warn", "계산 삼투압 " + sf(calc, 0) + " mOsm/kg — 저삼투압 상태입니다."));
+      if (!ok(meas)) flags.push(F("info", "측정 삼투압을 입력하면 삼투압차를 함께 계산합니다."));
+      return {
+        primary: [P("계산 삼투압", sf(calc, 0), "mOsm/kg"), gap !== null ? P("삼투압차", sf(gap, 1), "mOsm/kg", gap > 10 ? "crit" : "good") : null].filter(Boolean),
+        rows: rows,
+        flags: flags
+      };
+    },
+    note: "계산식: 2 × (Na + K) + 혈당/18 + BUN/2.8. 요소는 세포막을 자유롭게 통과하므로 긴장도(유효 삼투압)에는 기여하지 않습니다. 탈수 평가에는 유효 삼투압을 사용하십시오."
+  });
+
+  CALCS.push({
+    id: "ca", cat: "lyte", name: "알부민 보정 칼슘",
+    desc: "저알부민혈증에서 총 칼슘을 보정합니다. 개에 한해 제한적으로 사용합니다.",
+    keys: "칼슘 calcium 보정 corrected 알부민 albumin 이온화 저칼슘",
+    inputs: [
+      { k: "ca", label: "총 칼슘", unit: "mg/dL", def: 8.0, step: 0.1 },
+      { k: "alb", label: "알부민", unit: "g/dL", def: 2.0, step: 0.1 },
+      { k: "ica", label: "이온화 칼슘", unit: "mmol/L · 선택", def: 0, step: 0.01 }
+    ],
+    compute: function (v) {
+      var ca = num(v.ca), alb = num(v.alb);
+      if (!ok(ca) || !ok(alb)) return { flags: [F("info", "총 칼슘과 알부민을 입력하십시오.")] };
+      var corr = ca - alb + 3.5;
+      var flags = [];
+      if (!isDog()) flags.push(F("crit", "이 보정식은 고양이에서 검증되지 않았으며 오히려 오분류를 늘린다는 보고가 있습니다. 고양이는 반드시 이온화 칼슘을 직접 측정하십시오."));
+      else flags.push(F("warn", "개에서도 보정식의 신뢰도는 제한적입니다. 임상적 판단이 필요한 경우에는 이온화 칼슘 측정이 표준입니다."));
+      var ica = num(v.ica);
+      if (ok(ica)) {
+        var iTone, iMsg;
+        if (ica < 0.9) { iTone = "crit"; iMsg = "중증 저칼슘혈증 — 근경련·발작 위험. 글루콘산칼슘 정주를 ECG 감시하에 검토하십시오."; }
+        else if (ica < 1.1) { iTone = "warn"; iMsg = "저칼슘혈증 범위입니다."; }
+        else if (ica > 1.5) { iTone = "warn"; iMsg = "고칼슘혈증 범위 — 원인 감별(악성종양, 부갑상선기능항진, 비타민 D 중독, 신장병)이 필요합니다."; }
+        else { iTone = "good"; iMsg = "이온화 칼슘 정상 범위입니다."; }
+        flags.unshift(F(iTone, "이온화 칼슘 " + sf(ica, 2) + " mmol/L — " + iMsg + " 이온화 값이 있으면 보정 총칼슘보다 이 값을 우선하십시오."));
+      }
+      return {
+        primary: [P("보정 총칼슘", sf(corr, 2), "mg/dL"), ok(ica) ? P("이온화 칼슘", sf(ica, 2), "mmol/L") : null].filter(Boolean),
+        rows: [
+          R("측정 총칼슘", sf(ca, 1), "mg/dL"),
+          R("알부민", sf(alb, 1), "g/dL"),
+          R("보정폭", (corr - ca >= 0 ? "+" : "") + sf(corr - ca, 2), "mg/dL"),
+          R("이온화 칼슘 정상", "1.1–1.5", "mmol/L")
+        ],
+        flags: flags
+      };
+    },
+    note: "보정식: 보정 Ca = 총 Ca − 알부민(g/dL) + 3.5. 만성신장병 환자의 칼슘·인 대사 평가에는 이온화 칼슘, PTH, FGF-23을 함께 해석해야 합니다."
+  });
+
+  /* ---------- DRUGS ---------- */
+  CALCS.push({
+    id: "dose", cat: "drug", name: "약물 용량 계산",
+    desc: "mg/kg 용량과 제제 농도로 실제 투여 부피를 계산합니다.",
+    keys: "용량 dose 투여량 mg/kg 희석 dilution 시린지",
+    inputs: [
+      { k: "d", label: "용량", unit: "mg/kg", def: 2, step: 0.1 },
+      { k: "c", label: "제제 농도", unit: "mg/mL", def: 10, step: 1 },
+      { k: "freq", label: "투여 간격", type: "select", def: "12",
+        options: [{ v: "0", t: "1회 (단회)" }, { v: "24", t: "q24h · SID" }, { v: "12", t: "q12h · BID" }, { v: "8", t: "q8h · TID" }, { v: "6", t: "q6h · QID" }] },
+      { k: "dil", label: "희석 배수", unit: "× · 1이면 원액", def: 1, step: 1 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var d = num(v.d), c = num(v.c), dil = Math.max(1, num(v.dil));
+      if (!ok(d) || !ok(c)) return { flags: [F("info", "용량과 농도를 입력하십시오.")] };
+      var mg = d * bw;
+      var ml = mg / c;
+      var mlDil = ml * dil;
+      var freq = parseFloat(v.freq);
+      var perDay = freq > 0 ? 24 / freq : 0;
+      var flags = [];
+      if (ml < 0.05) flags.push(F("warn", "투여 부피 " + sf(ml, 3) + " mL — 정확한 계량이 어렵습니다. 희석하거나 인슐린 시린지(0.01 mL 눈금) 사용을 검토하십시오."));
+      if (ml > 20) flags.push(F("info", "투여 부피가 " + sf(ml, 1) + " mL로 큽니다. 주입 속도와 투여 경로를 확인하십시오."));
+      var rows = [
+        R("총 투여 용량", sf(mg, 2), "mg"),
+        R("원액 부피", sf(ml, 3), "mL")
+      ];
+      if (dil > 1) rows.push(R(sf(dil, 0) + "배 희석 후 부피", sf(mlDil, 2), "mL (최종 " + sf(c / dil, 2) + " mg/mL)"));
+      if (perDay > 0) {
+        rows.push(R("1일 총 용량", sf(mg * perDay, 2), "mg (" + sf(d * perDay, 2) + " mg/kg/day)"));
+        rows.push(R("1일 총 부피", sf(ml * perDay, 2), "mL"));
+      }
+      return {
+        primary: [P("1회 투여 부피", sf(dil > 1 ? mlDil : ml, 2), "mL"), P("1회 용량", sf(mg, 2), "mg")],
+        rows: rows,
+        flags: flags.length ? flags : [F("good", "1회 " + sf(ml, 2) + " mL를 투여합니다.")]
+      };
+    },
+    note: "신장·간 기능 저하 환자에서는 신배설 약물(아미노글리코사이드, 일부 세팔로스포린, 디곡신 등)의 용량 감량 또는 간격 연장이 필요합니다. 투석 환자는 약물 제거율에 따라 투석 후 보충 투여를 고려하십시오."
+  });
+
+  CALCS.push({
+    id: "cri", cat: "drug", name: "지속정주 (CRI) 계산",
+    desc: "목표 용량으로부터 시린지 원액 속도와 수액백 희석 조제량을 동시에 계산합니다.",
+    keys: "CRI 지속정주 constant rate infusion 시린지 펌프 도파민 도부타민 펜타닐 희석",
+    inputs: [
+      { k: "preset", label: "약물", type: "select", def: "dopamine", options: (function () {
+          var a = []; for (var kk in CRI_PRESETS) a.push({ v: kk, t: CRI_PRESETS[kk].label }); return a;
+        })() },
+      { k: "dose", label: "목표 용량", unit: "", def: 5, step: 0.1 },
+      { k: "unit", label: "용량 단위", type: "select", def: "mcgkgmin", options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
+      { k: "conc", label: "제제 농도", unit: "mg/mL", def: 40, step: 0.05 },
+      { k: "bag", label: "희석백 용량", unit: "mL", def: 250, step: 50 },
+      { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 20, step: 1 }
+    ],
+    hook: function (k, v, set) {
+      if (k === "preset") {
+        var p = CRI_PRESETS[v.preset];
+        if (p && v.preset !== "custom") { set("dose", p.dose); set("unit", p.unit); set("conc", p.conc); }
+      }
+    },
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var dose = num(v.dose), conc = num(v.conc), bag = num(v.bag), rate = num(v.rate);
+      if (!ok(dose) || !ok(conc)) return { flags: [F("info", "목표 용량과 제제 농도를 입력하십시오.")] };
+      var mgHr = doseToMgPerHr(dose, v.unit, bw);
+      var neatRate = mgHr / conc;
+      var hoursPerBag = bag / rate;
+      var drugMg = mgHr * hoursPerBag;
+      var drugML = drugMg / conc;
+      var finalConc = drugMg / bag;
+      var unitTxt = (CRI_UNITS.filter(function (u) { return u.v === v.unit; })[0] || {}).t || "";
+      var p = CRI_PRESETS[v.preset];
+
+      var flags = [];
+      if (p && p.hint) flags.push(F("info", p.label + " — 일반 범위 " + p.hint + "."));
+      if (drugML > bag * 0.2) flags.push(F("warn", "약물 부피 " + sf(drugML, 1) + " mL가 백 용량의 20%를 초과합니다. 최종 농도가 크게 달라지므로 동일 부피의 수액을 먼저 빼내십시오."));
+      if (neatRate < 0.1) flags.push(F("warn", "원액 속도 " + sf(neatRate, 3) + " mL/hr — 대부분의 시린지 펌프 최소 정밀도 이하입니다. 희석 조제를 사용하십시오."));
+      else flags.push(F("good", "시린지 펌프로 원액 " + sf(neatRate, 2) + " mL/hr, 또는 희석백을 " + sf(rate, 0) + " mL/hr로 투여합니다."));
+      flags.push(F("info", "희석백 " + sf(bag, 0) + " mL는 " + sf(hoursPerBag, 1) + "시간 지속됩니다. 카테콜아민은 광분해·산화되므로 24시간마다 새로 조제하십시오."));
+
+      return {
+        primary: [P("원액 주입 속도", sf(neatRate, 3), "mL/hr"), P("백에 넣을 약물", sf(drugML, 2), "mL"), P("시간당 투여량", sf(mgHr, 3), "mg/hr")],
+        rows: [
+          R("목표 용량", sf(dose, 3) + " " + unitTxt, ""),
+          R("백에 넣을 약물 (질량)", sf(drugMg, 2), "mg"),
+          R("희석 후 최종 농도", sf(finalConc, 4), "mg/mL"),
+          R("백 지속 시간", sf(hoursPerBag, 1), "hr"),
+          R("체중당 시간 용량", sf(mgHr / bw * 1000, 2), "µg/kg/hr")
+        ],
+        flags: flags
+      };
+    },
+    note: "희석 조제법: 위에 표시된 약물 부피만큼 수액백에서 미리 빼낸 뒤 약물을 주입하면 최종 농도가 계산값과 일치합니다. 승압제는 가급적 중심정맥으로 투여하고, 말초 투여 시 혈관외 유출을 자주 확인하십시오."
+  });
+
+  CALCS.push({
+    id: "emerg", cat: "drug", name: "응급 · 심폐소생 약물 차트",
+    desc: "현재 체중 기준으로 주요 응급 약물의 투여 부피를 한 표에 정리합니다. 인쇄해 케이지에 부착할 수 있습니다.",
+    keys: "응급 emergency CPR 심폐소생 에피네프린 아트로핀 리도카인 차트 chart 코드",
+    inputs: [],
+    compute: function () {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var rows = EMERG.map(function (d) {
+        var dose = d.d;
+        if (d.d === null) dose = isDog() ? d.dDog : d.dCat;
+        var totalDose = dose * bw;
+        var ml = totalDose / d.conc;
+        var doseTxt = (dose < 1 ? sf(dose, 3) : sf(dose, 2)) + " " + d.u;
+        return "<tr><td><b>" + esc(d.n) + "</b></td><td class=\"m s\">" + esc(d.c) + "</td><td class=\"m\">" + esc(doseTxt) + "</td><td class=\"n\">" + sf(ml, ml < 0.1 ? 3 : 2) + " mL</td><td class=\"s\">" + esc(d.note) + "</td></tr>";
+      }).join("");
+      var html = "<div class=\"scrollx\"><table class=\"tbl\"><thead><tr><th>약물</th><th>농도</th><th>용량</th><th>투여 부피</th><th>비고</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+      return {
+        primary: [P("기준 체중", sf(bw, 2), "kg"), P("종", spName(), "")],
+        html: html,
+        flags: [
+          F("crit", "투여 전 반드시 약병의 실제 농도를 확인하십시오. 표에 적힌 농도와 원내 재고가 다르면 부피가 달라집니다."),
+          F("info", "심정지 시 흉부압박은 100–120회/분, 흉곽 폭의 1/3–1/2 깊이로 2분간 중단 없이 시행한 뒤 리듬을 확인합니다. 약물보다 압박의 질이 생존율을 결정합니다."),
+          F("warn", "정맥로 확보가 지연되면 골내(IO) 투여를 즉시 고려하고, 기관내 투여 시에는 정맥 용량의 2–10배를 생리식염수로 희석해 투여합니다.")
+        ]
+      };
+    },
+    note: "RECOVER 가이드라인 기반의 일반적 용량이며, 원내 프로토콜과 담당 수의사의 판단이 우선합니다. 만니톨과 50% 포도당은 표에 mg/kg으로 환산해 표기했습니다(각각 0.5 g/kg, 0.5 mL/kg 상당)."
+  });
+
+  CALCS.push({
+    id: "insulin", cat: "drug", name: "DKA 인슐린 지속정주",
+    desc: "당뇨병성 케톤산증에서 속효성 인슐린 CRI 조제와 혈당 슬라이딩 스케일을 제시합니다.",
+    keys: "인슐린 insulin DKA 케톤산증 CRI 슬라이딩 혈당 포도당",
+    inputs: [
+      { k: "u", label: "인슐린 용량", unit: "U/kg (개 1.1–2.2 · 고양이 2.2)", def: 0, step: 0.1 },
+      { k: "bag", label: "희석 식염수", unit: "mL", def: 250, step: 50 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var perkg = ok(num(v.u)) ? num(v.u) : (isDog() ? 1.1 : 2.2);
+      var units = perkg * bw;
+      var bag = num(v.bag);
+      var uPerML = units / bag;
+      var sched = [
+        ["> 250", "10", "0.9% NaCl", "포도당 불필요"],
+        ["200 – 250", "7", "0.9% NaCl + 2.5% 포도당", "감속 시작"],
+        ["150 – 200", "5", "0.9% NaCl + 2.5% 포도당", ""],
+        ["100 – 150", "5", "0.9% NaCl + 5% 포도당", ""],
+        ["< 100", "중단", "0.9% NaCl + 5% 포도당", "1시간 뒤 재측정 후 재개"]
+      ];
+      var rows = sched.map(function (r) {
+        var mlhr = r[1] === "중단" ? "—" : sf(parseFloat(r[1]) * uPerML, 3) + " U/hr";
+        return "<tr><td class=\"m\">" + esc(r[0]) + "</td><td class=\"n\">" + esc(r[1] === "중단" ? "중단" : r[1] + " mL/hr") + "</td><td class=\"m s\">" + mlhr + "</td><td>" + esc(r[2]) + "</td><td class=\"s\">" + esc(r[3]) + "</td></tr>";
+      }).join("");
+      var html = "<div class=\"scrollx\"><table class=\"tbl\"><thead><tr><th>혈당 mg/dL</th><th>인슐린 백 속도</th><th>인슐린 투여량</th><th>동반 수액</th><th>비고</th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+      return {
+        primary: [P("조제 인슐린", sf(units, 2), "U"), P("희석 농도", sf(uPerML, 4), "U/mL"), P("기준", sf(perkg, 2), "U/kg")],
+        html: html,
+        flags: [
+          F("crit", "조제 후 첫 50 mL는 라인에 흘려 버리십시오. 인슐린이 플라스틱 표면에 흡착되어 초기 실제 투여량이 크게 낮아집니다."),
+          F("warn", "인슐린 시작 전 저칼륨혈증을 먼저 교정하십시오. 인슐린은 칼륨을 세포 내로 이동시켜 치명적 저칼륨혈증을 유발할 수 있습니다. 시작 후 4–6시간마다 K와 인을 확인하십시오."),
+          F("info", "혈당 하강 목표는 시간당 50–75 mg/dL입니다. 이보다 빠르면 뇌부종 위험이 있으므로 감속하고 포도당을 추가하십시오. 케톤이 소실되고 식욕이 돌아온 뒤에 피하 인슐린으로 전환합니다."),
+          F("info", "대안: 별도 시린지 펌프로 " + sf(0.05 * bw, 3) + "–" + sf(0.1 * bw, 3) + " U/hr (0.05–0.1 U/kg/hr) 직접 정주도 가능합니다.")
+        ]
+      };
+    },
+    note: "속효성(regular) 인슐린만 정주할 수 있습니다. 위 스케줄은 널리 인용되는 프로토콜이며, 환자 반응에 따라 속도를 개별 조정하십시오."
+  });
+
+  CALCS.push({
+    id: "bsa", cat: "drug", name: "체표면적 · 항암 용량",
+    desc: "체표면적을 계산하고 mg/m² 기반 용량을 산출합니다.",
+    keys: "체표면적 BSA body surface area 항암 chemotherapy mg/m2 독소루비신",
+    inputs: [
+      { k: "d", label: "용량", unit: "mg/m²", def: 30, step: 1 },
+      { k: "c", label: "제제 농도", unit: "mg/mL · 선택", def: 0, step: 0.1 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var K = isDog() ? 10.1 : 10.0;
+      var bsa = K * Math.pow(bw * 1000, 2 / 3) / 10000;
+      var d = num(v.d);
+      var mg = ok(d) ? d * bsa : NaN;
+      var c = num(v.c);
+      var rows = [
+        R("체표면적 계수 K", sf(K, 1), spName()),
+        R("체중", sf(bw, 2), "kg"),
+        R("mg/kg 환산", ok(d) ? sf(mg / bw, 2) + " mg/kg" : "—", "")
+      ];
+      if (ok(mg) && ok(c)) rows.push(R("투여 부피", sf(mg / c, 2), "mL"));
+      var flags = [];
+      if (isDog() && bw < 10) flags.push(F("warn", "체중 10 kg 미만의 개에서는 체표면적 환산이 실제 대사량 대비 용량을 과대평가해 골수억제·위장독성이 증가한다는 보고가 있습니다. 소형견은 mg/kg 기준 처방을 검토하십시오."));
+      if (!isDog()) flags.push(F("warn", "고양이는 체표면적 환산의 신뢰도가 낮아 다수의 항암 프로토콜이 mg/kg 또는 고정 용량을 사용합니다. 프로토콜의 원 단위를 확인하십시오."));
+      flags.push(F("crit", "세포독성 약물은 안전 캐비닛, 밀폐 이송 장치, 개인보호구를 갖춘 상태에서만 조제·투여하고 배설물 취급 지침을 보호자에게 안내하십시오."));
+      return {
+        primary: [P("체표면적", sf(bsa, 3), "m²"), ok(mg) ? P("총 용량", sf(mg, 2), "mg") : null].filter(Boolean),
+        rows: rows,
+        flags: flags
+      };
+    },
+    note: "BSA(m²) = K × 체중(g)^(2/3) / 10 000, K = 개 10.1 · 고양이 10.0. 투여 전 호중구 수(일반적으로 ≥1,500–2,000/µL)와 신·간 기능을 확인하십시오."
+  });
+
+  /* ---------- GENERAL ---------- */
+  CALCS.push({
+    id: "rer", cat: "misc", name: "에너지 요구량 · 급여량",
+    desc: "휴식기 에너지 요구량(RER)과 생활 단계별 유지 요구량, 실제 급여량을 계산합니다.",
+    keys: "RER MER 칼로리 에너지 급여량 영양 nutrition kcal 사료",
+    inputs: [
+      { k: "state", label: "생활 단계 / 상태", type: "select", def: "hosp", options: [
+        { v: "hosp", t: "입원 · 중환자 (1.0 × RER)" },
+        { v: "neut", t: "중성화 성체 (개 1.6 · 고양이 1.2)" },
+        { v: "intact", t: "미중성화 성체 (개 1.8 · 고양이 1.4)" },
+        { v: "loss", t: "체중 감량 (개 1.0 · 고양이 0.8)" },
+        { v: "growth", t: "성장기 (개 2.0 · 고양이 2.5)" },
+        { v: "work", t: "활동견 (3.0 ×)" }
+      ] },
+      { k: "kcal", label: "사료 열량", unit: "kcal/100 g 또는 kcal/캔", def: 100, step: 5 },
+      { k: "meals", label: "1일 급여 횟수", unit: "회", def: 3, step: 1 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var rer = 70 * Math.pow(bw, 0.75);
+      var f;
+      switch (v.state) {
+        case "hosp":   f = 1.0; break;
+        case "neut":   f = isDog() ? 1.6 : 1.2; break;
+        case "intact": f = isDog() ? 1.8 : 1.4; break;
+        case "loss":   f = isDog() ? 1.0 : 0.8; break;
+        case "growth": f = isDog() ? 2.0 : 2.5; break;
+        default:       f = 3.0;
+      }
+      var mer = rer * f;
+      var kcal = num(v.kcal), meals = Math.max(1, num(v.meals));
+      var amount = ok(kcal) ? mer / kcal * 100 : NaN;
+      var flags = [];
+      if (v.state === "hosp") flags.push(F("info", "입원 환자는 RER의 100%에서 시작합니다. 과거의 질병 계수(illness factor)는 과급여와 재급여 증후군 위험 때문에 현재는 권장되지 않습니다."));
+      flags.push(F("warn", "3–5일 이상 금식한 환자는 재급여 증후군 위험이 있습니다. 목표량의 25–33%에서 시작해 3–4일에 걸쳐 증량하고 인·칼륨·마그네슘을 매일 확인하십시오."));
+      flags.push(F("info", "48–72시간 이상 자발 섭취가 없으면 비식도관·비위관 등 영양관 설치를 적극적으로 검토하십시오. 만성신장병 환자에서 영양 유지는 생존기간과 직결됩니다."));
+      var rows = [
+        R("적용 계수", sf(f, 1) + " × RER", ""),
+        R("체중당 열량", sf(mer / bw, 0), "kcal/kg/day")
+      ];
+      if (ok(kcal)) {
+        rows.push(R("1일 급여량", sf(amount, 0), "g 또는 " + sf(mer / kcal, 2) + " 캔"));
+        rows.push(R("1회 급여량 (" + sf(meals, 0) + "회 분할)", sf(amount / meals, 0), "g"));
+      }
+      return {
+        primary: [P("RER", sf(rer, 0), "kcal/day"), P("목표 열량", sf(mer, 0), "kcal/day"), ok(kcal) ? P("1일 급여량", sf(amount, 0), "g") : null].filter(Boolean),
+        rows: rows,
+        flags: flags
+      };
+    },
+    note: "RER = 70 × 체중(kg)^0.75. 습식 사료는 캔당 kcal, 건사료는 100 g당 kcal를 입력하십시오(제품 라벨 또는 제조사 자료 확인). 신장 처방식은 단백·인 제한으로 열량 밀도가 다를 수 있습니다."
+  });
+
+  CALCS.push({
+    id: "convert", cat: "misc", name: "검사 단위 변환",
+    desc: "국내·해외 문헌과 장비 간 단위 차이를 한 번에 환산합니다.",
+    keys: "단위 변환 conversion mg/dL µmol/L mmol/L SI 크레아티닌 BUN 혈당",
+    inputs: [
+      { k: "an", label: "항목", type: "select", def: "cr", options: [
+        { v: "cr", t: "크레아티닌" }, { v: "bun", t: "BUN / 요소질소" }, { v: "glu", t: "혈당" },
+        { v: "ca", t: "칼슘" }, { v: "p", t: "인" }, { v: "mg", t: "마그네슘" },
+        { v: "alb", t: "알부민" }, { v: "chol", t: "콜레스테롤" }, { v: "tbil", t: "총빌리루빈" }
+      ] },
+      { k: "val", label: "값", unit: "", def: 1.5, step: 0.1 },
+      { k: "dir", label: "변환 방향", type: "select", def: "toSI",
+        options: [{ v: "toSI", t: "관용 단위 → SI 단위" }, { v: "toConv", t: "SI 단위 → 관용 단위" }] }
+    ],
+    compute: function (v) {
+      var TB = {
+        cr:   { f: 88.4,   a: "mg/dL", b: "µmol/L", ref: "개 0.5–1.4 · 고양이 0.8–1.8 mg/dL" },
+        bun:  { f: 0.357,  a: "mg/dL", b: "mmol/L", ref: "개 7–27 · 고양이 16–36 mg/dL" },
+        glu:  { f: 0.0555, a: "mg/dL", b: "mmol/L", ref: "개 70–120 · 고양이 70–150 mg/dL" },
+        ca:   { f: 0.2495, a: "mg/dL", b: "mmol/L", ref: "9.0–11.5 mg/dL (총 칼슘)" },
+        p:    { f: 0.3229, a: "mg/dL", b: "mmol/L", ref: "2.5–6.0 mg/dL (성체)" },
+        mg:   { f: 0.4114, a: "mg/dL", b: "mmol/L", ref: "1.8–2.5 mg/dL" },
+        alb:  { f: 10,     a: "g/dL",  b: "g/L",    ref: "2.5–4.0 g/dL" },
+        chol: { f: 0.0259, a: "mg/dL", b: "mmol/L", ref: "개 120–300 mg/dL" },
+        tbil: { f: 17.1,   a: "mg/dL", b: "µmol/L", ref: "0.1–0.5 mg/dL" }
+      };
+      var t = TB[v.an], val = num(v.val);
+      if (!isFinite(val)) return { flags: [F("info", "값을 입력하십시오.")] };
+      var out = v.dir === "toSI" ? val * t.f : val / t.f;
+      var from = v.dir === "toSI" ? t.a : t.b;
+      var to = v.dir === "toSI" ? t.b : t.a;
+      return {
+        primary: [P(sf(val, 3) + " " + from, sf(out, 3), to)],
+        rows: [
+          R("변환 계수", "× " + t.f, from + " → " + t.b),
+          R("일반 참고 범위", t.ref, ""),
+          R("역방향", sf(v.dir === "toSI" ? out / t.f : out * t.f, 3), from)
+        ],
+        flags: [
+          F("info", "체중 환산: " + sf(S.bw, 2) + " kg = " + sf(S.bw * 2.20462, 2) + " lb · 체온 환산: 38.5 °C = 101.3 °F."),
+          F("warn", "참고 범위는 검사 장비와 검사실마다 다릅니다. 반드시 결과지에 인쇄된 자체 기준 범위와 비교해 해석하십시오.")
+        ]
+      };
+    },
+    note: "BUN(요소질소)과 요소(urea)는 다른 값입니다. 요소(mmol/L) = BUN(mg/dL) × 0.357이며, 일부 장비는 요소를 직접 보고하므로 항목명을 확인하십시오."
+  });
+
+  CALCS.push({
+    id: "age", cat: "misc", name: "나이 환산",
+    desc: "체격을 반영해 반려동물의 나이를 사람 나이로 환산합니다.",
+    keys: "나이 age 환산 사람나이 human years 노령 senior",
+    inputs: [
+      { k: "y", label: "나이", unit: "년", def: 7, step: 0.5 },
+      { k: "size", label: "성견 체격", type: "select", def: "auto", options: [
+        { v: "auto", t: "체중으로 자동 판정" }, { v: "s", t: "소형 (9 kg 이하)" },
+        { v: "m", t: "중형 (10–22 kg)" }, { v: "l", t: "대형 (23–40 kg)" }, { v: "g", t: "초대형 (41 kg 이상)" }
+      ] }
+    ],
+    compute: function (v) {
+      var y = num(v.y);
+      if (!ok(y)) return { flags: [F("info", "나이를 입력하십시오.")] };
+      var human, sizeTxt = "";
+      if (!isDog()) {
+        human = y <= 1 ? y * 15 : y <= 2 ? 15 + (y - 1) * 9 : 24 + (y - 2) * 4;
+        sizeTxt = "고양이 표준 환산";
+      } else {
+        var sz = v.size;
+        if (sz === "auto") {
+          var b = S.bw;
+          sz = b <= 9 ? "s" : b <= 22 ? "m" : b <= 40 ? "l" : "g";
+        }
+        var perYear = { s: 4, m: 5, l: 6, g: 7.5 }[sz];
+        var label = { s: "소형견", m: "중형견", l: "대형견", g: "초대형견" }[sz];
+        sizeTxt = label + " 기준";
+        human = y <= 1 ? y * 15 : y <= 2 ? 15 + (y - 1) * 9 : 24 + (y - 2) * perYear;
+      }
+      var senior = isDog() ? ({ s: 10, m: 9, l: 7.5, g: 6 }[(v.size === "auto" ? (S.bw <= 9 ? "s" : S.bw <= 22 ? "m" : S.bw <= 40 ? "l" : "g") : v.size)]) : 10;
+      var flags = [];
+      if (y >= senior) flags.push(F("warn", "노령기(" + sf(senior, 1) + "세 이상)에 해당합니다. 6개월 간격의 건강검진, 혈압 측정, 요검사(UPC 포함), SDMA를 포함한 신장 기능 평가를 권장합니다."));
+      else flags.push(F("good", "성체기입니다. 연 1회 검진과 함께 기저 검사값을 축적해 두면 이후 변화 판정에 유용합니다."));
+      if (!isDog() && y >= 7) flags.push(F("info", "고양이는 7세부터 만성신장병 유병률이 뚜렷하게 증가합니다. 매년 요비중·SDMA·혈압을 함께 확인하십시오."));
+      return {
+        primary: [P("사람 나이", sf(human, 0), "세")],
+        rows: [
+          R("적용 기준", sizeTxt, ""),
+          R("실제 나이", sf(y, 1), "년"),
+          R("노령 진입 기준", sf(senior, 1), "세")
+        ],
+        flags: flags
+      };
+    },
+    note: "첫 1년을 사람의 15세, 두 번째 해를 9세로 계산하고 이후는 체격에 따라 연 4–7.5세씩 더하는 널리 쓰이는 방식입니다. 품종·개체 차가 크므로 참고 지표로만 사용하십시오."
+  });
+
+  /* ============ rendering ============ */
+  var col = document.getElementById("col");
+  var rail = document.getElementById("rail");
+  var chips = document.getElementById("chips");
+  var refresh = [];
+
+  function buildField(calc, inp) {
+    var wrap = el("div", "f" + (inp.span ? " span2" : ""));
+    var id = calc.id + "-" + inp.k;
+    var lab = el("label");
+    lab.setAttribute("for", id);
+    lab.appendChild(document.createTextNode(inp.label));
+    if (inp.unit) { var em = el("em", null, inp.unit); lab.appendChild(em); }
+    wrap.appendChild(lab);
+
+    var node;
+    if (inp.type === "select") {
+      node = el("select");
+      inp.options.forEach(function (o) {
+        var opt = el("option", null, o.t);
+        opt.value = o.v;
+        if (String(o.v) === String(inp.def)) opt.selected = true;
+        node.appendChild(opt);
+      });
+      node.value = String(inp.def);
+    } else {
+      node = el("input");
+      node.type = "text";
+      node.inputMode = "decimal";
+      node.value = String(inp.def);
+    }
+    node.id = id;
+    wrap.appendChild(node);
+    return { wrap: wrap, node: node };
+  }
+
+  function buildCalc(calc) {
+    var card = el("article", "calc");
+    card.id = "c-" + calc.id;
+    card.dataset.cat = calc.cat;
+    card.dataset.keys = (calc.name + " " + calc.desc + " " + (calc.keys || "")).toLowerCase();
+
+    var head = el("header");
+    head.appendChild(el("h3", null, calc.name));
+    head.appendChild(el("p", null, calc.desc));
+    card.appendChild(head);
+
+    var values = {};
+    var nodes = {};
+    var out = el("div", "out");
+
+    function setVal(k, val) {
+      values[k] = String(val);
+      if (nodes[k]) nodes[k].value = String(val);
+    }
+
+    function run() {
+      var res;
+      try { res = calc.compute(values) || {}; }
+      catch (e) { res = { flags: [F("crit", "계산 오류: " + e.message)] }; }
+      out.textContent = "";
+
+      if (res.badge) {
+        var bwrap = el("div");
+        var b = el("span", "badge t-" + (res.badge.tone || "info"), res.badge.text);
+        bwrap.appendChild(b);
+        out.appendChild(bwrap);
+      }
+      if (res.primary && res.primary.length) {
+        var pr = el("div", "pris");
+        res.primary.forEach(function (p) {
+          if (!p) return;
+          var d = el("div", "pri" + (p.tone ? " t-" + p.tone : ""));
+          d.appendChild(el("i", null, p.label));
+          var b2 = el("b", null, p.value);
+          if (p.unit) { var e2 = el("em", null, p.unit); b2.appendChild(e2); }
+          d.appendChild(b2);
+          pr.appendChild(d);
+        });
+        out.appendChild(pr);
+      }
+      if (res.rows && res.rows.length) {
+        var rr = el("div", "rows");
+        res.rows.forEach(function (r) {
+          if (!r) return;
+          var line = el("div", "row");
+          line.appendChild(el("span", null, r.label));
+          var b3 = el("b", null, r.value);
+          if (r.unit) { var e3 = el("em", null, r.unit); b3.appendChild(e3); }
+          line.appendChild(b3);
+          rr.appendChild(line);
+        });
+        out.appendChild(rr);
+      }
+      if (res.html) {
+        var h = el("div");
+        h.innerHTML = res.html;
+        out.appendChild(h);
+      }
+      if (res.flags && res.flags.length) {
+        var fl = el("div", "flags");
+        res.flags.forEach(function (f) {
+          if (!f) return;
+          var d = el("div", "flag " + (f.tone || "info"));
+          d.appendChild(el("span", null, f.text));
+          fl.appendChild(d);
+        });
+        out.appendChild(fl);
+      }
+    }
+
+    if (calc.inputs && calc.inputs.length) {
+      var grid = el("div", "grid");
+      calc.inputs.forEach(function (inp) {
+        var f = buildField(calc, inp);
+        values[inp.k] = String(inp.def);
+        nodes[inp.k] = f.node;
+        var handler = function () {
+          values[inp.k] = f.node.value;
+          if (calc.hook) calc.hook(inp.k, values, setVal);
+          run();
+        };
+        f.node.addEventListener("input", handler);
+        f.node.addEventListener("change", handler);
+        grid.appendChild(f.wrap);
+      });
+      card.appendChild(grid);
+    }
+
+    card.appendChild(out);
+    if (calc.note) {
+      var nt = el("p", "note");
+      nt.innerHTML = "<b>참고 —</b> " + esc(calc.note);
+      card.appendChild(nt);
+    }
+    refresh.push(run);
+    run();
+    return card;
+  }
+
+  CATS.forEach(function (c) {
+    var list = CALCS.filter(function (x) { return x.cat === c.id; });
+    var h = el("div", "sec-head");
+    h.id = "s-" + c.id;
+    h.appendChild(el("h2", null, c.name));
+    h.appendChild(el("span", null, c.eyebrow));
+    col.appendChild(h);
+    list.forEach(function (calc) { col.appendChild(buildCalc(calc)); });
+
+    var a = el("a");
+    a.href = "#s-" + c.id;
+    a.appendChild(document.createTextNode(c.name));
+    a.appendChild(el("small", null, String(list.length)));
+    a.dataset.cat = c.id;
+    rail.appendChild(a);
+  });
+  var hr = el("hr"); rail.appendChild(hr);
+  var railNote = el("p", null, "상단에 종과 체중을 한 번 입력하면 모든 계산기에 자동 반영됩니다.");
+  rail.appendChild(railNote);
+
+  var emptyMsg = el("div", "empty", "검색 결과가 없습니다.");
+  emptyMsg.style.display = "none";
+  col.appendChild(emptyMsg);
+
+  /* ============ patient context ============ */
+  function renderChips() {
+    chips.textContent = "";
+    var bw = S.bw;
+    if (!ok(bw)) return;
+    var K = isDog() ? 10.1 : 10.0;
+    var data = [
+      { l: "체표면적", v: sf(K * Math.pow(bw * 1000, 2 / 3) / 10000, 3), u: "m²" },
+      { l: "혈액량", v: sf(bw * BV_PER_KG(), 0), u: "mL" },
+      { l: "RER", v: sf(70 * Math.pow(bw, 0.75), 0), u: "kcal/d" },
+      { l: "유지수액", v: sf(bw * (isDog() ? 60 : 50) / 24, 1), u: "mL/hr" }
+    ];
+    data.forEach(function (d) {
+      var c = el("div", "chip");
+      c.appendChild(el("i", null, d.l));
+      var b = el("b", null, d.v);
+      b.appendChild(el("em", null, d.u));
+      c.appendChild(b);
+      chips.appendChild(c);
+    });
+  }
+
+  function recomputeAll() { refresh.forEach(function (fn) { try { fn(); } catch (e) {} }); renderChips(); }
+
+  var bwInput = document.getElementById("bw");
+  var bwUnit = document.getElementById("bwUnit");
+  bwInput.value = String(S.bw);
+  function readWeight() {
+    var raw = num(bwInput.value);
+    S.bw = bwUnit.value === "lb" ? raw / 2.20462 : raw;
+    persist();
+    recomputeAll();
+  }
+  bwInput.addEventListener("input", readWeight);
+  bwUnit.addEventListener("change", function () {
+    if (bwUnit.value === "lb") bwInput.value = sf(S.bw * 2.20462, 2);
+    else bwInput.value = sf(S.bw, 2);
+    readWeight();
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function (btn) {
+    btn.setAttribute("aria-pressed", String(btn.dataset.sp === S.sp));
+    btn.addEventListener("click", function () {
+      S.sp = btn.dataset.sp;
+      persist();
+      Array.prototype.forEach.call(document.querySelectorAll(".seg button"), function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.sp === S.sp));
+      });
+      recomputeAll();
+    });
+  });
+
+  /* ============ search ============ */
+  var q = document.getElementById("q");
+  q.addEventListener("input", function () {
+    var term = q.value.trim().toLowerCase();
+    var anyVisible = false;
+    CATS.forEach(function (c) {
+      var head = document.getElementById("s-" + c.id);
+      var shown = 0;
+      CALCS.filter(function (x) { return x.cat === c.id; }).forEach(function (calc) {
+        var card = document.getElementById("c-" + calc.id);
+        var hit = !term || card.dataset.keys.indexOf(term) >= 0;
+        card.style.display = hit ? "" : "none";
+        if (hit) shown++;
+      });
+      head.style.display = shown ? "" : "none";
+      if (shown) anyVisible = true;
+    });
+    emptyMsg.style.display = anyVisible ? "none" : "";
+  });
+
+  /* ============ nav highlight ============ */
+  var links = Array.prototype.slice.call(rail.querySelectorAll("a"));
+  if ("IntersectionObserver" in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var id = e.target.id.replace("s-", "");
+        links.forEach(function (a) { a.classList.toggle("on", a.dataset.cat === id); });
+      });
+    }, { rootMargin: "-120px 0px -70% 0px" });
+    CATS.forEach(function (c) { obs.observe(document.getElementById("s-" + c.id)); });
+  }
+
+  /* ============ theme + print ============ */
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var root = document.documentElement;
+    var cur = root.getAttribute("data-theme");
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = cur ? (cur === "dark" ? "light" : "dark") : (prefersDark ? "light" : "dark");
+    root.setAttribute("data-theme", next);
+  });
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  renderChips();
+})();
+</script>
+</body>
+</html>
