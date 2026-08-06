@@ -527,25 +527,28 @@ footer b { color: var(--ink-2); font-weight: 600; }
   ];
 
   /* ============ shared reference data ============ */
+  // 선택 목록 순서 = 아래 정의 순서. 원내 사용 빈도가 높은 약물을 위에 둔다.
   var CRI_PRESETS = {
     custom:   { label: "직접 입력", dose: 1,    unit: "mgkghr", conc: 10,   hint: "" },
-    dopamine: { label: "도파민",       dose: 5,    unit: "mcgkgmin", conc: 40,   hint: "2–10 µg/kg/min · 40 mg/mL 원액" },
-    dobut:    { label: "도부타민",     dose: 5,    unit: "mcgkgmin", conc: 12.5, hint: "개 2–10, 고양이 1–5 µg/kg/min · 12.5 mg/mL" },
-    norepi:   { label: "노르에피네프린", dose: 0.2, unit: "mcgkgmin", conc: 1,   hint: "0.05–1 µg/kg/min · 1 mg/mL" },
-    fentanyl: { label: "펜타닐",       dose: 3,    unit: "mcgkghr",  conc: 0.05, hint: "2–5 µg/kg/hr · 50 µg/mL" },
-    ketamine: { label: "케타민",       dose: 5,    unit: "mcgkgmin", conc: 100,  hint: "2–10 µg/kg/min · 100 mg/mL" },
-    lido:     { label: "리도카인 (개)", dose: 40,  unit: "mcgkgmin", conc: 20,   hint: "25–50 µg/kg/min · 2% (20 mg/mL) · 고양이 주의" },
-    furo:     { label: "푸로세미드",   dose: 0.5,  unit: "mgkghr",   conc: 10,   hint: "0.1–1 mg/kg/hr · 10 mg/mL" },
-    metoclo:  { label: "메토클로프라마이드", dose: 1.5, unit: "mgkgday", conc: 5, hint: "1–2 mg/kg/day · 5 mg/mL" },
-    dilt:     { label: "딜티아젬",     dose: 5,    unit: "mcgkgmin", conc: 5,    hint: "1–10 µg/kg/min · 5 mg/mL" },
     nitro:    { label: "니트로프루시드 나트륨", dose: 1, unit: "mcgkgmin", conc: 25, hint: "0.5–10 µg/kg/min · 25 mg/mL 원액 · 1–2에서 시작해 혈압 보며 적정",
       warns: [
         ["crit", "동맥압 지속 감시가 필수인 약물입니다. 5–10분마다 혈압을 확인하며 적정하고, 급격한 저혈압 시 즉시 감량·중단하십시오. 반감기가 매우 짧아 중단하면 수 분 내 혈압이 회복됩니다."],
         ["crit", "시안화물·티오시안산 축적 위험이 있습니다. 10 µg/kg/min 초과 투여나 24–48시간을 넘는 지속 투여는 피하고, 신부전·간부전 환자에서는 티오시안산 배설이 지연되므로 더 낮은 용량과 짧은 기간으로 제한하십시오."],
         ["warn", "광분해되므로 수액백과 라인을 차광하고, 5% 포도당으로 희석해 24시간마다 새로 조제하십시오. 용액이 청색·녹색·적갈색으로 변하면 폐기합니다."]
       ] },
+    dobut:    { label: "도부타민",     dose: 5,    unit: "mcgkgmin", conc: 12.5, hint: "개 2–10, 고양이 1–5 µg/kg/min · 12.5 mg/mL" },
+    dopamine: { label: "도파민",       dose: 5,    unit: "mcgkgmin", conc: 40,   hint: "2–10 µg/kg/min · 40 mg/mL 원액" },
+    norepi:   { label: "노르에피네프린", dose: 0.2, unit: "mcgkgmin", conc: 1,   hint: "0.05–1 µg/kg/min · 1 mg/mL" },
+    dilt:     { label: "딜티아젬",     dose: 5,    unit: "mcgkgmin", conc: 5,    hint: "1–10 µg/kg/min · 5 mg/mL" },
+    furo:     { label: "푸로세미드",   dose: 0.5,  unit: "mgkghr",   conc: 10,   hint: "0.1–1 mg/kg/hr · 10 mg/mL" },
+    fentanyl: { label: "펜타닐",       dose: 3,    unit: "mcgkghr",  conc: 0.05, hint: "2–5 µg/kg/hr · 50 µg/mL" },
+    ketamine: { label: "케타민",       dose: 5,    unit: "mcgkgmin", conc: 100,  hint: "2–10 µg/kg/min · 100 mg/mL" },
+    lido:     { label: "리도카인 (개)", dose: 40,  unit: "mcgkgmin", conc: 20,   hint: "25–50 µg/kg/min · 2% (20 mg/mL) · 고양이 주의" },
+    metoclo:  { label: "메토클로프라마이드", dose: 1.5, unit: "mgkgday", conc: 5, hint: "1–2 mg/kg/day · 5 mg/mL" },
     mannitol: { label: "만니톨 20%",   dose: 1,    unit: "mgkghr",   conc: 200,  hint: "볼루스 0.5–1 g/kg 20–30분, CRI는 프로토콜 확인" }
   };
+  // 첫 화면에 표시할 약물. 아래 입력 기본값은 여기서 끌어오므로 서로 어긋나지 않는다.
+  var CRI_DEFAULT = "nitro";
   var CRI_UNITS = [
     { v: "mcgkgmin", t: "µg/kg/min" },
     { v: "mcgkghr",  t: "µg/kg/hr" },
@@ -1563,12 +1566,12 @@ footer b { color: var(--ink-2); font-weight: 600; }
     desc: "목표 용량으로부터 시린지 원액 속도와 수액백 희석 조제량을 동시에 계산합니다.",
     keys: "CRI 지속정주 constant rate infusion 시린지 펌프 도파민 도부타민 펜타닐 희석",
     inputs: [
-      { k: "preset", label: "약물", type: "select", def: "dopamine", options: (function () {
+      { k: "preset", label: "약물", type: "select", def: CRI_DEFAULT, options: (function () {
           var a = []; for (var kk in CRI_PRESETS) a.push({ v: kk, t: CRI_PRESETS[kk].label }); return a;
         })() },
-      { k: "dose", label: "목표 용량", unit: "", def: 5, step: 0.1 },
-      { k: "unit", label: "용량 단위", type: "select", def: "mcgkgmin", options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
-      { k: "conc", label: "제제 농도", unit: "mg/mL", def: 40, step: 0.05 },
+      { k: "dose", label: "목표 용량", unit: "", def: CRI_PRESETS[CRI_DEFAULT].dose, step: 0.1 },
+      { k: "unit", label: "용량 단위", type: "select", def: CRI_PRESETS[CRI_DEFAULT].unit, options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
+      { k: "conc", label: "제제 농도", unit: "mg/mL", def: CRI_PRESETS[CRI_DEFAULT].conc, step: 0.05 },
       { k: "bag", label: "희석백 용량", unit: "mL", def: 250, step: 50 },
       { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 20, step: 1 }
     ],
