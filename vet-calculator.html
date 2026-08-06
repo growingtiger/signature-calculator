@@ -519,9 +519,9 @@ footer b { color: var(--ink-2); font-weight: 600; }
 
   /* ============ categories ============ */
   var CATS = [
+    { id: "drug",  name: "약물 · 용량", eyebrow: "Drug Dosing" },
     { id: "fluid", name: "수액 · 응급", eyebrow: "Fluids & Emergency" },
     { id: "lyte",  name: "전해질 · 산염기", eyebrow: "Electrolytes & Acid-Base" },
-    { id: "drug",  name: "약물 · 용량", eyebrow: "Drug Dosing" },
     { id: "misc",  name: "영양 · 일반", eyebrow: "Nutrition & General" },
     { id: "renal", name: "신장 · 투석", eyebrow: "Nephrology & Dialysis" }
   ];
@@ -1559,48 +1559,6 @@ footer b { color: var(--ink-2); font-weight: 600; }
 
   /* ---------- DRUGS ---------- */
   CALCS.push({
-    id: "dose", cat: "drug", name: "약물 용량 계산",
-    desc: "mg/kg 용량과 제제 농도로 실제 투여 부피를 계산합니다.",
-    keys: "용량 dose 투여량 mg/kg 희석 dilution 시린지",
-    inputs: [
-      { k: "d", label: "용량", unit: "mg/kg", def: 2, step: 0.1 },
-      { k: "c", label: "제제 농도", unit: "mg/mL", def: 10, step: 1 },
-      { k: "freq", label: "투여 간격", type: "select", def: "12",
-        options: [{ v: "0", t: "1회 (단회)" }, { v: "24", t: "q24h · SID" }, { v: "12", t: "q12h · BID" }, { v: "8", t: "q8h · TID" }, { v: "6", t: "q6h · QID" }] },
-      { k: "dil", label: "희석 배수", unit: "× · 1이면 원액", def: 1, step: 1 }
-    ],
-    compute: function (v) {
-      var bw = S.bw;
-      if (!ok(bw)) return { flags: needWeight() };
-      var d = num(v.d), c = num(v.c), dil = Math.max(1, num(v.dil));
-      if (!ok(d) || !ok(c)) return { flags: [F("info", "용량과 농도를 입력하십시오.")] };
-      var mg = d * bw;
-      var ml = mg / c;
-      var mlDil = ml * dil;
-      var freq = parseFloat(v.freq);
-      var perDay = freq > 0 ? 24 / freq : 0;
-      var flags = [];
-      if (ml < 0.05) flags.push(F("warn", "투여 부피 " + sf(ml, 3) + " mL — 정확한 계량이 어렵습니다. 희석하거나 인슐린 시린지(0.01 mL 눈금) 사용을 검토하십시오."));
-      if (ml > 20) flags.push(F("info", "투여 부피가 " + sf(ml, 1) + " mL로 큽니다. 주입 속도와 투여 경로를 확인하십시오."));
-      var rows = [
-        R("총 투여 용량", sf(mg, 2), "mg"),
-        R("원액 부피", sf(ml, 3), "mL")
-      ];
-      if (dil > 1) rows.push(R(sf(dil, 0) + "배 희석 후 부피", sf(mlDil, 2), "mL (최종 " + sf(c / dil, 2) + " mg/mL)"));
-      if (perDay > 0) {
-        rows.push(R("1일 총 용량", sf(mg * perDay, 2), "mg (" + sf(d * perDay, 2) + " mg/kg/day)"));
-        rows.push(R("1일 총 부피", sf(ml * perDay, 2), "mL"));
-      }
-      return {
-        primary: [P("1회 투여 부피", sf(dil > 1 ? mlDil : ml, 2), "mL"), P("1회 용량", sf(mg, 2), "mg")],
-        rows: rows,
-        flags: flags.length ? flags : [F("good", "1회 " + sf(ml, 2) + " mL를 투여합니다.")]
-      };
-    },
-    note: "신장·간 기능 저하 환자에서는 신배설 약물(아미노글리코사이드, 일부 세팔로스포린, 디곡신 등)의 용량 감량 또는 간격 연장이 필요합니다. 투석 환자는 약물 제거율에 따라 투석 후 보충 투여를 고려하십시오."
-  });
-
-  CALCS.push({
     id: "cri", cat: "drug", name: "지속정주 (CRI) 계산",
     desc: "목표 용량으로부터 시린지 원액 속도와 수액백 희석 조제량을 동시에 계산합니다.",
     keys: "CRI 지속정주 constant rate infusion 시린지 펌프 도파민 도부타민 펜타닐 희석",
@@ -1655,6 +1613,48 @@ footer b { color: var(--ink-2); font-weight: 600; }
       };
     },
     note: "희석 조제법: 위에 표시된 약물 부피만큼 수액백에서 미리 빼낸 뒤 약물을 주입하면 최종 농도가 계산값과 일치합니다. 승압제는 가급적 중심정맥으로 투여하고, 말초 투여 시 혈관외 유출을 자주 확인하십시오."
+  });
+
+  CALCS.push({
+    id: "dose", cat: "drug", name: "약물 용량 계산",
+    desc: "mg/kg 용량과 제제 농도로 실제 투여 부피를 계산합니다.",
+    keys: "용량 dose 투여량 mg/kg 희석 dilution 시린지",
+    inputs: [
+      { k: "d", label: "용량", unit: "mg/kg", def: 2, step: 0.1 },
+      { k: "c", label: "제제 농도", unit: "mg/mL", def: 10, step: 1 },
+      { k: "freq", label: "투여 간격", type: "select", def: "12",
+        options: [{ v: "0", t: "1회 (단회)" }, { v: "24", t: "q24h · SID" }, { v: "12", t: "q12h · BID" }, { v: "8", t: "q8h · TID" }, { v: "6", t: "q6h · QID" }] },
+      { k: "dil", label: "희석 배수", unit: "× · 1이면 원액", def: 1, step: 1 }
+    ],
+    compute: function (v) {
+      var bw = S.bw;
+      if (!ok(bw)) return { flags: needWeight() };
+      var d = num(v.d), c = num(v.c), dil = Math.max(1, num(v.dil));
+      if (!ok(d) || !ok(c)) return { flags: [F("info", "용량과 농도를 입력하십시오.")] };
+      var mg = d * bw;
+      var ml = mg / c;
+      var mlDil = ml * dil;
+      var freq = parseFloat(v.freq);
+      var perDay = freq > 0 ? 24 / freq : 0;
+      var flags = [];
+      if (ml < 0.05) flags.push(F("warn", "투여 부피 " + sf(ml, 3) + " mL — 정확한 계량이 어렵습니다. 희석하거나 인슐린 시린지(0.01 mL 눈금) 사용을 검토하십시오."));
+      if (ml > 20) flags.push(F("info", "투여 부피가 " + sf(ml, 1) + " mL로 큽니다. 주입 속도와 투여 경로를 확인하십시오."));
+      var rows = [
+        R("총 투여 용량", sf(mg, 2), "mg"),
+        R("원액 부피", sf(ml, 3), "mL")
+      ];
+      if (dil > 1) rows.push(R(sf(dil, 0) + "배 희석 후 부피", sf(mlDil, 2), "mL (최종 " + sf(c / dil, 2) + " mg/mL)"));
+      if (perDay > 0) {
+        rows.push(R("1일 총 용량", sf(mg * perDay, 2), "mg (" + sf(d * perDay, 2) + " mg/kg/day)"));
+        rows.push(R("1일 총 부피", sf(ml * perDay, 2), "mL"));
+      }
+      return {
+        primary: [P("1회 투여 부피", sf(dil > 1 ? mlDil : ml, 2), "mL"), P("1회 용량", sf(mg, 2), "mg")],
+        rows: rows,
+        flags: flags.length ? flags : [F("good", "1회 " + sf(ml, 2) + " mL를 투여합니다.")]
+      };
+    },
+    note: "신장·간 기능 저하 환자에서는 신배설 약물(아미노글리코사이드, 일부 세팔로스포린, 디곡신 등)의 용량 감량 또는 간격 연장이 필요합니다. 투석 환자는 약물 제거율에 따라 투석 후 보충 투여를 고려하십시오."
   });
 
   CALCS.push({
