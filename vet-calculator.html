@@ -1572,7 +1572,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
       { k: "dose", label: "목표 용량", unit: "", def: CRI_PRESETS[CRI_DEFAULT].dose, step: 0.1 },
       { k: "unit", label: "용량 단위", type: "select", def: CRI_PRESETS[CRI_DEFAULT].unit, options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
       { k: "conc", label: "제제 농도", unit: "mg/mL", def: CRI_PRESETS[CRI_DEFAULT].conc, step: 0.05 },
-      { k: "bag", label: "희석백 용량", unit: "mL", def: 50, step: 10 },
+      { k: "bag", label: "희석백 용량", unit: "mL", def: 54, step: 1 },
       { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 3, step: 1 }
     ],
     hook: function (k, v, set) {
