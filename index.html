@@ -543,7 +543,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
   // 선택 목록 순서 = 아래 정의 순서. 원내 사용 빈도가 높은 약물을 위에 둔다.
   var CRI_PRESETS = {
     custom:   { label: "직접 입력", dose: 1,    unit: "mgkghr", conc: 10,   hint: "" },
-    nitro:    { label: "니트로프루시드 나트륨", dose: 1, unit: "mcgkgmin", conc: 25, hint: "0.5–10 µg/kg/min · 25 mg/mL 원액 · 1–2에서 시작해 혈압 보며 적정",
+    nitro:    { label: "니트로프루시드 나트륨", dose: 3, unit: "mcgkgmin", conc: 25, hint: "0.5–10 µg/kg/min · 25 mg/mL 원액 · 혈압을 보며 적정",
       warns: [
         ["crit", "동맥압 지속 감시가 필수인 약물입니다. 5–10분마다 혈압을 확인하며 적정하고, 급격한 저혈압 시 즉시 감량·중단하십시오. 반감기가 매우 짧아 중단하면 수 분 내 혈압이 회복됩니다."],
         ["crit", "시안화물·티오시안산 축적 위험이 있습니다. 10 µg/kg/min 초과 투여나 24–48시간을 넘는 지속 투여는 피하고, 신부전·간부전 환자에서는 티오시안산 배설이 지연되므로 더 낮은 용량과 짧은 기간으로 제한하십시오."],
@@ -1585,8 +1585,8 @@ footer b { color: var(--ink-2); font-weight: 600; }
       { k: "dose", label: "목표 용량", unit: "", def: CRI_PRESETS[CRI_DEFAULT].dose, step: 0.1 },
       { k: "unit", label: "용량 단위", type: "select", def: CRI_PRESETS[CRI_DEFAULT].unit, options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
       { k: "conc", label: "제제 농도", unit: "mg/mL", def: CRI_PRESETS[CRI_DEFAULT].conc, step: 0.05 },
-      { k: "bag", label: "희석백 용량", unit: "mL", def: 250, step: 50 },
-      { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 20, step: 1 }
+      { k: "bag", label: "희석백 용량", unit: "mL", def: 50, step: 10 },
+      { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 3, step: 1 }
     ],
     hook: function (k, v, set) {
       if (k === "preset") {
@@ -1614,7 +1614,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
       if (drugML > bag * 0.2) flags.push(F("warn", "약물 부피 " + sf(drugML, 1) + " mL가 백 용량의 20%를 초과합니다. 최종 농도가 크게 달라지므로 동일 부피의 수액을 먼저 빼내십시오."));
       if (neatRate < 0.1) flags.push(F("warn", "원액 속도 " + sf(neatRate, 3) + " mL/hr — 대부분의 시린지 펌프 최소 정밀도 이하입니다. 희석 조제를 사용하십시오."));
       else flags.push(F("good", "시린지 펌프로 원액 " + sf(neatRate, 2) + " mL/hr, 또는 희석백을 " + sf(rate, 0) + " mL/hr로 투여합니다."));
-      flags.push(F("info", "희석백 " + sf(bag, 0) + " mL는 " + sf(hoursPerBag, 1) + "시간 지속됩니다. 카테콜아민은 광분해·산화되므로 24시간마다 새로 조제하십시오."));
+      flags.push(F("info", "희석백 " + sf(bag, 0) + " mL는 " + sf(hoursPerBag, 1) + "시간 지속됩니다. 광분해·산화되는 약물(카테콜아민, 니트로프루시드 등)은 24시간마다 새로 조제하십시오."));
 
       return {
         primary: [P("원액 주입 속도", sf(neatRate, 3), "mL/hr"), P("백에 넣을 약물", sf(drugML, 2), "mL"), P("시간당 투여량", sf(mgHr, 3), "mg/hr")],
