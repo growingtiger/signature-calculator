@@ -53,6 +53,19 @@ def pulse(draw, size, cx, cy, w, color, weight):
 LOGO = pathlib.Path(__file__).with_name("logo.png")
 
 
+def logo_bg(default):
+    """로고에 단색 배경이 깔려 있으면 그 색을 아이콘 바탕으로 쓴다.
+    네 모서리 색이 모두 같고 불투명할 때만 인정한다(투명 배경 로고는 제외)."""
+    if not LOGO.exists():
+        return default
+    im = Image.open(LOGO).convert("RGBA")
+    w, h = im.size
+    corners = [im.getpixel(p) for p in ((1, 1), (w - 2, 1), (1, h - 2), (w - 2, h - 2))]
+    if all(c[3] == 255 for c in corners) and len({c[:3] for c in corners}) == 1:
+        return corners[0][:3]
+    return default
+
+
 def place_logo(img, s, safe):
     """logo.png를 정사각 캔버스 가운데에 비율을 유지해 얹는다.
     safe는 로고가 차지할 최대 폭·높이 비율(마스커블은 잘림을 고려해 작게)."""
@@ -64,9 +77,10 @@ def place_logo(img, s, safe):
     img.alpha_composite(logo, (int((s - logo.width) / 2), int((s - logo.height) / 2)))
 
 
-def build(px, maskable=False, simple=False, bg=TEAL, mark=WHITE):
+def build(px, maskable=False, simple=False, bg=None, mark=WHITE):
     """simple=True면 파형을 빼고 발자국만 크게 — 32px 이하에서 뭉개지지 않는다.
-    폴더에 logo.png가 있으면 발자국 대신 그 로고를 사용한다."""
+    폴더에 logo.png가 있으면 발자국 대신 그 로고를 쓰고, 로고 배경색을 바탕으로 삼는다."""
+    bg = bg or logo_bg(TEAL)
     s = px * SS
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -102,7 +116,10 @@ def main():
         ("favicon-32.png", build(32, simple=True)),
         ("favicon-16.png", build(16, simple=True)),
     ]
+    bg = logo_bg(TEAL)
     print("로고 소스:", "logo.png" if LOGO.exists() else "없음 — 기본 발자국 마크 사용")
+    print("아이콘 바탕: #%02X%02X%02X%s" % (bg[0], bg[1], bg[2],
+          " (로고 배경에서 추출)" if bg != TEAL else " (기본값)"))
     for name, im in outputs:
         im.convert("RGB").save(name) if name == "apple-touch-icon.png" else im.save(name)
         print("생성:", name, im.size)
