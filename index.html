@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등을 종과 체중 한 번 입력으로 계산합니다.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#2B3A5E" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E121B" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#212E51" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1019" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="시그니처 동물의료센터 · 수의 임상 계산기">
 <meta property="og:description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등을 종과 체중 한 번 입력으로 계산합니다.">
@@ -28,29 +28,29 @@
 :root {
   color-scheme: light dark;
 
-  /* 센터 CI — 네이비 #2B3A5E, 골드 #C3A17B.
+  /* 센터 CI — 네이비 #212E51, 골드 #AF9476.
      액센트는 네이비 계열로 통일하고, 골드는 라벨·이브로우 같은 비의미 요소에만 쓴다.
      골드를 상태색으로 쓰면 '주의' 앰버와 혼동될 수 있어 의도적으로 분리했다. */
-  --bg:        #F2F4F8;
+  --bg:        #F4F5F8;
   --surface:   #FFFFFF;
-  --surface-2: #E8ECF3;
-  --ink:       #141A26;
-  --ink-2:     #49546B;
-  --ink-3:     #7B869C;
-  --line:      #DBE0EA;
-  --line-2:    #C5CCDB;
-  --accent:    #2B3A5E;
-  --accent-2:  #1A2540;
-  --accent-soft:#E6EAF3;
-  --gold:      #8A6A3C;
-  --gold-soft: #F3EBDE;
+  --surface-2: #E6E8EF;
+  --ink:       #141824;
+  --ink-2:     #4C5367;
+  --ink-3:     #7E869A;
+  --line:      #DDE0E9;
+  --line-2:    #C3C8D5;
+  --accent:    #212E51;
+  --accent-2:  #12192B;
+  --accent-soft:#EAEDF5;
+  --gold:      #8A6F51;
+  --gold-soft: #F4EEE6;
   --good:      #2C7A55;
   --good-soft: #E3F0E9;
   --warn:      #8E4D0D;
   --warn-soft: #FAEEE0;
   --crit:      #A63A32;
   --crit-soft: #F7E5E3;
-  --shadow:    0 1px 2px rgba(20,26,38,.05), 0 8px 24px -16px rgba(20,26,38,.28);
+  --shadow:    0 1px 2px rgba(20,24,36,.05), 0 8px 24px -16px rgba(20,24,36,.28);
 
   --f-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   --f-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -64,19 +64,19 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* 다크에서는 네이비가 바탕이 되므로 액센트를 같은 계열의 밝은 청보라로 올린다 */
-    --bg:        #0E121B;
-    --surface:   #161C28;
-    --surface-2: #1E2533;
-    --ink:       #E7EBF3;
-    --ink-2:     #9EA9BE;
-    --ink-3:     #6D788E;
-    --line:      #252E3E;
-    --line-2:    #354052;
-    --accent:    #8FA6DA;
-    --accent-2:  #B2C1E9;
-    --accent-soft:#182033;
-    --gold:      #C9A87F;
-    --gold-soft: #241D14;
+    --bg:        #0D1019;
+    --surface:   #171B27;
+    --surface-2: #1F2433;
+    --ink:       #E6E8F0;
+    --ink-2:     #A2A8B9;
+    --ink-3:     #70788F;
+    --line:      #282E3E;
+    --line-2:    #3B4254;
+    --accent:    #8AA2DE;
+    --accent-2:  #ADBEEB;
+    --accent-soft:#1B2237;
+    --gold:      #A68866;
+    --gold-soft: #231C15;
     --good:      #55B487;
     --good-soft: #12261D;
     --warn:      #D9954A;
@@ -89,21 +89,21 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg:#0E121B; --surface:#161C28; --surface-2:#1E2533; --ink:#E7EBF3; --ink-2:#9EA9BE;
-  --ink-3:#6D788E; --line:#252E3E; --line-2:#354052; --accent:#8FA6DA; --accent-2:#B2C1E9;
-  --accent-soft:#182033; --gold:#C9A87F; --gold-soft:#241D14;
+  --bg:#0D1019; --surface:#171B27; --surface-2:#1F2433; --ink:#E6E8F0; --ink-2:#A2A8B9;
+  --ink-3:#70788F; --line:#282E3E; --line-2:#3B4254; --accent:#8AA2DE; --accent-2:#ADBEEB;
+  --accent-soft:#1B2237; --gold:#A68866; --gold-soft:#231C15;
   --good:#55B487; --good-soft:#12261D; --warn:#D9954A; --warn-soft:#2A2114;
   --crit:#E3796F; --crit-soft:#2C1917;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
 }
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg:#F2F4F8; --surface:#FFFFFF; --surface-2:#E8ECF3; --ink:#141A26; --ink-2:#49546B;
-  --ink-3:#7B869C; --line:#DBE0EA; --line-2:#C5CCDB; --accent:#2B3A5E; --accent-2:#1A2540;
-  --accent-soft:#E6EAF3; --gold:#8A6A3C; --gold-soft:#F3EBDE;
+  --bg:#F4F5F8; --surface:#FFFFFF; --surface-2:#E6E8EF; --ink:#141824; --ink-2:#4C5367;
+  --ink-3:#7E869A; --line:#DDE0E9; --line-2:#C3C8D5; --accent:#212E51; --accent-2:#12192B;
+  --accent-soft:#EAEDF5; --gold:#8A6F51; --gold-soft:#F4EEE6;
   --good:#2C7A55; --good-soft:#E3F0E9; --warn:#8E4D0D; --warn-soft:#FAEEE0;
   --crit:#A63A32; --crit-soft:#F7E5E3;
-  --shadow:0 1px 2px rgba(20,26,38,.05), 0 8px 24px -16px rgba(20,26,38,.28);
+  --shadow:0 1px 2px rgba(20,24,36,.05), 0 8px 24px -16px rgba(20,24,36,.28);
 }
 
 body {
@@ -130,7 +130,7 @@ body {
 }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 /* 로고 자리. logo.png를 두면 빌드 스크립트가 이 안의 내용을 로고 이미지로 바꾼다. */
-.brand-mark { flex: none; width: 34px; height: 34px; display: block; }
+.brand-mark { flex: none; width: 38px; height: 38px; display: block; }
 .brand-mark svg, .brand-mark img { width: 100%; height: 100%; display: block; border-radius: 8px; object-fit: contain; }
 .brand-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .brand-text b {
@@ -448,6 +448,63 @@ footer b { color: var(--ink-2); font-weight: 600; }
   .pri b { font-size: 22px; }
 }
 
+/* ---------- AI 처방 점검 ---------- */
+.ai-body { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+.ai-body label.al { font-size: 11.5px; font-weight: 500; color: var(--ink-2); }
+.ai-body input[type="password"], .ai-body input[type="text"], .ai-body select {
+  padding: 7px 9px; font-size: 13px; color: var(--ink); background: var(--surface-2);
+  border: 1px solid transparent; border-radius: 7px; font-family: var(--f-sans);
+}
+.ai-body input[type="password"] { font-family: var(--f-mono); }
+.ai-body input:focus, .ai-body select:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.ai-body textarea {
+  width: 100%; min-height: 130px; padding: 10px 12px;
+  font-family: var(--f-sans); font-size: 13px; line-height: 1.6;
+  color: var(--ink); background: var(--surface-2);
+  border: 1px solid transparent; border-radius: 7px; resize: vertical;
+}
+.ai-body textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.ai-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ai-btn {
+  border: 0; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: var(--f-sans); background: var(--accent); color: var(--surface);
+}
+.ai-btn:disabled { opacity: .5; cursor: wait; }
+.ai-btn.ghost { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.ai-conds { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px 10px; }
+.ai-conds label { display: flex; gap: 6px; align-items: center; font-size: 12.5px; cursor: pointer; }
+.ai-conds input { accent-color: var(--accent); }
+.ai-drop {
+  border: 2px dashed var(--line-2); border-radius: 8px; padding: 12px;
+  text-align: center; color: var(--ink-3); font-size: 12.5px; cursor: pointer;
+}
+.ai-drop.hover { border-color: var(--accent); color: var(--accent); }
+.ai-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.ai-thumb { position: relative; width: 72px; height: 72px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.ai-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ai-thumb button {
+  position: absolute; top: 2px; right: 2px; border: 0; background: rgba(0,0,0,.65);
+  color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; line-height: 1;
+}
+.flag.gold { background: var(--gold-soft); color: var(--gold); }
+.flag.gold::before { background: var(--gold); }
+.ai-out h4 { margin: 14px 0 8px; font-size: 13px; letter-spacing: -.01em; }
+.ai-out .flag i { font-style: normal; font-weight: 700; font-size: 10.5px; letter-spacing: .04em; margin-right: 2px; }
+.ai-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ai-chips span { background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+.ai-chips span small { color: var(--ink-3); margin-left: 4px; font-size: 10.5px; }
+.ai-dz { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; background: var(--surface); }
+.ai-dz summary { padding: 8px 12px; cursor: pointer; font-size: 12.5px; font-weight: 600; }
+.ai-dz .dzb { padding: 0 12px 10px; font-size: 12.5px; color: var(--ink-2); line-height: 1.55; }
+.ai-status { font-size: 12.5px; color: var(--ink-2); }
+.ai-spin {
+  display: inline-block; width: 12px; height: 12px; border: 2px solid var(--line-2);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: aisp .8s linear infinite; vertical-align: -2px; margin-right: 6px;
+}
+@keyframes aisp { to { transform: rotate(360deg); } }
+.ai-usage { font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-3); }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
@@ -467,7 +524,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
   <div class="shell">
     <div class="top-a">
       <div class="brand">
-        <span class="brand-mark" id="brandMark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#2B3A5E"></rect><g fill="#C3A17B"><ellipse cx="50" cy="56.44" rx="16.28" ry="13.32"></ellipse><ellipse cx="29.65" cy="34.24" rx="6.29" ry="8.33" transform="rotate(-24 29.65 34.24)"></ellipse><ellipse cx="42.97" cy="26.1" rx="6.29" ry="8.33" transform="rotate(-8 42.97 26.1)"></ellipse><ellipse cx="57.03" cy="26.1" rx="6.29" ry="8.33" transform="rotate(8 57.03 26.1)"></ellipse><ellipse cx="70.35" cy="34.24" rx="6.29" ry="8.33" transform="rotate(24 70.35 34.24)"></ellipse></g></svg></span>
+        <span class="brand-mark" id="brandMark" aria-hidden="true"><img src="data:image/png;base64,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" alt="시그니처 동물의료센터 로고"></span>
         <span class="brand-text">
           <b>시그니처 동물의료센터</b>
           <span>Veterinary Clinical Calculators</span>
@@ -564,7 +621,8 @@ footer b { color: var(--ink-2); font-weight: 600; }
     { id: "fluid", name: "수액 · 응급", eyebrow: "Fluids & Emergency" },
     { id: "lyte",  name: "전해질 · 산염기", eyebrow: "Electrolytes & Acid-Base" },
     { id: "misc",  name: "영양 · 일반", eyebrow: "Nutrition & General" },
-    { id: "renal", name: "신장 · 투석", eyebrow: "Nephrology & Dialysis" }
+    { id: "renal", name: "신장 · 투석", eyebrow: "Nephrology & Dialysis" },
+    { id: "ai",    name: "AI 처방 점검", eyebrow: "AI Rx Check" }
   ];
 
   /* ============ shared reference data ============ */
@@ -2185,6 +2243,365 @@ footer b { color: var(--ink-2); font-weight: 600; }
     return card;
   }
 
+  /* ============ AI 처방 점검 ============ */
+  // 계산기는 공개로 두고 이 패널만 비밀번호로 잠근다. API 키는 비밀번호로
+  // AES-256-GCM 암호화되어 localStorage에 저장되므로, 비밀번호 없이는 페이지
+  // 소스나 저장소를 뒤져도 키를 꺼낼 수 없다. 복호화된 키는 메모리에만 있고
+  // 30분 미사용 시 폐기된다. Artifact 게시본은 CSP가 외부 API를 차단하므로
+  // 안내만 표시한다.
+  var AI_LS = "sig-rxai-enc", AI_MODEL_LS = "sig-rxai-model";
+  var AI_URL = "https://signature-calculator.vercel.app";
+  var aiKey = null, aiLastUse = Date.now();
+  var AI_BLOCKED = /claude/i.test(location.hostname);
+
+  var aiB64 = function (buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); };
+  var aiUnb64 = function (s) { return Uint8Array.from(atob(s), function (c) { return c.charCodeAt(0); }); };
+  function aiDerive(pw, salt) {
+    return crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"])
+      .then(function (mat) {
+        return crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 310000, hash: "SHA-256" },
+          mat, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+      });
+  }
+  async function aiEncStore(pw, plainKey) {
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    var k = await aiDerive(pw, salt);
+    var ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, k, new TextEncoder().encode(plainKey));
+    localStorage.setItem(AI_LS, JSON.stringify({ salt: aiB64(salt), iv: aiB64(iv), ct: aiB64(ct) }));
+  }
+  async function aiDecrypt(pw) {
+    var rec = JSON.parse(localStorage.getItem(AI_LS));
+    var k = await aiDerive(pw, aiUnb64(rec.salt));
+    var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: aiUnb64(rec.iv) }, k, aiUnb64(rec.ct));
+    return new TextDecoder().decode(pt);
+  }
+
+  var AI_SCHEMA = {
+    type: "object", additionalProperties: false,
+    required: ["drugs", "unrecognized", "interactions", "patient_cautions", "dose_checks", "lab_interference", "side_effects", "overall"],
+    properties: {
+      drugs: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["name", "name_en", "drug_class"],
+        properties: { name: { type: "string" }, name_en: { type: "string" }, drug_class: { type: "string" } } } },
+      unrecognized: { type: "array", items: { type: "string" } },
+      interactions: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["severity", "title", "drugs", "mechanism", "action"],
+        properties: { severity: { type: "string", enum: ["금기", "중대", "주의", "참고"] },
+          title: { type: "string" }, drugs: { type: "array", items: { type: "string" } },
+          mechanism: { type: "string" }, action: { type: "string" } } } },
+      patient_cautions: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["drug", "level", "condition", "reason"],
+        properties: { drug: { type: "string" }, level: { type: "string", enum: ["회피", "주의"] },
+          condition: { type: "string" }, reason: { type: "string" } } } },
+      dose_checks: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["drug", "parsed", "calculated", "reference", "verdict", "comment"],
+        properties: { drug: { type: "string" }, parsed: { type: "string" }, calculated: { type: "string" },
+          reference: { type: "string" },
+          verdict: { type: "string", enum: ["범위 내", "범위 초과", "범위 미만", "확인 필요"] },
+          comment: { type: "string" } } } },
+      lab_interference: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["category", "effect", "drugs"],
+        properties: { category: { type: "string" }, effect: { type: "string" }, drugs: { type: "array", items: { type: "string" } } } } },
+      side_effects: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["drug", "effects", "monitoring"],
+        properties: { drug: { type: "string" }, effects: { type: "string" }, monitoring: { type: "string" } } } },
+      overall: { type: "string" }
+    }
+  };
+
+  var AI_SYSTEM = "당신은 소동물(개·고양이) 임상약리학에 정통한 수의사 보조 시스템이다. 시그니처 동물의료센터(혈액투석·신장비뇨기 중심 2차 병원)의 수의사가 처방전을 검토할 때 쓰는 스크리닝 도구로서, Plumb's Veterinary Drug Handbook 등 표준 수의 약전 지식을 기준으로 답한다.\n\n입력으로 처방 내용(텍스트 또는 처방전 캡쳐 이미지)과 환자 정보(축종, 체중, 기저 상태)가 주어진다. 다음을 수행하라.\n\n1. 약물 식별: 처방에서 모든 약물을 식별한다(성분명·상품명·한글·영문 모두). 이미지가 주어지면 정확히 판독하되, 판독이 불확실한 항목은 drugs에 넣지 말고 unrecognized에 \"판독 불확실: (보이는 대로)\" 형태로 넣는다. 약물이 아닌 항목(사료, 처치 등)은 무시한다.\n2. 상호작용: 식별된 약물들 사이의 임상적으로 의미 있는 상호작용을 모두 나열한다. severity는 금기(병용 원칙적 회피)/중대(적극적 모니터링·용량조절 필요)/주의(시간차 투여·정기 모니터링)/참고(의도적 병용 가능성 있음, 알아둘 것)로 나눈다. NSAID+스테로이드, triple whammy(NSAID+RAAS차단제+이뇨제), 세로토닌 증후군 조합, CYP·P-gp 상호작용, 킬레이트·흡수 간섭, QT 연장 조합, 고칼륨혈증 조합 등을 빠짐없이 검토한다. mechanism에는 기전을, action에는 구체적 임상 권고를 쓴다.\n3. 환자 상태별 주의: 주어진 축종·기저 상태에서 회피 또는 주의가 필요한 약물을 나열한다. 축종 금기(예: 고양이 아세트아미노펜·아자티오프린·KBr, MDR1 변이견 고용량 이버멕틴)는 patient_cautions level \"회피\"로 표시하되, 치명적 축종 금기는 interactions에도 severity \"금기\"로 중복 표시한다.\n4. 용량 체크: 처방에서 용량·횟수를 파싱하고 체중으로 mg/kg(/day)를 계산하여 해당 축종의 표준 용량 범위와 비교한다. parsed에는 파싱한 원문(\"25 mg BID\"), calculated에는 계산값(\"10 mg/kg/day\"), reference에는 표준 범위와 근거 요약, verdict는 범위 내/범위 초과/범위 미만/확인 필요 중 하나. 적응증에 따라 정상적으로 범위를 벗어날 수 있으면 comment에 설명한다. 용량 정보가 없으면 verdict \"확인 필요\".\n5. 검사 간섭: 각 약물이 혈액·요·내분비 검사 결과를 변화시키거나 왜곡할 수 있는 내용을 나열한다(예: 스테로이드의 ALP 상승·T4 저하·피내검사 억제, 페노바르비탈의 T4 저하, KBr의 Cl 위양성, TMS의 Cr 상승, 세팔로스포린의 요당 위양성, 검사 전 휴약이 필요한 약물 등). category는 간효소/신장·요/전해질/CBC/내분비/혈당·지질/응고·혈소판/기타 중에서 고른다.\n6. 부작용·모니터링: 약물별 주요 부작용(effects)과 권장 모니터링 항목·주기(monitoring)를 쓴다.\n7. overall: 이 처방 전체에 대한 종합 의견을 3~6문장으로 쓴다. 가장 중요한 위험 1~2가지와 권장 조치를 앞에 둔다.\n\n원칙: 모든 텍스트는 한국어(약물명은 한글, 필요시 영문 병기). 확실하지 않은 것은 단정하지 말고 \"확인 필요\"로 표시한다. 근거가 약한 상호작용을 과장하지 말고, 임상적으로 의미 있는 것에 집중한다. 신장 환자 비중이 높은 병원임을 고려해 신독성·신배설 약물의 용량 조절은 특히 꼼꼼히 다룬다.";
+
+  function buildAiPanel() {
+    var card = el("div", "calc");
+    card.id = "c-ai-panel";
+    card.dataset.keys = "ai 처방 점검 처방전 상호작용 부작용 용량 검사 간섭 약물 분석 rx prescription drug interaction";
+
+    var headEl = el("header");
+    var h3 = el("h3", null, "AI 처방 안전 점검 🔒");
+    var pDesc = el("p", null, "처방(텍스트·캡쳐 이미지)을 넣으면 Claude가 약물 상호작용, 환자 상태별 주의, 용량, 검사 간섭, 부작용을 분석합니다. API 사용료가 발생하므로 비밀번호를 아는 사람만 사용할 수 있습니다.");
+    headEl.appendChild(h3); headEl.appendChild(pDesc);
+    card.appendChild(headEl);
+
+    var body = el("div", "ai-body");
+    card.appendChild(body);
+
+    if (AI_BLOCKED) {
+      body.innerHTML = '<div class="flag warn">이 주소(Claude Artifact)에서는 보안 정책상 AI 분석을 실행할 수 없습니다. 계산기는 그대로 사용 가능합니다.</div>'
+        + '<div class="flag info">AI 처방 점검은 앱 주소에서 사용하세요: <a href="' + AI_URL + '" target="_blank" rel="noopener" style="color:inherit;font-weight:700">' + AI_URL.replace("https://", "") + '</a></div>';
+      return card;
+    }
+
+    var images = [];
+    var status = function (msg, tone) {
+      var s = body.querySelector(".ai-status");
+      if (s) { s.innerHTML = tone === "busy" ? '<span class="ai-spin"></span>' + esc(msg) : esc(msg);
+        s.style.color = tone === "err" ? "var(--crit)" : ""; }
+    };
+
+    function stateSetup() {
+      body.innerHTML =
+        '<div class="flag info">처음 한 번, API 키와 사용 비밀번호를 설정합니다. 키는 비밀번호로 암호화(AES-256)되어 이 브라우저에만 저장되며, 비밀번호 없이는 꺼낼 수 없습니다.</div>'
+        + '<label class="al">Anthropic API 키</label>'
+        + '<input type="password" id="ai-key" placeholder="sk-ant-..." autocomplete="off">'
+        + '<label class="al">사용 비밀번호 설정 — 이 비밀번호를 아는 사람만 분석을 실행할 수 있습니다</label>'
+        + '<div class="ai-row">'
+        + '<input type="password" id="ai-pw1" placeholder="비밀번호" style="flex:1;min-width:120px" autocomplete="new-password">'
+        + '<input type="password" id="ai-pw2" placeholder="비밀번호 확인" style="flex:1;min-width:120px" autocomplete="new-password">'
+        + '</div>'
+        + '<div class="ai-row"><button type="button" class="ai-btn" id="ai-setup">암호화하여 저장</button><span class="ai-status"></span></div>'
+        + '<details class="ai-dz"><summary>다른 기기에서 만든 설정 코드로 불러오기</summary><div class="dzb">'
+        + '<p>이미 설정한 기기에서 「설정 코드 복사」로 코드를 받아 붙여넣으면, API 키 입력 없이 같은 비밀번호로 사용할 수 있습니다.</p>'
+        + '<div class="ai-row"><input type="text" id="ai-import" placeholder="설정 코드 붙여넣기" style="flex:1;min-width:160px"><button type="button" class="ai-btn ghost" id="ai-importBtn">불러오기</button></div>'
+        + '</div></details>';
+      body.querySelector("#ai-setup").onclick = async function () {
+        var key = body.querySelector("#ai-key").value.trim();
+        var p1 = body.querySelector("#ai-pw1").value, p2 = body.querySelector("#ai-pw2").value;
+        if (key.indexOf("sk-") !== 0) { status("올바른 API 키를 입력하세요 (sk-ant-...).", "err"); return; }
+        if (p1.length < 4) { status("비밀번호는 4자 이상으로 설정하세요.", "err"); return; }
+        if (p1 !== p2) { status("비밀번호 확인이 일치하지 않습니다.", "err"); return; }
+        await aiEncStore(p1, key);
+        aiKey = key; aiLastUse = Date.now();
+        stateTool();
+      };
+      body.querySelector("#ai-importBtn").onclick = function () {
+        try {
+          var rec = JSON.parse(body.querySelector("#ai-import").value.trim());
+          if (!rec.salt || !rec.iv || !rec.ct) throw new Error();
+          localStorage.setItem(AI_LS, JSON.stringify(rec));
+          stateLock();
+        } catch (e) { status("설정 코드 형식이 올바르지 않습니다.", "err"); }
+      };
+    }
+
+    function stateLock() {
+      body.innerHTML =
+        '<div class="flag gold">🔒 잠금 상태 — 비밀번호를 입력하면 AI 분석을 사용할 수 있습니다.</div>'
+        + '<div class="ai-row">'
+        + '<input type="password" id="ai-pwin" placeholder="비밀번호" style="flex:1;min-width:140px" autocomplete="current-password">'
+        + '<button type="button" class="ai-btn" id="ai-unlock">잠금 해제</button>'
+        + '<button type="button" class="ai-btn ghost" id="ai-reset">재설정</button>'
+        + '</div><span class="ai-status"></span>';
+      async function unlock() {
+        var pw = body.querySelector("#ai-pwin").value;
+        if (!pw) return;
+        try { aiKey = await aiDecrypt(pw); aiLastUse = Date.now(); stateTool(); }
+        catch (e) { status("비밀번호가 올바르지 않습니다.", "err"); }
+      }
+      body.querySelector("#ai-unlock").onclick = unlock;
+      body.querySelector("#ai-pwin").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
+      body.querySelector("#ai-reset").onclick = function () {
+        if (!confirm("저장된 API 키와 비밀번호를 삭제할까요? 이후 키를 다시 입력해야 합니다.")) return;
+        localStorage.removeItem(AI_LS); aiKey = null; stateSetup();
+      };
+    }
+
+    function stateTool() {
+      images.length = 0;
+      var CONDS = ["신질환(CKD/AKI)", "간질환", "심장질환", "위장 궤양·출혈 병력", "임신·수유", "성장기(미성숙)", "발작 병력", "당뇨", "MDR1 변이(콜리계)", "탈수·저혈량"];
+      body.innerHTML =
+        '<div class="ai-row" style="justify-content:space-between">'
+        + '<span style="font-size:12.5px">🔓 <b>잠금 해제됨</b> · 종·체중은 상단 환자 바의 값을 사용합니다</span>'
+        + '<span class="ai-row">'
+        + '<select id="ai-model"><option value="claude-opus-5">Claude Opus 5 (권장)</option><option value="claude-sonnet-5">Claude Sonnet 5 (저렴)</option><option value="claude-haiku-4-5">Claude Haiku 4.5 (최저가)</option></select>'
+        + '<button type="button" class="ai-btn ghost" id="ai-lock">잠그기</button>'
+        + '<button type="button" class="ai-btn ghost" id="ai-share">설정 코드 복사</button>'
+        + '</span></div>'
+        + '<label class="al">기저 상태 (해당 시 체크)</label>'
+        + '<div class="ai-conds">' + CONDS.map(function (c) {
+            return '<label><input type="checkbox" value="' + esc(c) + '"> ' + esc(c) + '</label>'; }).join("") + '</div>'
+        + '<div class="ai-row">'
+        + '<input type="text" id="ai-age" placeholder="나이 (예: 12살)" style="width:110px">'
+        + '<input type="text" id="ai-extra" placeholder="기타 참고 (예: Cr 2.8, 투석 주 2회)" style="flex:1;min-width:160px">'
+        + '</div>'
+        + '<textarea id="ai-rx" placeholder="처방 내용을 붙여넣거나, 아래에 캡쳐 이미지를 추가하세요.\n예)\n멜록시캄 0.1 mg/kg SID\n베나제프릴 5 mg BID"></textarea>'
+        + '<div class="ai-drop" id="ai-drop" tabindex="0" role="button">📷 처방전 캡쳐: 클릭해서 선택, 드래그, 또는 Ctrl/Cmd+V 붙여넣기<input type="file" id="ai-file" accept="image/*" multiple hidden></div>'
+        + '<div class="ai-thumbs" id="ai-thumbs"></div>'
+        + '<div class="ai-row"><button type="button" class="ai-btn" id="ai-go">AI 분석하기</button><span class="ai-status"></span></div>'
+        + '<div class="ai-out" id="ai-out"></div>';
+
+      body.querySelector("#ai-model").value = localStorage.getItem(AI_MODEL_LS) || "claude-opus-5";
+      body.querySelector("#ai-model").onchange = function () { localStorage.setItem(AI_MODEL_LS, this.value); };
+      body.querySelector("#ai-lock").onclick = function () { aiKey = null; stateLock(); };
+      body.querySelector("#ai-share").onclick = function () {
+        var blob = localStorage.getItem(AI_LS) || "";
+        var done = function () { status("설정 코드를 복사했습니다. 다른 기기의 「설정 코드로 불러오기」에 붙여넣으세요."); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(blob).then(done, function () { prompt("아래 코드를 복사하세요", blob); });
+        else prompt("아래 코드를 복사하세요", blob);
+      };
+
+      function renderThumbs() {
+        var t = body.querySelector("#ai-thumbs");
+        t.innerHTML = images.map(function (im, i) {
+          return '<div class="ai-thumb"><img src="' + im.url + '" alt="처방 이미지"><button type="button" data-i="' + i + '">×</button></div>'; }).join("");
+        Array.prototype.forEach.call(t.querySelectorAll("button"), function (b) {
+          b.onclick = function () { images.splice(+b.dataset.i, 1); renderThumbs(); }; });
+      }
+      function addImageFile(file) {
+        if (!file || file.type.indexOf("image/") !== 0) return;
+        var img = new Image();
+        img.onload = function () {
+          var w = img.width, h = img.height, MAX = 2200;
+          var sc = Math.min(1, MAX / Math.max(w, h));
+          w = Math.round(w * sc); h = Math.round(h * sc);
+          var cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+          cv.getContext("2d").drawImage(img, 0, 0, w, h);
+          var url = cv.toDataURL("image/jpeg", 0.9);
+          images.push({ data: url.split(",")[1], url: url });
+          renderThumbs();
+          URL.revokeObjectURL(img.src);
+        };
+        img.src = URL.createObjectURL(file);
+      }
+      var dropEl = body.querySelector("#ai-drop"), fileEl = body.querySelector("#ai-file");
+      dropEl.onclick = function () { fileEl.click(); };
+      dropEl.onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") fileEl.click(); };
+      fileEl.onchange = function (e) { Array.prototype.forEach.call(e.target.files, addImageFile); e.target.value = ""; };
+      dropEl.ondragover = function (e) { e.preventDefault(); dropEl.classList.add("hover"); };
+      dropEl.ondragleave = function () { dropEl.classList.remove("hover"); };
+      dropEl.ondrop = function (e) { e.preventDefault(); dropEl.classList.remove("hover");
+        Array.prototype.forEach.call(e.dataTransfer.files, addImageFile); };
+      card.addEventListener("paste", function (e) {
+        if (!aiKey) return;
+        Array.prototype.forEach.call(e.clipboardData.items, function (item) {
+          if (item.type.indexOf("image/") === 0) addImageFile(item.getAsFile());
+        });
+      });
+
+      body.querySelector("#ai-go").onclick = function () { aiAnalyze(body, images, status); };
+    }
+
+    async function aiAnalyze(body, images, status) {
+      if (!aiKey) { stateLock(); return; }
+      var rx = body.querySelector("#ai-rx").value.trim();
+      if (!rx && !images.length) { status("처방 텍스트 또는 이미지를 넣어주세요.", "err"); return; }
+      aiLastUse = Date.now();
+      var conds = Array.prototype.map.call(body.querySelectorAll(".ai-conds input:checked"), function (c) { return c.value; });
+      var age = body.querySelector("#ai-age").value.trim(), extra = body.querySelector("#ai-extra").value.trim();
+      var userText = "[환자 정보]\n축종: " + spName() + "\n체중: " + (ok(S.bw) ? sf(S.bw, 2) + " kg" : "미입력")
+        + "\n나이: " + (age || "미입력")
+        + "\n기저 상태: " + (conds.length ? conds.join(", ") : "특이사항 없음");
+      if (extra) userText += "\n기타: " + extra;
+      userText += "\n\n[처방 내용]\n" + (rx || "(첨부된 처방전 이미지 참조)");
+      if (images.length) userText += "\n\n(처방전 캡쳐 이미지 " + images.length + "장 첨부 — 이미지의 처방 내용도 함께 분석할 것)";
+
+      var content = images.map(function (im) {
+        return { type: "image", source: { type: "base64", media_type: "image/jpeg", data: im.data } };
+      });
+      content.push({ type: "text", text: userText });
+
+      var model = body.querySelector("#ai-model").value;
+      var goBtn = body.querySelector("#ai-go");
+      goBtn.disabled = true;
+      status(model + " 모델이 처방을 분석하고 있습니다… (30초~2분)", "busy");
+      body.querySelector("#ai-out").innerHTML = "";
+
+      try {
+        var res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": aiKey,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({
+            model: model, max_tokens: 16000,
+            system: [{ type: "text", text: AI_SYSTEM, cache_control: { type: "ephemeral" } }],
+            output_config: { format: { type: "json_schema", schema: AI_SCHEMA } },
+            messages: [{ role: "user", content: content }]
+          })
+        });
+        if (!res.ok) {
+          var msg = "HTTP " + res.status;
+          try { var j = await res.json(); msg = (j && j.error && j.error.message) || msg; } catch (e2) {}
+          if (res.status === 401) msg = "API 키가 올바르지 않습니다. 재설정 후 키를 다시 확인하세요.";
+          if (res.status === 429) msg = "요청 한도 초과 — 잠시 후 다시 시도하세요.";
+          if (res.status === 529) msg = "API가 일시적으로 혼잡합니다 — 잠시 후 다시 시도하세요.";
+          throw new Error(msg);
+        }
+        var data = await res.json();
+        if (data.stop_reason === "refusal") throw new Error("모델이 이 요청의 처리를 거부했습니다. 입력 내용을 확인 후 다시 시도하세요.");
+        if (data.stop_reason === "max_tokens") throw new Error("응답이 너무 길어 잘렸습니다. 처방을 나눠서 분석해 보세요.");
+        var tb = (data.content || []).filter(function (b) { return b.type === "text"; })[0];
+        if (!tb) throw new Error("응답에서 분석 결과를 찾지 못했습니다.");
+        aiRender(body, JSON.parse(tb.text), data.usage, model);
+        status("분석 완료 — 인식된 약물 목록을 원 처방과 반드시 대조하세요.");
+      } catch (err) {
+        var m = err && err.message ? err.message : String(err);
+        if (err instanceof TypeError) m = "네트워크 오류 — 인터넷 연결을 확인하세요.";
+        status("분석 실패: " + m, "err");
+      } finally {
+        goBtn.disabled = false;
+      }
+    }
+
+    function aiRender(body, r, usage, model) {
+      var out = body.querySelector("#ai-out");
+      var sevCls = { "금기": "crit", "중대": "warn", "주의": "gold", "참고": "info" };
+      var ordMap = { "금기": 0, "중대": 1, "주의": 2, "참고": 3 };
+      var inter = (r.interactions || []).slice().sort(function (a, b) { return (ordMap[a.severity] || 9) - (ordMap[b.severity] || 9); });
+      var h = "";
+
+      h += '<h4>① 인식된 약물 (' + (r.drugs || []).length + ')</h4><div class="ai-chips">'
+        + (r.drugs || []).map(function (d) { return "<span>" + esc(d.name) + "<small>" + esc(d.drug_class) + "</small></span>"; }).join("")
+        + "</div>";
+      if ((r.unrecognized || []).length)
+        h += '<div class="flag gold" style="margin-top:8px"><span><i>확인 필요</i> 판독 불확실: ' + r.unrecognized.map(esc).join(" · ") + "</span></div>";
+
+      h += "<h4>② 약물 상호작용</h4>";
+      if (!inter.length) h += '<div class="flag good">임상적으로 의미 있는 상호작용이 확인되지 않았습니다.</div>';
+      h += '<div class="flags">' + inter.map(function (it) {
+        return '<div class="flag ' + (sevCls[it.severity] || "info") + '"><span><i>' + esc(it.severity) + "</i> <b>" + esc(it.title) + "</b> (" + (it.drugs || []).map(esc).join(" + ") + ")<br>"
+          + esc(it.mechanism) + "<br>→ <b>" + esc(it.action) + "</b></span></div>";
+      }).join("") + "</div>";
+
+      h += "<h4>③ 환자 상태별 주의</h4>";
+      if (!(r.patient_cautions || []).length) h += '<div class="flag good">현재 환자 상태에서 특별히 회피·주의로 분류된 약물이 없습니다.</div>';
+      h += '<div class="flags">' + (r.patient_cautions || []).map(function (c) {
+        return '<div class="flag ' + (c.level === "회피" ? "crit" : "gold") + '"><span><i>' + esc(c.level) + "</i> <b>" + esc(c.drug) + "</b> · " + esc(c.condition) + " — " + esc(c.reason) + "</span></div>";
+      }).join("") + "</div>";
+
+      if ((r.dose_checks || []).length) {
+        h += '<h4>④ 용량 체크</h4><div class="scrollx"><table class="tbl"><thead><tr><th>약물</th><th>처방</th><th>계산값</th><th>참고 범위</th><th>판정</th><th>비고</th></tr></thead><tbody>';
+        var vTone = { "범위 내": "t-good", "범위 초과": "t-crit", "범위 미만": "t-warn", "확인 필요": "t-neutral" };
+        h += r.dose_checks.map(function (d) {
+          return "<tr><td><b>" + esc(d.drug) + "</b></td><td class=\"m\">" + esc(d.parsed) + "</td><td class=\"m\">" + esc(d.calculated) + "</td><td class=\"s\">" + esc(d.reference)
+            + '</td><td><span class="badge ' + (vTone[d.verdict] || "t-neutral") + '" style="font-size:11px;padding:3px 9px">' + esc(d.verdict) + "</span></td><td class=\"s\">" + esc(d.comment) + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+      }
+
+      if ((r.lab_interference || []).length) {
+        h += '<h4>⑤ 검사 결과 간섭·왜곡</h4><div class="scrollx"><table class="tbl"><thead><tr><th>검사 영역</th><th>영향</th><th>원인 약물</th></tr></thead><tbody>';
+        h += r.lab_interference.map(function (l) {
+          return "<tr><td><b>" + esc(l.category) + "</b></td><td>" + esc(l.effect) + "</td><td class=\"s\">" + (l.drugs || []).map(esc).join(", ") + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+      }
+
+      if ((r.side_effects || []).length) {
+        h += "<h4>⑥ 부작용 · 모니터링</h4>";
+        h += r.side_effects.map(function (s) {
+          return '<details class="ai-dz"><summary>' + esc(s.drug) + '</summary><div class="dzb">' + esc(s.effects) + "<br><b>모니터링:</b> " + esc(s.monitoring) + "</div></details>";
+        }).join("");
+      }
+
+      if (r.overall) h += '<div class="flag info" style="margin-top:12px"><span><b>종합 의견</b><br>' + esc(r.overall) + "</span></div>";
+      if (usage) {
+        var inTok = (usage.input_tokens || 0) + (usage.cache_read_input_tokens || 0) + (usage.cache_creation_input_tokens || 0);
+        h += '<p class="ai-usage">' + esc(model) + " · input " + inTok.toLocaleString() + " tok · output " + (usage.output_tokens || 0).toLocaleString() + " tok</p>";
+      }
+      out.innerHTML = h;
+    }
+
+    if (localStorage.getItem(AI_LS)) stateLock(); else stateSetup();
+
+    setInterval(function () {
+      if (aiKey && Date.now() - aiLastUse > 30 * 60 * 1000) { aiKey = null; stateLock(); }
+    }, 60 * 1000);
+
+    return card;
+  }
+
   CATS.forEach(function (c) {
     var list = CALCS.filter(function (x) { return x.cat === c.id; });
     var h = el("div", "sec-head");
@@ -2193,11 +2610,12 @@ footer b { color: var(--ink-2); font-weight: 600; }
     h.appendChild(el("span", null, c.eyebrow));
     col.appendChild(h);
     list.forEach(function (calc) { col.appendChild(buildCalc(calc)); });
+    if (c.id === "ai") col.appendChild(buildAiPanel());
 
     var a = el("a");
     a.href = "#s-" + c.id;
     a.appendChild(document.createTextNode(c.name));
-    a.appendChild(el("small", null, String(list.length)));
+    a.appendChild(el("small", null, c.id === "ai" ? "🔒" : String(list.length)));
     a.dataset.cat = c.id;
     rail.appendChild(a);
   });
@@ -2279,6 +2697,15 @@ footer b { color: var(--ink-2); font-weight: 600; }
         card.style.display = hit ? "" : "none";
         if (hit) shown++;
       });
+      // AI 패널은 CALCS 목록 밖의 커스텀 카드라 별도로 검색을 처리한다
+      if (c.id === "ai") {
+        var aiCard = document.getElementById("c-ai-panel");
+        if (aiCard) {
+          var aiHit = !term || aiCard.dataset.keys.indexOf(term) >= 0;
+          aiCard.style.display = aiHit ? "" : "none";
+          if (aiHit) shown++;
+        }
+      }
       head.style.display = shown ? "" : "none";
       if (shown) anyVisible = true;
     });
