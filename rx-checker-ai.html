@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>처방 안전 점검 AI · 시그니처 동물의료센터</title>
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface2:#eef1f5; --ink:#1c2733; --ink2:#5b6a7a;
+  --line:#dde3ea; --accent:#0e7490; --accent-ink:#ffffff;
+  --contra:#c81e3c; --major:#d9640e; --moderate:#b08308; --info:#2563eb; --ok:#1a8a4a;
+  --contra-bg:#fdeef1; --major-bg:#fdf3ea; --moderate-bg:#fbf6e7; --info-bg:#eef3fd; --ok-bg:#ebf7f0;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f151c; --surface:#171f29; --surface2:#1f2937; --ink:#e7edf4; --ink2:#9aa8b8;
+    --line:#2b3644; --accent:#38b2c8; --accent-ink:#06222a;
+    --contra:#ff6b85; --major:#ffa057; --moderate:#e6c34d; --info:#7aa5ff; --ok:#5fd394;
+    --contra-bg:#3a1520; --major-bg:#37220f; --moderate-bg:#332b10; --info-bg:#16233d; --ok-bg:#12301f;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Apple SD Gothic Neo','Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+header.top{max-width:1180px;margin:0 auto;padding:26px 16px 6px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+header.top h1{font-size:1.45rem;margin:0;letter-spacing:-.01em}
+header.top .sub{color:var(--ink2);font-size:.85rem}
+.pill{font-size:.68rem;font-weight:800;letter-spacing:.06em;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:3px 10px;vertical-align:middle}
+.grid{display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+.panel h2{font-size:.95rem;margin:0 0 12px}
+.eyebrow{font-size:.7rem;letter-spacing:.08em;color:var(--accent);font-weight:700}
+label.fld{display:block;font-size:.78rem;color:var(--ink2);margin-bottom:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface2);color:var(--ink2);padding:7px 18px;font-size:.9rem;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+input[type=number]{width:90px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--ink);font-size:.95rem;font-variant-numeric:tabular-nums}
+input[type=password],input[type=text]{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--ink);font-size:.88rem;font-family:var(--mono)}
+select{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--ink);font-size:.88rem;font-family:inherit}
+.chks{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-bottom:4px}
+.chks label{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--ink);cursor:pointer;padding:3px 2px}
+.chks input{accent-color:var(--accent)}
+textarea{width:100%;min-height:150px;padding:12px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface2);color:var(--ink);font-size:.92rem;font-family:inherit;resize:vertical;line-height:1.6}
+textarea:focus,input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:8px;padding:10px 18px;font-size:.92rem;cursor:pointer;font-family:inherit;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:disabled{opacity:.5;cursor:wait}
+.btn.ghost{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.76rem;color:var(--ink2);margin-top:8px}
+.drop{border:2px dashed var(--line);border-radius:8px;padding:14px;text-align:center;color:var(--ink2);
+  font-size:.83rem;cursor:pointer;margin-top:10px;transition:border-color .15s}
+.drop.hover{border-color:var(--accent);color:var(--accent)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumb{position:relative;width:86px;height:86px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb button{position:absolute;top:2px;right:2px;border:0;background:rgba(0,0,0,.65);color:#fff;border-radius:50%;
+  width:20px;height:20px;font-size:.75rem;cursor:pointer;line-height:1}
+/* results */
+.status{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:.86rem;color:var(--ink2);margin-bottom:14px}
+.status.err{background:var(--contra-bg);border-color:var(--contra);color:var(--ink)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);
+  border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:2s}}
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.sumcell{flex:1 1 100px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;text-align:center}
+.sumcell .n{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.sumcell .t{font-size:.73rem;color:var(--ink2)}
+.sumcell.c-contra .n{color:var(--contra)} .sumcell.c-major .n{color:var(--major)}
+.sumcell.c-moderate .n{color:var(--moderate)} .sumcell.c-drug .n{color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.83rem}
+.chip small{color:var(--ink2);margin-left:5px;font-size:.72rem}
+.sect{margin-top:18px}
+.sect>h3{font-size:1rem;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.card{border:1px solid var(--line);border-left:4px solid var(--info);border-radius:8px;background:var(--surface);padding:12px 14px;margin-bottom:10px}
+.card.sev-금기{border-left-color:var(--contra);background:var(--contra-bg)}
+.card.sev-중대{border-left-color:var(--major);background:var(--major-bg)}
+.card.sev-주의{border-left-color:var(--moderate);background:var(--moderate-bg)}
+.card.sev-참고{border-left-color:var(--info);background:var(--info-bg)}
+.card h4{margin:0 0 4px;font-size:.93rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:.68rem;font-weight:800;letter-spacing:.05em;border-radius:5px;padding:2px 8px;color:#fff}
+.badge.b-금기{background:var(--contra)} .badge.b-중대{background:var(--major)}
+.badge.b-주의{background:var(--moderate)} .badge.b-참고{background:var(--info)}
+@media (prefers-color-scheme: dark){ .badge{color:#0d1117} }
+.card p{margin:3px 0;font-size:.86rem}
+.card .why{color:var(--ink2)}
+.card .act{font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.85rem;background:var(--surface)}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+th{background:var(--surface2);text-align:left;padding:8px 10px;font-size:.76rem;color:var(--ink2);white-space:nowrap}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+.vd{font-weight:700;white-space:nowrap}
+.vd.v-범위내{color:var(--ok)} .vd.v-초과{color:var(--contra)} .vd.v-미만{color:var(--major)} .vd.v-확인{color:var(--ink2);font-weight:400}
+details.dz{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin-bottom:8px}
+details.dz summary{padding:10px 14px;cursor:pointer;font-size:.9rem;font-weight:600;list-style:none}
+details.dz summary::before{content:'▸ ';color:var(--ink2)}
+details.dz[open] summary::before{content:'▾ '}
+details.dz .body{padding:0 14px 12px;font-size:.85rem}
+details.dz .body p{margin:4px 0}
+.klass{font-size:.72rem;color:var(--ink2);font-weight:400}
+.flagline{margin:0 0 6px;font-size:.86rem}
+.flagline b.l-회피{color:var(--contra)} .flagline b.l-주의{color:var(--major)}
+.overall{border:1px solid var(--accent);border-radius:8px;padding:12px 14px;background:var(--surface);font-size:.9rem;margin-top:16px}
+.usage{font-size:.72rem;color:var(--ink2);margin-top:10px;font-family:var(--mono)}
+footer.disc{max-width:1180px;margin:0 auto;padding:0 16px 40px;color:var(--ink2);font-size:.76rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>처방 안전 점검 <span class="pill">AI</span></h1>
+  <span class="sub">Claude 기반 처방 분석 — 전체 약물 · 이미지 인식 지원 · 시그니처 동물의료센터</span>
+</header>
+
+<div class="wrap">
+<div class="grid">
+<div>
+  <section class="panel" aria-label="설정">
+    <div class="eyebrow">SETUP</div>
+    <h2>API 설정</h2>
+    <div id="kaSetup" hidden>
+      <p class="hint" id="migNote" hidden style="margin:0 0 8px">기존에 저장된 키를 불러왔습니다 — 비밀번호를 설정하면 암호화되어 다시 저장됩니다.</p>
+      <label class="fld" for="key">Anthropic API 키</label>
+      <input type="password" id="key" placeholder="sk-ant-..." style="width:100%;margin-bottom:8px">
+      <label class="fld">사용 비밀번호 설정 — 이 비밀번호를 아는 사람만 분석을 실행할 수 있습니다</label>
+      <div class="row" style="margin-bottom:8px">
+        <input type="password" id="pw1" placeholder="비밀번호" style="flex:1;min-width:120px">
+        <input type="password" id="pw2" placeholder="비밀번호 확인" style="flex:1;min-width:120px">
+      </div>
+      <button class="btn primary" id="setupBtn">암호화하여 저장</button>
+    </div>
+    <div id="kaLock" hidden>
+      <label class="fld" for="pwIn">🔒 잠금 상태 — 비밀번호를 입력하면 사용할 수 있습니다</label>
+      <div class="row" style="margin-bottom:8px">
+        <input type="password" id="pwIn" placeholder="비밀번호" style="flex:1;min-width:140px">
+        <button class="btn primary" id="unlockBtn">잠금 해제</button>
+      </div>
+      <button class="btn ghost" id="resetBtn">키·비밀번호 재설정 (초기화)</button>
+    </div>
+    <div id="kaOpen" hidden>
+      <p style="font-size:.88rem;margin:0 0 10px">🔓 <b>잠금 해제됨</b> — 분석을 사용할 수 있습니다. 30분 미사용 시 자동 잠금됩니다.</p>
+      <div class="btns" style="margin-top:0">
+        <button class="btn ghost" id="lockBtn">잠그기</button>
+        <button class="btn ghost" id="resetBtn2">키·비밀번호 재설정</button>
+      </div>
+    </div>
+    <label class="fld" for="model" style="margin-top:12px">모델</label>
+    <select id="model">
+      <option value="claude-opus-5">Claude Opus 5 — 권장 (분석당 약 100~300원)</option>
+      <option value="claude-sonnet-5">Claude Sonnet 5 — 빠르고 저렴</option>
+      <option value="claude-haiku-4-5">Claude Haiku 4.5 — 최저가 (정확도 낮을 수 있음)</option>
+    </select>
+    <p class="hint">API 키는 비밀번호로 암호화(AES-256-GCM)되어 이 브라우저에만 저장됩니다 — 비밀번호 없이는 저장된 키를 꺼낼 수 없습니다. 비밀번호를 잊으면 복구할 수 없으며, 재설정 후 키를 다시 입력해야 합니다.</p>
+  </section>
+
+  <section class="panel" aria-label="입력">
+    <div class="eyebrow">INPUT</div>
+    <h2>환자 정보 · 처방</h2>
+    <div class="row">
+      <div>
+        <label class="fld">축종</label>
+        <div class="seg" role="group" aria-label="축종">
+          <button type="button" id="spDog" class="on">개</button>
+          <button type="button" id="spCat">고양이</button>
+        </div>
+      </div>
+      <div>
+        <label class="fld" for="wt">체중 (kg)</label>
+        <input type="number" id="wt" min="0" step="0.1" placeholder="예: 4.2">
+      </div>
+      <div>
+        <label class="fld" for="age">나이</label>
+        <input type="text" id="age" placeholder="예: 12살" style="width:90px;font-family:inherit">
+      </div>
+    </div>
+    <label class="fld">기저 상태 (해당 시 체크)</label>
+    <div class="chks">
+      <label><input type="checkbox" value="신질환(CKD/AKI)"> 신질환 (CKD/AKI)</label>
+      <label><input type="checkbox" value="간질환"> 간질환</label>
+      <label><input type="checkbox" value="심장질환"> 심장질환</label>
+      <label><input type="checkbox" value="위장 궤양·출혈 병력"> 위장 궤양·출혈</label>
+      <label><input type="checkbox" value="임신·수유"> 임신·수유</label>
+      <label><input type="checkbox" value="성장기(미성숙)"> 성장기</label>
+      <label><input type="checkbox" value="발작 병력"> 발작 병력</label>
+      <label><input type="checkbox" value="당뇨"> 당뇨</label>
+      <label><input type="checkbox" value="MDR1 변이(콜리계)"> MDR1 변이</label>
+      <label><input type="checkbox" value="탈수·저혈량"> 탈수·저혈량</label>
+    </div>
+    <label class="fld" for="extra" style="margin-top:8px">기타 참고사항 (선택)</label>
+    <input type="text" id="extra" placeholder="예: 최근 Cr 2.8, 투석 주 2회" style="width:100%;font-family:inherit">
+
+    <label class="fld" for="rx" style="margin-top:12px">처방 내용 — 텍스트 붙여넣기</label>
+    <textarea id="rx" placeholder="처방전 텍스트를 붙여넣거나, 아래에 캡쳐 이미지를 추가하세요.
+예)
+멜록시캄 0.1 mg/kg SID
+베나제프릴 5 mg BID"></textarea>
+
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="이미지 추가">
+      📷 처방전 캡쳐 이미지: 클릭해서 선택, 여기로 드래그, 또는 Ctrl/Cmd+V로 붙여넣기
+      <input type="file" id="file" accept="image/*" multiple hidden>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+
+    <div class="btns">
+      <button class="btn primary" id="go">AI 분석하기</button>
+      <button class="btn ghost" id="clr">지우기</button>
+    </div>
+    <p class="hint">텍스트와 이미지를 함께 넣어도 됩니다. 분석에는 보통 30초~2분 걸립니다.</p>
+  </section>
+</div>
+
+<section id="out" aria-live="polite">
+  <div class="status">API 키를 저장한 뒤 처방(텍스트 또는 캡쳐 이미지)을 넣고 <b>AI 분석하기</b>를 누르세요.
+  ① 약물 상호작용 ② 환자 상태별 주의 ③ 용량 체크 ④ 검사 결과 간섭 ⑤ 부작용·모니터링 ⑥ 종합 의견을 반환합니다.
+  내장 DB 방식과 달리 <b>모든 약물</b>을 분석 대상으로 하며, Plumb's 등 표준 수의 약전 지식을 기반으로 답하지만
+  실시간 문헌 조회는 아니므로 최종 확인은 원 참고서로 하세요.</div>
+</section>
+</div>
+</div>
+
+<footer class="disc">
+  본 도구는 AI 기반 <b>참고용 스크리닝 보조 도구</b>입니다. AI는 약물명 오독(특히 저화질 이미지)이나 부정확한 용량 판정을
+  할 수 있으므로, 인식된 약물 목록을 반드시 원 처방과 대조하고 최종 판단은 수의사의 임상적 판단과 표준 참고서(Plumb's 등)
+  확인으로 확정하십시오. 시그니처 동물의료센터 내부용.
+</footer>
+
+<script>
+/* ===== 설정 & 키 암호화 =====
+ API 키는 사용자가 정한 비밀번호로 AES-256-GCM 암호화되어 localStorage에 저장된다.
+ 복호화된 키는 메모리(apiKey 변수)에만 존재하며, 잠금 시 즉시 폐기된다. */
+const $=s=>document.querySelector(s);
+const ENC_LS='rxai_enc', OLD_KEY_LS='rxai_key', MODEL_LS='rxai_model';
+let apiKey=null, lastUse=Date.now();
+$('#model').value=localStorage.getItem(MODEL_LS)||'claude-opus-5';
+$('#model').onchange=()=>localStorage.setItem(MODEL_LS,$('#model').value);
+
+const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pw,salt){
+  const mat=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},mat,
+    {name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encryptAndStore(pw,plainKey){
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const k=await deriveKey(pw,salt);
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(plainKey));
+  localStorage.setItem(ENC_LS,JSON.stringify({salt:b64(salt),iv:b64(iv),ct:b64(ct)}));
+}
+async function tryDecrypt(pw){
+  const rec=JSON.parse(localStorage.getItem(ENC_LS));
+  const k=await deriveKey(pw,unb64(rec.salt));
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(rec.iv)},k,unb64(rec.ct));
+  return new TextDecoder().decode(pt);
+}
+function showState(){
+  const has=!!localStorage.getItem(ENC_LS);
+  $('#kaSetup').hidden=has;
+  $('#kaLock').hidden=!has||!!apiKey;
+  $('#kaOpen').hidden=!apiKey;
+}
+$('#setupBtn').onclick=async()=>{
+  const key=$('#key').value.trim(), p1=$('#pw1').value, p2=$('#pw2').value;
+  if(!key.startsWith('sk-')){flash('올바른 API 키를 입력하세요 (sk-ant-...).',true);return;}
+  if(p1.length<4){flash('비밀번호는 4자 이상으로 설정하세요.',true);return;}
+  if(p1!==p2){flash('비밀번호 확인이 일치하지 않습니다.',true);return;}
+  await encryptAndStore(p1,key);
+  localStorage.removeItem(OLD_KEY_LS);
+  apiKey=key; lastUse=Date.now();
+  $('#key').value='';$('#pw1').value='';$('#pw2').value='';
+  showState(); flash('키를 암호화하여 저장하고 잠금을 해제했습니다.');
+};
+async function unlock(){
+  const pw=$('#pwIn').value;
+  if(!pw)return;
+  try{ apiKey=await tryDecrypt(pw); lastUse=Date.now(); $('#pwIn').value=''; showState(); }
+  catch(e){ flash('비밀번호가 올바르지 않습니다.',true); }
+}
+$('#unlockBtn').onclick=unlock;
+$('#pwIn').addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+function lockApp(){ apiKey=null; showState(); }
+$('#lockBtn').onclick=()=>{lockApp();flash('잠금했습니다.');};
+function resetAll(){
+  if(!confirm('저장된 API 키와 비밀번호를 삭제할까요? 이후 키를 다시 입력해야 합니다.'))return;
+  localStorage.removeItem(ENC_LS); apiKey=null; showState();
+}
+$('#resetBtn').onclick=resetAll; $('#resetBtn2').onclick=resetAll;
+setInterval(()=>{ if(apiKey&&Date.now()-lastUse>30*60*1000){ lockApp(); flash('30분 동안 사용이 없어 자동 잠금되었습니다.'); } },60*1000);
+// 이전 버전에서 평문으로 저장된 키가 있으면 설정 화면에 미리 채워 마이그레이션 유도
+if(!localStorage.getItem(ENC_LS)&&localStorage.getItem(OLD_KEY_LS)){
+  $('#key').value=localStorage.getItem(OLD_KEY_LS);
+  $('#migNote').hidden=false;
+}
+showState();
+
+let species='개';
+$('#spDog').onclick=()=>{species='개';$('#spDog').classList.add('on');$('#spCat').classList.remove('on');};
+$('#spCat').onclick=()=>{species='고양이';$('#spCat').classList.add('on');$('#spDog').classList.remove('on');};
+
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function flash(msg,err){$('#out').insertAdjacentHTML('afterbegin',
+  `<div class="status${err?' err':''}">${esc(msg)}</div>`);
+  setTimeout(()=>{const n=$('#out .status');if(n&&n.textContent===msg)n.remove();},4000);}
+
+/* ===== 이미지 입력 ===== */
+const images=[]; // {media_type, data(b64), url}
+const MAXDIM=2200;
+function addImageFile(file){
+  if(!file.type.startsWith('image/'))return;
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.width,h=img.height;
+    const scale=Math.min(1,MAXDIM/Math.max(w,h));
+    w=Math.round(w*scale);h=Math.round(h*scale);
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    const url=c.toDataURL('image/jpeg',0.9);
+    images.push({media_type:'image/jpeg',data:url.split(',')[1],url});
+    renderThumbs();
+    URL.revokeObjectURL(img.src);
+  };
+  img.src=URL.createObjectURL(file);
+}
+function renderThumbs(){
+  $('#thumbs').innerHTML=images.map((im,i)=>
+    `<div class="thumb"><img src="${im.url}" alt="처방 이미지 ${i+1}"><button data-i="${i}" aria-label="삭제">×</button></div>`).join('');
+  document.querySelectorAll('.thumb button').forEach(b=>b.onclick=()=>{images.splice(+b.dataset.i,1);renderThumbs();});
+}
+const drop=$('#drop');
+drop.onclick=()=>$('#file').click();
+drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')$('#file').click();};
+$('#file').onchange=e=>{[...e.target.files].forEach(addImageFile);e.target.value='';};
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('hover');};
+drop.ondragleave=()=>drop.classList.remove('hover');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('hover');[...e.dataTransfer.files].forEach(addImageFile);};
+document.addEventListener('paste',e=>{
+  for(const item of e.clipboardData.items)
+    if(item.type.startsWith('image/')) addImageFile(item.getAsFile());
+});
+
+/* ===== 스키마 & 시스템 프롬프트 ===== */
+const SCHEMA={
+  type:"object",additionalProperties:false,
+  required:["drugs","unrecognized","interactions","patient_cautions","dose_checks","lab_interference","side_effects","overall"],
+  properties:{
+    drugs:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["name","name_en","drug_class"],
+      properties:{name:{type:"string"},name_en:{type:"string"},drug_class:{type:"string"}}}},
+    unrecognized:{type:"array",items:{type:"string"}},
+    interactions:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["severity","title","drugs","mechanism","action"],
+      properties:{severity:{type:"string",enum:["금기","중대","주의","참고"]},
+        title:{type:"string"},drugs:{type:"array",items:{type:"string"}},
+        mechanism:{type:"string"},action:{type:"string"}}}},
+    patient_cautions:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["drug","level","condition","reason"],
+      properties:{drug:{type:"string"},level:{type:"string",enum:["회피","주의"]},
+        condition:{type:"string"},reason:{type:"string"}}}},
+    dose_checks:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["drug","parsed","calculated","reference","verdict","comment"],
+      properties:{drug:{type:"string"},parsed:{type:"string"},calculated:{type:"string"},
+        reference:{type:"string"},
+        verdict:{type:"string",enum:["범위 내","범위 초과","범위 미만","확인 필요"]},
+        comment:{type:"string"}}}},
+    lab_interference:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["category","effect","drugs"],
+      properties:{category:{type:"string"},effect:{type:"string"},drugs:{type:"array",items:{type:"string"}}}}},
+    side_effects:{type:"array",items:{type:"object",additionalProperties:false,
+      required:["drug","effects","monitoring"],
+      properties:{drug:{type:"string"},effects:{type:"string"},monitoring:{type:"string"}}}},
+    overall:{type:"string"}
+  }
+};
+
+const SYSTEM=`당신은 소동물(개·고양이) 임상약리학에 정통한 수의사 보조 시스템이다. 시그니처 동물의료센터(혈액투석·신장비뇨기 중심 2차 병원)의 수의사가 처방전을 검토할 때 쓰는 스크리닝 도구로서, Plumb's Veterinary Drug Handbook 등 표준 수의 약전 지식을 기준으로 답한다.
+
+입력으로 처방 내용(텍스트 또는 처방전 캡쳐 이미지)과 환자 정보(축종, 체중, 기저 상태)가 주어진다. 다음을 수행하라.
+
+1. 약물 식별: 처방에서 모든 약물을 식별한다(성분명·상품명·한글·영문 모두). 이미지가 주어지면 정확히 판독하되, 판독이 불확실한 항목은 drugs에 넣지 말고 unrecognized에 "판독 불확실: (보이는 대로)" 형태로 넣는다. 약물이 아닌 항목(사료, 처치 등)은 무시한다.
+2. 상호작용: 식별된 약물들 사이의 임상적으로 의미 있는 상호작용을 모두 나열한다. severity는 금기(병용 원칙적 회피)/중대(적극적 모니터링·용량조절 필요)/주의(시간차 투여·정기 모니터링)/참고(의도적 병용 가능성 있음, 알아둘 것)로 나눈다. NSAID+스테로이드, triple whammy(NSAID+RAAS차단제+이뇨제), 세로토닌 증후군 조합, CYP·P-gp 상호작용, 킬레이트·흡수 간섭, QT 연장 조합, 고칼륨혈증 조합 등을 빠짐없이 검토한다. mechanism에는 기전을, action에는 구체적 임상 권고를 쓴다.
+3. 환자 상태별 주의: 주어진 축종·기저 상태에서 회피 또는 주의가 필요한 약물을 나열한다. 축종 금기(예: 고양이 아세트아미노펜·아자티오프린·KBr, MDR1 변이견 고용량 이버멕틴)는 반드시 severity "금기"의 상호작용이 아닌 patient_cautions level "회피"로 표시하되, 치명적 축종 금기는 interactions에도 severity "금기"로 중복 표시한다.
+4. 용량 체크: 처방에서 용량·횟수를 파싱하고 체중으로 mg/kg(/day)를 계산하여 해당 축종의 표준 용량 범위와 비교한다. parsed에는 파싱한 원문("25 mg BID"), calculated에는 계산값("10 mg/kg/day"), reference에는 표준 범위와 근거 요약, verdict는 범위 내/범위 초과/범위 미만/확인 필요 중 하나. 적응증에 따라 정상적으로 범위를 벗어날 수 있으면 comment에 설명한다. 용량 정보가 없으면 verdict "확인 필요".
+5. 검사 간섭: 각 약물이 혈액·요·내분비 검사 결과를 변화시키거나 왜곡할 수 있는 내용을 나열한다(예: 스테로이드의 ALP 상승·T4 저하·피내검사 억제, 페노바르비탈의 T4 저하, KBr의 Cl 위양성, TMS의 Cr 상승, 세팔로스포린의 요당 위양성, 검사 전 휴약이 필요한 약물 등). category는 간효소/신장·요/전해질/CBC/내분비/혈당·지질/응고·혈소판/기타 중에서 고른다.
+6. 부작용·모니터링: 약물별 주요 부작용(effects)과 권장 모니터링 항목·주기(monitoring)를 쓴다.
+7. overall: 이 처방 전체에 대한 종합 의견을 3~6문장으로 쓴다. 가장 중요한 위험 1~2가지와 권장 조치를 앞에 둔다.
+
+원칙: 모든 텍스트는 한국어(약물명은 한글, 필요시 영문 병기). 확실하지 않은 것은 단정하지 말고 "확인 필요"로 표시한다. 근거가 약한 상호작용을 과장하지 말고, 임상적으로 의미 있는 것에 집중한다. 신장 환자 비중이 높은 병원임을 고려해 신독성·신배설 약물의 용량 조절은 특히 꼼꼼히 다룬다.`;
+
+/* ===== API 호출 ===== */
+async function analyze(){
+  if(!apiKey){
+    flash(localStorage.getItem(ENC_LS)?'먼저 비밀번호로 잠금을 해제하세요.':'먼저 API 키와 비밀번호를 설정하세요.',true);
+    ($('#pwIn')||$('#key'))?.focus();
+    return;
+  }
+  lastUse=Date.now();
+  const rx=$('#rx').value.trim();
+  if(!rx&&!images.length){flash('처방 텍스트 또는 이미지를 넣어주세요.',true);return;}
+
+  const conds=[...document.querySelectorAll('.chks input:checked')].map(c=>c.value);
+  const wt=$('#wt').value, age=$('#age').value.trim(), extra=$('#extra').value.trim();
+  let userText=`[환자 정보]\n축종: ${species}\n체중: ${wt?wt+' kg':'미입력'}\n나이: ${age||'미입력'}\n기저 상태: ${conds.length?conds.join(', '):'특이사항 없음'}`;
+  if(extra) userText+=`\n기타: ${extra}`;
+  userText+=`\n\n[처방 내용]\n${rx||'(첨부된 처방전 이미지 참조)'}`;
+  if(images.length) userText+=`\n\n(처방전 캡쳐 이미지 ${images.length}장 첨부 — 이미지의 처방 내용도 함께 분석할 것)`;
+
+  const content=[
+    ...images.map(im=>({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}})),
+    {type:'text',text:userText}
+  ];
+
+  const model=$('#model').value;
+  $('#go').disabled=true;
+  $('#out').innerHTML=`<div class="status"><span class="spin"></span>${esc(model)} 모델이 처방을 분석하고 있습니다… (30초~2분)</div>`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'content-type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model, max_tokens:16000,
+        system:[{type:'text',text:SYSTEM,cache_control:{type:'ephemeral'}}],
+        output_config:{format:{type:'json_schema',schema:SCHEMA}},
+        messages:[{role:'user',content}]
+      })
+    });
+    if(!res.ok){
+      let msg='HTTP '+res.status;
+      try{const j=await res.json();msg=j?.error?.message||msg;}catch(e){}
+      if(res.status===401) msg='API 키가 올바르지 않습니다. 키를 확인하세요.';
+      if(res.status===429) msg='요청 한도 초과 — 잠시 후 다시 시도하세요.';
+      if(res.status===529) msg='API가 일시적으로 혼잡합니다 — 잠시 후 다시 시도하세요.';
+      throw new Error(msg);
+    }
+    const data=await res.json();
+    if(data.stop_reason==='refusal'){
+      throw new Error('모델이 이 요청의 처리를 거부했습니다. 입력 내용을 확인 후 다시 시도하세요.');
+    }
+    if(data.stop_reason==='max_tokens'){
+      throw new Error('응답이 너무 길어 잘렸습니다. 처방을 나눠서 분석해 보세요.');
+    }
+    const textBlock=(data.content||[]).find(b=>b.type==='text');
+    if(!textBlock) throw new Error('응답에서 분석 결과를 찾지 못했습니다.');
+    const result=JSON.parse(textBlock.text);
+    renderResult(result, data.usage, model);
+  }catch(err){
+    let m=err.message;
+    if(err instanceof TypeError) m='네트워크 오류 — 인터넷 연결을 확인하세요. ('+m+')';
+    $('#out').innerHTML=`<div class="status err"><b>분석 실패:</b> ${esc(m)}</div>`;
+  }finally{
+    $('#go').disabled=false;
+  }
+}
+
+/* ===== 렌더링 ===== */
+function renderResult(r, usage, model){
+  const ord={'금기':0,'중대':1,'주의':2,'참고':3};
+  const inter=(r.interactions||[]).slice().sort((a,b)=>(ord[a.severity]??9)-(ord[b.severity]??9));
+  const nC=inter.filter(x=>x.severity==='금기').length+(r.patient_cautions||[]).filter(x=>x.level==='회피').length;
+  const nM=inter.filter(x=>x.severity==='중대').length;
+  const nMo=inter.filter(x=>x.severity==='주의').length;
+
+  let h='';
+  h+='<div class="sumbar">'
+   +`<div class="sumcell c-drug"><div class="n">${(r.drugs||[]).length}</div><div class="t">인식된 약물</div></div>`
+   +`<div class="sumcell c-contra"><div class="n">${nC}</div><div class="t">금기·회피</div></div>`
+   +`<div class="sumcell c-major"><div class="n">${nM}</div><div class="t">중대 주의</div></div>`
+   +`<div class="sumcell c-moderate"><div class="n">${nMo}</div><div class="t">주의·모니터</div></div>`
+   +'</div>';
+
+  h+='<div class="sect"><h3>① 인식된 약물</h3>';
+  if((r.drugs||[]).length)
+    h+='<div class="chips">'+r.drugs.map(d=>`<span class="chip">${esc(d.name)}<small>${esc(d.drug_class)}</small></span>`).join('')+'</div>';
+  else h+='<p class="hint">인식된 약물이 없습니다.</p>';
+  if((r.unrecognized||[]).length)
+    h+=`<div class="card sev-주의" style="margin-top:10px"><h4><span class="badge b-주의">확인 필요</span> 판독 불확실 항목</h4>
+    <p>${r.unrecognized.map(esc).join(' · ')}</p><p class="why">원 처방과 대조하여 확인하세요.</p></div>`;
+  h+='<p class="hint">⚠ AI 판독 결과입니다 — 반드시 원 처방과 대조하세요.</p></div>';
+
+  h+='<div class="sect"><h3>② 약물 상호작용</h3>';
+  if(!inter.length) h+='<p class="hint">임상적으로 의미 있는 상호작용이 확인되지 않았습니다.</p>';
+  for(const it of inter){
+    h+=`<div class="card sev-${esc(it.severity)}"><h4><span class="badge b-${esc(it.severity)}">${esc(it.severity)}</span> ${esc(it.title)} <span class="klass">(${(it.drugs||[]).map(esc).join(' + ')})</span></h4>
+    <p class="why">${esc(it.mechanism)}</p><p class="act">→ ${esc(it.action)}</p></div>`;
+  }
+  h+='</div>';
+
+  h+='<div class="sect"><h3>③ 환자 상태별 주의</h3>';
+  if(!(r.patient_cautions||[]).length) h+='<p class="hint">현재 환자 상태에서 특별히 회피·주의로 분류된 약물이 없습니다.</p>';
+  else{
+    const byCondMap={};
+    for(const c of r.patient_cautions)(byCondMap[c.condition]=byCondMap[c.condition]||[]).push(c);
+    for(const cond in byCondMap){
+      const arr=byCondMap[cond];
+      h+=`<div class="card sev-${arr.some(x=>x.level==='회피')?'중대':'주의'}"><h4>${esc(cond)}</h4>`;
+      for(const c of arr) h+=`<p class="flagline"><b class="l-${esc(c.level)}">${c.level==='회피'?'회피 권장':'주의'}</b> — <b>${esc(c.drug)}</b>: ${esc(c.reason)}</p>`;
+      h+='</div>';
+    }
+  }
+  h+='</div>';
+
+  h+='<div class="sect"><h3>④ 용량 체크</h3>';
+  if(!(r.dose_checks||[]).length) h+='<p class="hint">—</p>';
+  else{
+    const vc={'범위 내':'v-범위내','범위 초과':'v-초과','범위 미만':'v-미만','확인 필요':'v-확인'};
+    h+='<div class="tblwrap"><table><thead><tr><th>약물</th><th>처방</th><th>계산값</th><th>참고 범위</th><th>판정</th><th>비고</th></tr></thead><tbody>';
+    for(const d of r.dose_checks)
+      h+=`<tr><td><b>${esc(d.drug)}</b></td><td>${esc(d.parsed)}</td><td>${esc(d.calculated)}</td><td>${esc(d.reference)}</td><td><span class="vd ${vc[d.verdict]||'v-확인'}">${esc(d.verdict)}</span></td><td>${esc(d.comment)}</td></tr>`;
+    h+='</tbody></table></div><p class="hint">"범위 초과/미만"은 재확인 신호입니다 — 적응증·프로토콜에 따라 정상적으로 벗어날 수 있습니다.</p>';
+  }
+  h+='</div>';
+
+  h+='<div class="sect"><h3>⑤ 검사 결과 간섭·왜곡</h3>';
+  if(!(r.lab_interference||[]).length) h+='<p class="hint">등록된 검사 간섭 정보가 없습니다.</p>';
+  else{
+    h+='<div class="tblwrap"><table><thead><tr><th>검사 영역</th><th>영향</th><th>원인 약물</th></tr></thead><tbody>';
+    for(const l of r.lab_interference)
+      h+=`<tr><td><b>${esc(l.category)}</b></td><td>${esc(l.effect)}</td><td>${(l.drugs||[]).map(esc).join(', ')}</td></tr>`;
+    h+='</tbody></table></div><p class="hint">검사 의뢰·판독 시 위 약물 투여 이력을 함께 고려하세요.</p>';
+  }
+  h+='</div>';
+
+  h+='<div class="sect"><h3>⑥ 부작용 · 모니터링</h3>';
+  for(const s of (r.side_effects||[]))
+    h+=`<details class="dz"><summary>${esc(s.drug)}</summary><div class="body">
+    <p>${esc(s.effects)}</p><p class="hint"><b>모니터링:</b> ${esc(s.monitoring)}</p></div></details>`;
+  h+='</div>';
+
+  if(r.overall) h+=`<div class="overall"><b>종합 의견</b><br>${esc(r.overall)}</div>`;
+
+  if(usage){
+    const inTok=(usage.input_tokens||0)+(usage.cache_read_input_tokens||0)+(usage.cache_creation_input_tokens||0);
+    h+=`<p class="usage">model: ${esc(model)} · input ${inTok.toLocaleString()} tok (cache read ${(usage.cache_read_input_tokens||0).toLocaleString()}) · output ${(usage.output_tokens||0).toLocaleString()} tok</p>`;
+  }
+  $('#out').innerHTML=h;
+  $('#out').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+$('#go').onclick=analyze;
+$('#clr').onclick=()=>{$('#rx').value='';images.length=0;renderThumbs();
+  $('#out').innerHTML='<div class="status">입력이 지워졌습니다.</div>';};
+</script>
+</body>
+</html>

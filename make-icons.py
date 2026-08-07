@@ -14,9 +14,9 @@ import pathlib
 
 from PIL import Image, ImageDraw
 
-NAVY = (43, 58, 94)        # 센터 CI 네이비 #2B3A5E — 아이콘 바탕
-GOLD = (195, 161, 123)     # 센터 CI 골드 #C3A17B — 마크
-MINT = (216, 190, 156)     # 펄스 라인(밝은 골드)
+NAVY = (33, 46, 81)        # 센터 CI 네이비 #212E51 — 로고에서 추출
+GOLD = (175, 148, 118)     # 센터 CI 골드 #AF9476 — 로고에서 추출
+MINT = (200, 176, 148)     # 펄스 라인(밝은 골드)
 WHITE = (255, 255, 255)
 SS = 4                     # 슈퍼샘플링 배율
 
@@ -68,10 +68,66 @@ def logo_bg(default):
     return default
 
 
+MARK = pathlib.Path(__file__).with_name("logo-mark.png")
+
+
+def extract_symbol():
+    """로고에서 심볼(맨 위 도형 블록)만 잘라 logo-mark.png로 저장한다.
+
+    아이콘 크기에서는 'SIGNATURE ANIMAL MEDICAL CENTER' 글자가 읽히지 않고
+    심볼만 작아지므로, 글자를 뺀 심볼만 쓰는 것이 맞다. 세로 방향으로 마크
+    픽셀이 이어지는 구간(밴드)을 찾아 첫 번째 밴드를 심볼로 본다.
+    밴드가 하나뿐이면(=심볼만 있는 로고) 원본을 그대로 쓴다.
+    """
+    im = Image.open(LOGO).convert("RGBA")
+    w, h = im.size
+    px = im.load()
+    bg = px[1, 1]
+
+    def marked(c):
+        return sum(abs(a - b) for a, b in zip(c[:3], bg[:3])) > 60 and c[3] > 40
+
+    bands, start = [], None
+    for y in range(h):
+        n = sum(1 for x in range(0, w, 3) if marked(px[x, y]))
+        if n > 2 and start is None:
+            start = y
+        elif n <= 2 and start is not None:
+            if y - start > h * 0.01:
+                bands.append((start, y))
+            start = None
+    if start is not None:
+        bands.append((start, h))
+
+    if len(bands) < 2:
+        return LOGO  # 잘라낼 글자가 없다
+
+    top, bot = bands[0]
+    xs = [x for x in range(w) for y in range(top, bot, 3) if marked(px[x, y])]
+    if not xs:
+        return LOGO
+    left, right = min(xs), max(xs)
+
+    pad = int(max(bot - top, right - left) * 0.08)
+    box = max(bot - top, right - left) + pad * 2
+    cx, cy = (left + right) // 2, (top + bot) // 2
+    out = Image.new("RGBA", (box, box), bg)
+    crop = im.crop((max(0, cx - box // 2), max(0, cy - box // 2),
+                    min(w, cx + box // 2), min(h, cy + box // 2)))
+    out.paste(crop, ((box - crop.width) // 2, (box - crop.height) // 2))
+
+    # 헤더에 data URI로 심으므로 용량을 줄인다. 사실상 2색 이미지라
+    # 512px 팔레트 PNG로도 화질 손실이 없다.
+    out = out.convert("RGB").resize((512, 512), Image.LANCZOS)
+    out = out.quantize(colors=32, method=Image.MEDIANCUT)
+    out.save(MARK, optimize=True)
+    return MARK
+
+
 def place_logo(img, s, safe):
-    """logo.png를 정사각 캔버스 가운데에 비율을 유지해 얹는다.
+    """로고를 정사각 캔버스 가운데에 비율을 유지해 얹는다.
     safe는 로고가 차지할 최대 폭·높이 비율(마스커블은 잘림을 고려해 작게)."""
-    logo = Image.open(LOGO).convert("RGBA")
+    logo = Image.open(MARK if MARK.exists() else LOGO).convert("RGBA")
     box = s * safe
     ratio = min(box / logo.width, box / logo.height)
     logo = logo.resize((max(1, int(logo.width * ratio)),
@@ -109,6 +165,17 @@ def build(px, maskable=False, simple=False, bg=None, mark=GOLD):
 
 
 def main():
+    # 심볼 추출을 아이콘 생성보다 먼저 해야 첫 실행부터 반영된다
+    if LOGO.exists():
+        src = extract_symbol()
+        print("로고 소스: %s%s" % (src.name,
+              " (심볼만 자동 추출)" if src == MARK else " (밴드가 하나뿐이라 원본 사용)"))
+    else:
+        print("로고 소스: 없음 — 기본 발자국 마크 사용")
+    bg = logo_bg(NAVY)
+    print("아이콘 바탕: #%02X%02X%02X%s" % (bg[0], bg[1], bg[2],
+          " (로고 배경에서 추출)" if bg != NAVY else " (CI 네이비)"))
+
     outputs = [
         ("icon-192.png", build(192)),
         ("icon-512.png", build(512)),
@@ -118,10 +185,6 @@ def main():
         ("favicon-32.png", build(32, simple=True)),
         ("favicon-16.png", build(16, simple=True)),
     ]
-    bg = logo_bg(NAVY)
-    print("로고 소스:", "logo.png" if LOGO.exists() else "없음 — 기본 발자국 마크 사용")
-    print("아이콘 바탕: #%02X%02X%02X%s" % (bg[0], bg[1], bg[2],
-          " (로고 배경에서 추출)" if bg != NAVY else " (CI 네이비)"))
     for name, im in outputs:
         im.convert("RGB").save(name) if name == "apple-touch-icon.png" else im.save(name)
         print("생성:", name, im.size)

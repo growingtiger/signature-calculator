@@ -1,0 +1,835 @@
+<title>처방 안전 점검 · 시그니처 동물의료센터</title>
+<style>
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --surface2:#eef1f5; --ink:#1c2733; --ink2:#5b6a7a;
+  --line:#dde3ea; --accent:#0e7490; --accent-ink:#ffffff;
+  --contra:#c81e3c; --major:#d9640e; --moderate:#b08308; --info:#2563eb; --ok:#1a8a4a;
+  --contra-bg:#fdeef1; --major-bg:#fdf3ea; --moderate-bg:#fbf6e7; --info-bg:#eef3fd; --ok-bg:#ebf7f0;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f151c; --surface:#171f29; --surface2:#1f2937; --ink:#e7edf4; --ink2:#9aa8b8;
+    --line:#2b3644; --accent:#38b2c8; --accent-ink:#06222a;
+    --contra:#ff6b85; --major:#ffa057; --moderate:#e6c34d; --info:#7aa5ff; --ok:#5fd394;
+    --contra-bg:#3a1520; --major-bg:#37220f; --moderate-bg:#332b10; --info-bg:#16233d; --ok-bg:#12301f;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f151c; --surface:#171f29; --surface2:#1f2937; --ink:#e7edf4; --ink2:#9aa8b8;
+  --line:#2b3644; --accent:#38b2c8; --accent-ink:#06222a;
+  --contra:#ff6b85; --major:#ffa057; --moderate:#e6c34d; --info:#7aa5ff; --ok:#5fd394;
+  --contra-bg:#3a1520; --major-bg:#37220f; --moderate-bg:#332b10; --info-bg:#16233d; --ok-bg:#12301f;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6f8; --surface:#ffffff; --surface2:#eef1f5; --ink:#1c2733; --ink2:#5b6a7a;
+  --line:#dde3ea; --accent:#0e7490; --accent-ink:#ffffff;
+  --contra:#c81e3c; --major:#d9640e; --moderate:#b08308; --info:#2563eb; --ok:#1a8a4a;
+  --contra-bg:#fdeef1; --major-bg:#fdf3ea; --moderate-bg:#fbf6e7; --info-bg:#eef3fd; --ok-bg:#ebf7f0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Apple SD Gothic Neo','Pretendard Variable',Pretendard,'Noto Sans KR',system-ui,sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+header.top{max-width:1180px;margin:0 auto;padding:26px 16px 6px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+header.top h1{font-size:1.45rem;margin:0;letter-spacing:-.01em}
+header.top .sub{color:var(--ink2);font-size:.85rem}
+.grid{display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.panel h2{font-size:.95rem;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.eyebrow{font-size:.7rem;letter-spacing:.08em;color:var(--accent);font-weight:700}
+label.fld{display:block;font-size:.78rem;color:var(--ink2);margin-bottom:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface2);color:var(--ink2);padding:7px 18px;font-size:.9rem;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+input[type=number]{width:90px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--ink);font-size:.95rem;font-variant-numeric:tabular-nums}
+.chks{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-bottom:12px}
+.chks label{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--ink);cursor:pointer;padding:3px 2px}
+.chks input{accent-color:var(--accent)}
+textarea{width:100%;min-height:190px;padding:12px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface2);color:var(--ink);font-size:.92rem;font-family:inherit;resize:vertical;line-height:1.6}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:8px;padding:10px 18px;font-size:.92rem;cursor:pointer;font-family:inherit;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.76rem;color:var(--ink2);margin-top:10px}
+/* results */
+.sumbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.sumcell{flex:1 1 100px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;text-align:center}
+.sumcell .n{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.sumcell .t{font-size:.73rem;color:var(--ink2)}
+.sumcell.c-contra .n{color:var(--contra)} .sumcell.c-major .n{color:var(--major)}
+.sumcell.c-moderate .n{color:var(--moderate)} .sumcell.c-drug .n{color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.83rem}
+.chip small{color:var(--ink2);margin-left:5px;font-size:.72rem}
+.sect{margin-top:18px}
+.sect>h3{font-size:1rem;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+.card{border:1px solid var(--line);border-left:4px solid var(--info);border-radius:8px;background:var(--surface);padding:12px 14px;margin-bottom:10px}
+.card.sev-contra{border-left-color:var(--contra);background:var(--contra-bg)}
+.card.sev-major{border-left-color:var(--major);background:var(--major-bg)}
+.card.sev-moderate{border-left-color:var(--moderate);background:var(--moderate-bg)}
+.card.sev-info{border-left-color:var(--info);background:var(--info-bg)}
+.card h4{margin:0 0 4px;font-size:.93rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:.68rem;font-weight:800;letter-spacing:.05em;border-radius:5px;padding:2px 8px;color:#fff}
+.badge.contra{background:var(--contra)} .badge.major{background:var(--major)}
+.badge.moderate{background:var(--moderate)} .badge.info{background:var(--info)}
+:root[data-theme="dark"] .badge, .dark-badge{color:#0d1117}
+@media (prefers-color-scheme: dark){ .badge{color:#0d1117} }
+:root[data-theme="light"] .badge{color:#fff}
+.card p{margin:3px 0;font-size:.86rem}
+.card .why{color:var(--ink2)}
+.card .act{font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.85rem;background:var(--surface)}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+th{background:var(--surface2);text-align:left;padding:8px 10px;font-size:.76rem;color:var(--ink2);white-space:nowrap}
+td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+td.num{font-family:var(--mono);font-size:.8rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.vd{font-weight:700;white-space:nowrap}
+.vd.ok{color:var(--ok)} .vd.high{color:var(--contra)} .vd.low{color:var(--major)} .vd.na{color:var(--ink2);font-weight:400}
+details.dz{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin-bottom:8px}
+details.dz summary{padding:10px 14px;cursor:pointer;font-size:.9rem;font-weight:600;list-style:none;display:flex;gap:8px;align-items:center}
+details.dz summary::before{content:'▸';color:var(--ink2);transition:transform .15s}
+details.dz[open] summary::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion: reduce){details.dz summary::before{transition:none}}
+details.dz .body{padding:0 14px 12px;font-size:.85rem}
+details.dz .body p{margin:4px 0}
+.klass{font-size:.72rem;color:var(--ink2);font-weight:400}
+.empty{color:var(--ink2);font-size:.86rem;padding:6px 2px}
+.flagline{margin:0 0 6px;font-size:.86rem}
+.flagline b.avoid{color:var(--contra)} .flagline b.caution{color:var(--major)}
+footer.disc{max-width:1180px;margin:0 auto;padding:0 16px 40px;color:var(--ink2);font-size:.76rem;line-height:1.6}
+.notice{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--ink2);margin-bottom:14px}
+</style>
+
+<header class="top">
+  <h1>처방 안전 점검</h1>
+  <span class="sub">약물 상호작용 · 용량 · 검사 간섭 스크리닝 — 시그니처 동물의료센터</span>
+</header>
+
+<div class="wrap">
+<div class="grid">
+  <section class="panel" aria-label="입력">
+    <div class="eyebrow">INPUT</div>
+    <h2>환자 정보 · 처방 내용</h2>
+    <div class="row">
+      <div>
+        <label class="fld">축종</label>
+        <div class="seg" role="group" aria-label="축종">
+          <button type="button" id="spDog" class="on">개</button>
+          <button type="button" id="spCat">고양이</button>
+        </div>
+      </div>
+      <div>
+        <label class="fld" for="wt">체중 (kg)</label>
+        <input type="number" id="wt" min="0" step="0.1" placeholder="예: 4.2">
+      </div>
+    </div>
+    <label class="fld">기저 상태 (해당 시 체크 — 약물별 주의사항에 반영)</label>
+    <div class="chks">
+      <label><input type="checkbox" id="f_ren"> 신질환 (CKD/AKI)</label>
+      <label><input type="checkbox" id="f_hep"> 간질환</label>
+      <label><input type="checkbox" id="f_car"> 심장질환</label>
+      <label><input type="checkbox" id="f_gi"> 위장 궤양·출혈 병력</label>
+      <label><input type="checkbox" id="f_preg"> 임신·수유</label>
+      <label><input type="checkbox" id="f_young"> 성장기 (미성숙)</label>
+      <label><input type="checkbox" id="f_sz"> 발작 병력</label>
+      <label><input type="checkbox" id="f_dm"> 당뇨</label>
+      <label><input type="checkbox" id="f_mdr1"> MDR1 변이 (콜리계 등)</label>
+      <label><input type="checkbox" id="f_dehy"> 탈수·저혈량</label>
+    </div>
+    <label class="fld" for="rx">처방 내용 붙여넣기 (약물명은 한글·영문·상품명 모두 인식)</label>
+    <textarea id="rx" placeholder="예)
+멜록시캄 0.1 mg/kg SID
+베나제프릴 5 mg BID
+푸로세미드 8 mg BID
+파모티딘 2.5 mg BID"></textarea>
+    <div class="btns">
+      <button class="btn primary" id="go">분석하기</button>
+      <button class="btn ghost" id="ex1">예시: 심장·신장</button>
+      <button class="btn ghost" id="ex2">예시: 피부·통증</button>
+      <button class="btn ghost" id="clr">지우기</button>
+    </div>
+    <p class="hint">용량 판정은 한 줄에 「약물명 + 숫자 + mg(또는 mg/kg) + 횟수(SID/BID/TID, q12h, 하루 2회…)」가 함께 있을 때 정확합니다. 체중을 입력하면 mg → mg/kg 환산까지 확인합니다.</p>
+  </section>
+
+  <section id="out" aria-live="polite">
+    <div class="notice">처방 내용을 붙여넣고 <b>분석하기</b>를 누르면 ① 약물 상호작용 ② 환자 상태별 주의 ③ 용량 체크 ④ 검사 결과 간섭 ⑤ 부작용·모니터링 항목을 한 번에 확인합니다. 내장 데이터베이스(약 60종)에 있는 약물만 인식하며, 인식된 목록을 반드시 처방과 대조하세요.</div>
+  </section>
+</div>
+</div>
+
+<footer class="disc">
+  본 도구는 내장 데이터베이스 기반의 <b>참고용 스크리닝 보조 도구</b>입니다. 모든 용량 범위는 일반적인 참고치(Plumb's 등 표준 참고서 기준)이며 적응증·제형·개체 상태에 따라 달라질 수 있습니다.
+  약물 인식 누락·오인식이 있을 수 있으므로 최종 판단은 반드시 수의사의 임상적 판단과 원 처방 검토로 확정하십시오. 시그니처 동물의료센터 내부용.
+</footer>
+
+<script>
+/* ================= 약물 DB =================
+ tg: 매칭 태그 / d: 표시용 용량 문구 / dd,dc: [1일 최소, 1일 최대] mg/kg/day (개/고양이, null=자동판정 생략)
+ fl: 환자상태 플래그 {키:[레벨 a(회피)|c(주의), 설명]} / se: 부작용 / lab: [[카테고리, 내용]...] */
+const DB=[
+{id:'carprofen',n:'카프로펜',en:'Carprofen',al:['carprofen','카프로펜','리마딜','rimadyl','로디캄'],cl:'NSAID',tg:['nsaid'],
+ d:{dog:'4.4 mg/kg SID 또는 2.2 mg/kg BID',cat:'경구 반복투여 비권장'},dd:[2.2,4.4],dc:null,
+ fl:{ren:['a','신관류 의존 상태에서 신독성 — CKD/AKI에서 회피'],hep:['c','간독성(특이체질) 보고 — 간수치 모니터'],gi:['a','궤양·출혈 병력 시 회피'],dehy:['a','탈수·저혈량 시 급성 신손상 위험'],preg:['a','임신 후기 회피']},
+ se:'구토·식욕부진·흑색변(GI 궤양), 신수치 상승, 특이체질성 간독성(래브라도 보고). 투여 중 BUN/Cr·간효소 정기 확인.',
+ lab:[['신장·요','BUN·Cr 상승 가능(신관류 저하)'],['간효소','ALT 상승(특이체질성 간독성) — 투여 초기 2주 내 모니터'],['CBC','GI 출혈 시 빈혈·BUN 상승']]},
+{id:'meloxicam',n:'멜록시캄',en:'Meloxicam',al:['meloxicam','멜록시캄','메타캄','metacam','멜록시켐'],cl:'NSAID',tg:['nsaid'],
+ d:{dog:'초기 0.2 → 유지 0.1 mg/kg SID',cat:'0.05 mg/kg 첫날 → 0.02–0.03 SID 단기(국가별 상이)'},dd:[0.05,0.2],dc:[0.01,0.05],
+ fl:{ren:['a','고양이 반복투여 급성신부전 보고 — CKD에서 회피'],gi:['a','궤양 병력 시 회피'],dehy:['a','탈수 시 회피'],preg:['a','회피']},
+ se:'GI 궤양·구토, 신독성(특히 고양이 반복투여·탈수 시). 고양이 장기 사용 시 최저 유효 용량.',
+ lab:[['신장·요','BUN·Cr·SDMA 상승 가능'],['CBC','GI 출혈 시 빈혈']]},
+{id:'firocoxib',n:'피로콕시브',en:'Firocoxib',al:['firocoxib','피로콕시브','프리비콕스','previcox'],cl:'NSAID',tg:['nsaid'],
+ d:{dog:'5 mg/kg SID',cat:'비권장'},dd:[4.5,5.5],dc:null,
+ fl:{ren:['a','CKD에서 회피'],gi:['a','궤양 병력 시 회피'],dehy:['a','탈수 시 회피'],young:['c','7개월 미만 안전성 미확립']},
+ se:'GI 장애, 신수치 상승, 드물게 간독성.',lab:[['신장·요','BUN·Cr 상승 가능'],['간효소','ALT 상승 가능']]},
+{id:'robenacoxib',n:'로베나콕시브',en:'Robenacoxib',al:['robenacoxib','로베나콕시브','온시올','onsior'],cl:'NSAID',tg:['nsaid'],
+ d:{dog:'1–2 mg/kg SID',cat:'1–2.4 mg/kg SID (단기)'},dd:[1,2],dc:[1,2.4],
+ fl:{ren:['a','CKD에서 회피'],gi:['a','궤양 병력 시 회피'],dehy:['a','탈수 시 회피']},
+ se:'GI 장애, 신수치 상승. 고양이 장기 투여 근거 제한적.',lab:[['신장·요','BUN·Cr 상승 가능']]},
+{id:'piroxicam',n:'피록시캄',en:'Piroxicam',al:['piroxicam','피록시캄'],cl:'NSAID',tg:['nsaid'],
+ d:{dog:'0.3 mg/kg SID~EOD (이행상피암 등)',cat:'0.3 mg/kg EOD~q72h (신중)'},dd:[0.15,0.3],dc:null,
+ fl:{ren:['a','신독성 높은 편 — CKD 회피'],gi:['a','GI 궤양 위험 높음 — 위장보호제 병용 고려']},
+ se:'GI 궤양·출혈 위험이 다른 NSAID보다 높음, 신유두괴사.',lab:[['신장·요','BUN·Cr 상승'],['CBC','GI 출혈성 빈혈']]},
+{id:'aspirin',n:'아스피린',en:'Aspirin',al:['aspirin','아스피린','asa'],cl:'NSAID·항혈소판',tg:['nsaid','antiplatelet'],
+ d:{dog:'항혈소판 0.5–1 mg/kg SID',cat:'항혈소판 저용량 q72h (신중)'},dd:[0.5,10],dc:null,
+ fl:{ren:['c','신독성 주의'],gi:['a','궤양 병력 시 회피']},
+ se:'GI 자극·궤양, 혈소판 기능 비가역 억제(수술 5–7일 전 중단).',
+ lab:[['응고·혈소판','혈소판 응집능 저하 — 출혈시간 연장, 수술 전 확인'],['기타','T4 경미한 저하 가능(고용량)']]},
+{id:'acetaminophen',n:'아세트아미노펜',en:'Acetaminophen',al:['acetaminophen','paracetamol','아세트아미노펜','타이레놀','tylenol'],cl:'해열진통제',tg:[],
+ d:{dog:'10–15 mg/kg BID 단기',cat:'절대 금기'},dd:[20,30],dc:null,catContra:'고양이 절대 금기 — 메트헤모글로빈혈증·하인츠소체 용혈·간괴사',
+ fl:{hep:['a','간질환 시 회피'],ren:['c','장기 사용 주의']},
+ se:'개: 용량 초과 시 간독성·건성각결막염 보고. 고양이: 치명적 — 절대 사용 금지.',
+ lab:[['CBC','메트헤모글로빈·하인츠소체(과량)'],['간효소','ALT 상승(과량)']]},
+{id:'prednisolone',n:'프레드니솔론',en:'Prednisolone',al:['prednisolone','prednisone','프레드니솔론','프레드니손','소론도','솔론도'],cl:'글루코코르티코이드',tg:['steroid'],
+ d:{dog:'항염 0.5–1 · 면역억제 2–4 mg/kg/day',cat:'항염 1–2 · 면역억제 2–4(경구는 프레드니솔론 권장)'},dd:[0.5,4],dc:[0.5,4],
+ fl:{dm:['a','인슐린 저항 유발 — 당뇨 조절 붕괴'],gi:['c','궤양 위험 — NSAID 병용 절대 금지'],car:['c','체액 저류·고양이 울혈성심부전 유발 가능'],preg:['c','임신 시 주의'],ren:['c','다음다뇨·단백뇨 악화 가능']},
+ se:'다음다뇨·다식, 헐떡임, 근소실, 의인성 쿠싱, 감염 감수성 증가, 당뇨 유발(고양이). 장기 투여 후 급단 금지(점감).',
+ lab:[['간효소','개: ALP 현저히 상승(스테로이드 유도 ALP), ALT·GGT 상승'],['CBC','스트레스 백혈구상 — 호중구↑·림프구↓·호산구↓'],['내분비','T4 저하, ACTH 자극·LDDST 결과 왜곡(검사 전 휴약 필요), 프레드니솔론은 코티솔 측정에 교차반응'],['혈당·지질','혈당·중성지방·콜레스테롤 상승'],['신장·요','요비중 저하, 단백뇨(UPC) 상승 가능'],['기타','피내 알레르기 검사 억제 — 검사 전 2주 이상 휴약']]},
+{id:'dexamethasone',n:'덱사메타손',en:'Dexamethasone',al:['dexamethasone','덱사메타손','덱사'],cl:'글루코코르티코이드',tg:['steroid'],
+ d:{dog:'항염 0.05–0.15 mg/kg/day (프레드니솔론의 약 7배 역가)',cat:'동일 기준'},dd:[0.05,0.3],dc:[0.05,0.3],
+ fl:{dm:['a','인슐린 저항'],gi:['c','궤양 위험 — 프레드니솔론보다 GI 부작용 큼'],preg:['a','임신 말기 분만 유발 가능']},
+ se:'프레드니솔론과 동일 계열 부작용이며 GI 궤양 위험 더 높음. 미네랄로코르티코이드 작용은 거의 없음.',
+ lab:[['간효소','ALP·ALT 상승(개)'],['CBC','스트레스 백혈구상'],['내분비','ACTH·LDDST 억제(단, 코티솔 측정 교차반응은 없어 LDDST에 사용됨)'],['혈당·지질','혈당 상승'],['기타','피내검사 억제']]},
+{id:'amoxiclav',n:'아목시실린-클라불란산',en:'Amoxicillin–Clavulanate',al:['amoxicillin-clavulanate','amoxicillin/clavulanate','clavamox','아목시실린클라불란산','클라바목스','아목시클라','augmentin','오구멘틴','아목시실린-클라불란산'],cl:'항생제(β-lactam)',tg:['betalactam'],
+ d:{dog:'12.5–25 mg/kg BID',cat:'12.5–25 mg/kg BID'},dd:[25,50],dc:[25,50],
+ fl:{ren:['c','중증 신부전 시 투여 간격 연장 고려']},
+ se:'구토·설사(식사와 함께 투여 시 감소), 드물게 과민반응.',
+ lab:[['기타','요당 위양성 가능(구리환원법)'],['CBC','드물게 Coombs 위양성']]},
+{id:'amoxicillin',n:'아목시실린',en:'Amoxicillin',al:['amoxicillin','아목시실린'],cl:'항생제(β-lactam)',tg:['betalactam'],
+ d:{dog:'10–22 mg/kg BID~TID',cat:'10–22 mg/kg BID'},dd:[20,66],dc:[20,44],
+ fl:{ren:['c','중증 신부전 시 간격 연장']},se:'구토·설사, 과민반응.',lab:[['기타','요당 위양성 가능(구리환원법)']]},
+{id:'cephalexin',n:'세팔렉신',en:'Cephalexin',al:['cephalexin','cefalexin','세팔렉신','세파렉신','리렉신'],cl:'항생제(1세대 cephalosporin)',tg:['betalactam','cephalosporin'],
+ d:{dog:'22–30 mg/kg BID~TID',cat:'22–30 mg/kg BID'},dd:[44,90],dc:[44,60],
+ fl:{ren:['c','신배설 — 중증 신부전 시 간격 연장']},se:'구토·설사, 드물게 과민반응.',
+ lab:[['신장·요','Jaffe법 크레아티닌 위양성 상승 가능'],['기타','요당 위양성(구리환원법)'],['CBC','Coombs 위양성 가능']]},
+{id:'cefovecin',n:'세포베신',en:'Cefovecin',al:['cefovecin','세포베신','콘베니아','convenia'],cl:'항생제(3세대 cephalosporin, 주사)',tg:['betalactam','cephalosporin'],
+ d:{dog:'8 mg/kg SC 1회(14일 지속)',cat:'8 mg/kg SC 1회'},dd:null,dc:null,
+ fl:{ren:['c','신부전 시 배설 지연 — 반복투여 간격 주의']},
+ se:'주사 후 14일 이상 체내 잔류 — 부작용 발생 시에도 소실 지연. 고도 단백결합으로 다른 고단백결합 약물과 상호작용 가능.',
+ lab:[['CBC','Coombs 위양성 가능'],['기타','요당 위양성(구리환원법)']]},
+{id:'enrofloxacin',n:'엔로플록사신',en:'Enrofloxacin',al:['enrofloxacin','엔로플록사신','바이트릴','baytril'],cl:'항생제(fluoroquinolone)',tg:['fq'],
+ d:{dog:'5–20 mg/kg SID',cat:'최대 5 mg/kg SID (초과 금지)'},dd:[5,20],dc:[5,5],
+ fl:{sz:['c','경련 역치 저하 — 발작 병력 시 회피 또는 주의'],young:['a','성장기 연골 손상 — 대형견 8–12개월 미만 회피'],ren:['c','고양이 CKD에서 망막독성 위험 증가 — 감량']},
+ se:'고양이: 5 mg/kg/day 초과 시 급성 망막변성·실명 위험. 성장기 연골병증, 경련 역치 저하, GI 장애.',
+ lab:[['신장·요','알칼리뇨에서 결정뇨 가능'],['기타','테오필린 병용 시 테오필린 농도 상승(별도 경고 참조)']]},
+{id:'marbofloxacin',n:'마보플록사신',en:'Marbofloxacin',al:['marbofloxacin','마보플록사신','마보실','marbocyl','자니퀸'],cl:'항생제(fluoroquinolone)',tg:['fq'],
+ d:{dog:'2.75–5.5 mg/kg SID',cat:'2.75–5.5 mg/kg SID'},dd:[2.75,5.5],dc:[2.75,5.5],
+ fl:{sz:['c','경련 역치 저하'],young:['a','성장기 연골 손상 위험']},
+ se:'GI 장애, 경련 역치 저하. 고양이 망막독성은 엔로플록사신보다 낮으나 고용량 회피.',lab:[]},
+{id:'doxycycline',n:'독시사이클린',en:'Doxycycline',al:['doxycycline','독시사이클린','비브라마이신','모노독스'],cl:'항생제(tetracycline)',tg:['tetracycline'],
+ d:{dog:'5 mg/kg BID 또는 10 mg/kg SID',cat:'5 mg/kg BID (물과 함께 — 식도협착 예방)'},dd:[5,10],dc:[5,10],
+ fl:{hep:['c','간수치 상승 가능 — 간질환 시 모니터'],preg:['a','태아 골격·치아 착색'],young:['c','치아 착색(에나멜 형성기)']},
+ se:'구토·식욕부진, 고양이 식도염·식도협착(반드시 물 또는 사료와 함께), 간수치 상승.',
+ lab:[['신장·요','항동화 작용으로 BUN 상승 가능(Cr은 정상)'],['간효소','ALT 상승 가능']]},
+{id:'metronidazole',n:'메트로니다졸',en:'Metronidazole',al:['metronidazole','메트로니다졸','후라시닐','flagyl','플라질'],cl:'항생제·항원충제',tg:[],
+ d:{dog:'10–15 mg/kg BID',cat:'10–12.5 mg/kg BID'},dd:[20,30],dc:[20,25],
+ fl:{hep:['c','간대사 — 간부전 시 감량(50%)'],sz:['c','신경독성(전정실조·경련) — 발작 병력 시 주의'],preg:['c','고용량 회피']},
+ se:'누적 고용량(>60 mg/kg/day 또는 장기)에서 전정신경계 독성 — 실조·안진·경련. 유연·식욕부진(쓴맛).',
+ lab:[['기타','드물게 ALT 경미 상승']]},
+{id:'clindamycin',n:'클린다마이신',en:'Clindamycin',al:['clindamycin','클린다마이신','안토롭','antirobe','훌그램'],cl:'항생제(lincosamide)',tg:[],
+ d:{dog:'5.5–11 mg/kg BID',cat:'5.5–11 mg/kg BID (물과 함께)'},dd:[11,22],dc:[11,22],
+ fl:{hep:['c','중증 간부전 시 감량']},se:'구토·설사, 고양이 식도염(물과 함께 투여).',lab:[['간효소','ALT 경미 상승 가능']]},
+{id:'azithromycin',n:'아지스로마이신',en:'Azithromycin',al:['azithromycin','아지스로마이신','지스로맥스','zithromax'],cl:'항생제(azalide)',tg:[],
+ d:{dog:'5–10 mg/kg SID',cat:'5–10 mg/kg SID'},dd:[5,10],dc:[5,10],
+ fl:{hep:['c','간배설 — 간부전 시 주의']},se:'GI 장애. 드물게 QT 연장(다른 QT 연장 약물과 병용 주의).',lab:[]},
+{id:'tms',n:'트리메토프림-설파',en:'Trimethoprim–Sulfa',al:['trimethoprim','sulfamethoxazole','tms','tmps','트리메토프림','설파','박트림','bactrim','셉트린','코트림'],cl:'항생제(potentiated sulfa)',tg:['sulfa'],
+ d:{dog:'15–30 mg/kg BID',cat:'15–30 mg/kg BID (단기)'},dd:[30,60],dc:[30,60],
+ fl:{ren:['c','결정뇨·신독성 — 충분한 음수, 신부전 시 감량'],hep:['c','특이체질성 간독성'],preg:['a','엽산 길항 — 기형 위험']},
+ se:'건성각결막염(KCS — 장기 투여 시 STT 모니터), 특이체질 과민반응(발열·다발관절염, 도베르만), 골수억제, 요결정.',
+ lab:[['내분비','T4 저하(장기 투여 — 갑상선기능저하 오진 주의)'],['신장·요','크레아티닌 상승(세뇨관 분비 억제 — GFR 변화 없음), 설파 결정뇨'],['CBC','장기 투여 시 골수억제(빈혈·혈소판감소)'],['기타','요단백 시험지 위양성 가능']]},
+{id:'amikacin',n:'아미카신',en:'Amikacin',al:['amikacin','아미카신'],cl:'항생제(aminoglycoside)',tg:['ag'],
+ d:{dog:'15–30 mg/kg SID (주사)',cat:'10–15 mg/kg SID'},dd:[15,30],dc:[10,15],
+ fl:{ren:['a','대표적 신독성 항생제 — 신부전 시 회피, 사용 시 요검사·Cr 매일 모니터'],dehy:['a','탈수 시 신독성 급증']},
+ se:'신독성(근위세뇨관 괴사 — 요 cast 조기 지표), 이독성(전정·와우), 신경근 차단.',
+ lab:[['신장·요','Cr·BUN 상승, 요 원주(cast)·당뇨·단백뇨 — 신독성 조기 지표로 매일 요검사 권장']]},
+{id:'gentamicin',n:'겐타마이신',en:'Gentamicin',al:['gentamicin','겐타마이신'],cl:'항생제(aminoglycoside)',tg:['ag'],
+ d:{dog:'9–14 mg/kg SID (주사)',cat:'5–8 mg/kg SID'},dd:[9,14],dc:[5,8],
+ fl:{ren:['a','신독성 — 신부전 시 회피'],dehy:['a','탈수 시 회피']},
+ se:'신독성·이독성 — 아미카신보다 신독성 높음.',lab:[['신장·요','Cr 상승, 요 cast — 매일 요검사 권장']]},
+{id:'itraconazole',n:'이트라코나졸',en:'Itraconazole',al:['itraconazole','이트라코나졸','스포라녹스','sporanox'],cl:'항진균제(azole)',tg:['azole'],
+ d:{dog:'5–10 mg/kg SID (식사와 함께)',cat:'5 mg/kg SID'},dd:[5,10],dc:[5,5],
+ fl:{hep:['c','간독성 — 간수치 정기 모니터']},
+ se:'식욕부진·구토, 간독성(ALT 모니터), 개 고용량에서 혈관염·피부궤양. 캡슐은 위산 필요(제산제와 상호작용), 액제는 무관.',
+ lab:[['간효소','ALT 상승 — 정기 모니터 필요']]},
+{id:'ketoconazole',n:'케토코나졸',en:'Ketoconazole',al:['ketoconazole','케토코나졸','니조랄'],cl:'항진균제(azole)',tg:['azole'],
+ d:{dog:'5–10 mg/kg BID',cat:'가능하면 다른 아졸 권장'},dd:[10,20],dc:null,
+ fl:{hep:['a','간독성 — 간질환 시 회피']},
+ se:'강력한 CYP3A4·P-gp 억제제 — 병용약 농도 상승 주의. 간독성, 식욕부진, 스테로이드 합성 억제(코티솔 저하).',
+ lab:[['내분비','코티솔 저하 — ACTH 자극검사 결과 왜곡(치료적으로 이용되기도 함)'],['간효소','ALT·ALP 상승']]},
+{id:'fluconazole',n:'플루코나졸',en:'Fluconazole',al:['fluconazole','플루코나졸','디푸루칸'],cl:'항진균제(azole)',tg:['azole'],
+ d:{dog:'5–10 mg/kg SID~BID',cat:'50 mg/마리 SID 또는 5–10 mg/kg SID'},dd:[5,20],dc:[5,10],
+ fl:{ren:['c','신배설 — 신부전 시 감량 필수']},se:'GI 장애, 간수치 상승(다른 아졸보다 적음). CYP 억제는 케토코나졸보다 약함.',
+ lab:[['간효소','ALT 경미 상승 가능']]},
+{id:'omeprazole',n:'오메프라졸',en:'Omeprazole',al:['omeprazole','오메프라졸','로섹','오엠피'],cl:'PPI',tg:['ppi'],
+ d:{dog:'0.7–1 mg/kg SID~BID (BID가 효과적)',cat:'0.5–1 mg/kg SID~BID'},dd:[0.7,2],dc:[0.5,2],
+ fl:{hep:['c','간대사 — 중증 간부전 시 감량']},
+ se:'장기(>8주) 사용 시 장내세균 불균형·저마그네슘혈증·B12 흡수 저하 보고. 중단 시 산 반동 분비 — 점감 권장.',
+ lab:[['내분비','가스트린 상승(가스트리노마 검사 전 휴약 필요)'],['전해질','장기 사용 시 Mg 저하 가능'],['기타','장기 사용 시 B12 저하 가능']]},
+{id:'famotidine',n:'파모티딘',en:'Famotidine',al:['famotidine','파모티딘','가스터','pepcid'],cl:'H2 차단제',tg:['h2'],
+ d:{dog:'0.5–1 mg/kg SID~BID',cat:'0.5–1 mg/kg SID~BID'},dd:[0.5,2],dc:[0.5,2],
+ fl:{ren:['c','신배설 — 중증 신부전 시 50% 감량 또는 간격 연장']},
+ se:'연용 시 내성(효과 감소) — 지속 산억제 필요 시 PPI 고려. 고양이 급속 IV 시 용혈 보고.',lab:[]},
+{id:'sucralfate',n:'수크랄페이트',en:'Sucralfate',al:['sucralfate','수크랄페이트','아루사루민','울사'],cl:'위점막보호제',tg:['binder'],
+ d:{dog:'소형 0.25–0.5 g, 대형 0.5–1 g PO TID (공복)',cat:'0.25 g/마리 TID'},dd:null,dc:null,
+ fl:{},se:'변비. 산성 환경에서 활성화 — 제산제와 동시 투여 시 효과 감소.',
+ lab:[['기타','다수 경구약 흡수 방해(킬레이트) — 플루오로퀴놀론·독시사이클린·레보티록신 등과 2시간 이상 간격']]},
+{id:'misoprostol',n:'미소프로스톨',en:'Misoprostol',al:['misoprostol','미소프로스톨','싸이토텍','cytotec'],cl:'PGE1 유사체',tg:[],
+ d:{dog:'2–5 µg/kg TID',cat:'근거 제한'},dd:null,dc:null,
+ fl:{preg:['a','절대 금기 — 자궁수축·유산 유발. 임신한 사람이 조제·투약 시 접촉 주의']},
+ se:'설사·복통(용량 의존), 임신동물 절대 금기.',lab:[]},
+{id:'maropitant',n:'마로피탄트',en:'Maropitant',al:['maropitant','마로피탄트','세레니아','cerenia'],cl:'NK-1 길항 항구토제',tg:[],
+ d:{dog:'2 mg/kg PO SID (멀미 8) · 1 mg/kg SC/IV',cat:'1 mg/kg SID'},dd:[1,8],dc:[0.5,1],
+ fl:{hep:['c','간대사 — 중증 간부전 시 감량']},se:'주사 부위 통증(SC), 드물게 유연. 5일 초과 연속투여 시 축적 가능.',lab:[]},
+{id:'ondansetron',n:'온단세트론',en:'Ondansetron',al:['ondansetron','온단세트론','조프란','zofran'],cl:'5-HT3 길항 항구토제',tg:['serotonergic_block'],
+ d:{dog:'0.5–1 mg/kg BID~TID',cat:'0.5–1 mg/kg BID'},dd:[1,3],dc:[1,2],
+ fl:{hep:['c','간대사 — 간부전 시 감량']},se:'드물게 변비·진정. QT 연장 가능성(다른 QT 연장 약물과 병용 주의).',lab:[]},
+{id:'metoclopramide',n:'메토클로프라미드',en:'Metoclopramide',al:['metoclopramide','메토클로프라미드','맥소롱','멕시롱','reglan'],cl:'위장관운동촉진·항구토',tg:[],
+ d:{dog:'0.2–0.5 mg/kg TID 또는 CRI 1–2 mg/kg/day',cat:'0.2–0.5 mg/kg TID'},dd:[0.6,2],dc:[0.6,1.5],
+ fl:{ren:['c','신배설 — 신부전 시 감량(추체외로 증상 위험)'],sz:['c','경련 역치 저하 가능']},
+ se:'추체외로 증상(초조·경직 — 특히 신부전에서), 행동 변화. 고양이에선 항구토 효과 제한적.',
+ lab:[['내분비','프로락틴 상승 가능']]},
+{id:'cisapride',n:'시사프라이드',en:'Cisapride',al:['cisapride','시사프라이드','프레피드'],cl:'위장관운동촉진제',tg:['qt'],
+ d:{dog:'0.1–0.5 mg/kg TID',cat:'2.5–5 mg/마리 BID~TID (거대결장)'},dd:[0.3,1.5],dc:null,
+ fl:{car:['c','QT 연장 가능 — 심질환 시 주의']},
+ se:'설사·복통. CYP3A4 억제제(아졸·마크로라이드)와 병용 시 QT 연장·부정맥 위험.',lab:[]},
+{id:'mirtazapine',n:'미르타자핀',en:'Mirtazapine',al:['mirtazapine','미르타자핀','레메론','remeron','미라타즈','mirataz'],cl:'식욕촉진·항구토',tg:['serotonergic'],
+ d:{dog:'0.6 mg/kg SID',cat:'1.88 mg/마리 SID (CKD는 q48h), 연고제는 귀 안쪽 도포'},dd:[0.5,0.6],dc:null,
+ fl:{ren:['c','고양이 CKD — 배설 지연으로 q48h 권장'],hep:['c','간부전 시 감량']},
+ se:'과흥분·발성·빈맥(특히 고양이 과량), 진정. 세로토닌성 약물과 병용 시 세로토닌 증후군 위험.',lab:[]},
+{id:'loperamide',n:'로페라마이드',en:'Loperamide',al:['loperamide','로페라마이드','로페린'],cl:'지사제(opioid)',tg:['pgp_sub'],
+ d:{dog:'0.08–0.1 mg/kg BID~TID',cat:'신중(흥분 반응 가능)'},dd:[0.16,0.3],dc:null,
+ fl:{mdr1:['a','MDR1 변이견 — 중추 침투로 심한 진정·신경증상. 회피'],hep:['c','간부전 시 축적']},
+ se:'변비·진정. MDR1 변이견에서 신경독성.',lab:[]},
+{id:'pimobendan',n:'피모벤단',en:'Pimobendan',al:['pimobendan','피모벤단','베트메딘','vetmedin','하트메딘'],cl:'강심제(inodilator)',tg:[],
+ d:{dog:'0.25–0.3 mg/kg BID (공복)',cat:'0.25–0.3 mg/kg BID (적응외)'},dd:[0.5,0.6],dc:[0.5,0.6],
+ fl:{car:['c','유출로 폐색(HOCM 등)에서는 신중']},
+ se:'드물게 GI 장애·빈맥. 식전 1시간 투여 시 흡수 최적.',lab:[]},
+{id:'furosemide',n:'푸로세미드',en:'Furosemide',al:['furosemide','푸로세미드','라식스','lasix','후로세미드'],cl:'루프이뇨제',tg:['loop'],
+ d:{dog:'1–4 mg/kg SID~TID (급성 시 증량)',cat:'1–2 mg/kg SID~BID'},dd:[1,12],dc:[1,4],
+ fl:{ren:['c','탈수·질소혈증 유발 — CKD에서 신중, 신수치 모니터'],dehy:['a','탈수 시 회피·수액 교정 우선'],dm:['c','혈당 상승 가능']},
+ se:'탈수, 전해질 소실(K·Cl·Mg), 신전성 질소혈증, 고양이 고용량에서 이독성. RAAS 활성화 — ACEi/ARB 병용이 일반적.',
+ lab:[['전해질','K·Cl·Na·Mg 저하 — 정기 전해질 모니터 필수'],['신장·요','BUN·Cr 상승(신전성), 요비중 저하(이뇨 중 농축능 평가 불가)'],['혈당·지질','혈당 경미 상승 가능'],['기타','대사성 알칼리증(저Cl성)']]},
+{id:'torsemide',n:'토르세미드',en:'Torsemide',al:['torsemide','torasemide','토르세미드','토라세미드','업카드','upcard'],cl:'루프이뇨제',tg:['loop'],
+ d:{dog:'0.1–0.3 mg/kg SID~BID (푸로세미드의 약 1/10)',cat:'0.1–0.3 mg/kg SID'},dd:[0.1,0.6],dc:[0.1,0.3],
+ fl:{ren:['c','질소혈증 유발 주의'],dehy:['a','탈수 시 회피']},
+ se:'푸로세미드와 동일 계열이나 역가 약 10배·지속시간 김 — 전환 시 용량 환산 주의. 항알도스테론 부가작용.',
+ lab:[['전해질','K·Cl 저하'],['신장·요','BUN·Cr 상승 가능']]},
+{id:'spironolactone',n:'스피로놀락톤',en:'Spironolactone',al:['spironolactone','스피로놀락톤','알닥톤','aldactone'],cl:'K+보존 이뇨제',tg:['ksparing'],
+ d:{dog:'1–2 mg/kg SID~BID',cat:'1–2 mg/kg SID'},dd:[1,4],dc:[1,2],
+ fl:{ren:['c','고칼륨혈증 위험 — 신부전 시 K 모니터 강화']},
+ se:'고칼륨혈증, 고양이에서 안면 소양성 피부염 보고, 항안드로겐 작용.',
+ lab:[['전해질','K 상승 — ACEi/ARB 병용 시 특히 모니터'],['내분비','알도스테론 측정 간섭, 디곡신 면역측정 교차반응 가능']]},
+{id:'hydrochlorothiazide',n:'히드로클로로티아지드',en:'Hydrochlorothiazide',al:['hydrochlorothiazide','히드로클로로티아지드','다이크로짇','hctz'],cl:'티아지드 이뇨제',tg:['thiazide'],
+ d:{dog:'1–2 mg/kg BID',cat:'1–2 mg/kg BID'},dd:[2,4],dc:[2,4],
+ fl:{ren:['c','GFR 저하 시 효과 감소·질소혈증'],dm:['c','혈당 상승']},
+ se:'저칼륨혈증·탈수. 칼슘 배설 감소(칼슘옥살레이트 결석 예방에 이용).',
+ lab:[['전해질','K 저하, Ca 상승, Na 저하'],['혈당·지질','혈당 상승 가능']]},
+{id:'enalapril',n:'에날라프릴',en:'Enalapril',al:['enalapril','에날라프릴','에나실','enacard'],cl:'ACE 억제제',tg:['acei'],
+ d:{dog:'0.25–0.5 mg/kg SID~BID',cat:'0.25–0.5 mg/kg SID'},dd:[0.25,1],dc:[0.25,0.5],
+ fl:{ren:['c','투여 초기 Cr 상승 가능(30% 이내는 허용) — 1–2주 후 신수치·K 재검'],dehy:['a','탈수·저혈량 시 급성 신손상 위험 — 교정 후 투여']},
+ se:'저혈압·기립성 무력, 고칼륨혈증, 신수치 상승. 활성대사체가 신배설 — 신부전 시 베나제프릴 선호.',
+ lab:[['전해질','K 상승'],['신장·요','Cr 경도 상승(정상 반응 범위 확인), UPC 감소(치료 목표)']]},
+{id:'benazepril',n:'베나제프릴',en:'Benazepril',al:['benazepril','베나제프릴','포르테콜','fortekor'],cl:'ACE 억제제',tg:['acei'],
+ d:{dog:'0.25–0.5 mg/kg SID',cat:'0.5–1 mg/kg SID'},dd:[0.25,0.5],dc:[0.5,1],
+ fl:{ren:['c','초기 Cr 상승 모니터(30% 이내 허용)'],dehy:['a','탈수 시 교정 후 투여']},
+ se:'저혈압, 고칼륨혈증. 간·신 이중 배설로 신부전 시 선호되는 ACEi.',
+ lab:[['전해질','K 상승'],['신장·요','Cr 경도 상승, UPC 감소']]},
+{id:'telmisartan',n:'텔미사르탄',en:'Telmisartan',al:['telmisartan','텔미사르탄','세마인트라','semintra','미카르디스'],cl:'ARB',tg:['arb'],
+ d:{dog:'1 mg/kg SID',cat:'단백뇨 1 mg/kg SID · 고혈압 1.5–3 mg/kg SID'},dd:[0.5,1],dc:[1,3],
+ fl:{ren:['c','초기 Cr·K 모니터'],dehy:['a','탈수 시 교정 후 투여'],hep:['c','간대사 — 간부전 시 주의'],preg:['a','태아 독성']},
+ se:'GI 장애·저혈압, 고칼륨혈증. 고양이 CKD 단백뇨·고혈압 1차 선택.',
+ lab:[['전해질','K 상승'],['신장·요','Cr·SDMA 경도 상승 가능, UPC 감소']]},
+{id:'amlodipine',n:'암로디핀',en:'Amlodipine',al:['amlodipine','암로디핀','노바스크','norvasc','암로핀'],cl:'칼슘채널차단제',tg:['ccb'],
+ d:{dog:'0.1–0.4 mg/kg SID',cat:'0.625–1.25 mg/마리 SID'},dd:[0.1,0.4],dc:null,
+ fl:{hep:['c','간대사 — 간부전 시 감량']},
+ se:'잇몸 증식(장기), 저혈압·빈맥. 단독 사용 시 RAAS 활성화 — 개 단백뇨성 고혈압에선 RAAS 차단제 병용 고려.',
+ lab:[['기타','반사성 RAAS 활성화 — 알도스테론 상승 가능']]},
+{id:'diltiazem',n:'딜티아젬',en:'Diltiazem',al:['diltiazem','딜티아젬','헤르벤','herbesser'],cl:'칼슘채널차단제(심박수조절)',tg:['ccb','hr_low'],
+ d:{dog:'0.5–1.5 mg/kg TID',cat:'7.5 mg/마리 TID (서방형은 30–60 mg/마리 SID~BID)'},dd:[1.5,4.5],dc:null,
+ fl:{car:['c','동기능부전·방실차단 시 신중'],hep:['c','간대사']},
+ se:'서맥·저혈압·GI 장애. 디곡신 농도 상승, β차단제 병용 시 서맥 가중.',lab:[]},
+{id:'atenolol',n:'아테놀롤',en:'Atenolol',al:['atenolol','아테놀롤','테놀민','tenormin'],cl:'β1 차단제',tg:['bb','hr_low'],
+ d:{dog:'0.25–1 mg/kg SID~BID',cat:'6.25–12.5 mg/마리 SID~BID'},dd:[0.25,2],dc:null,
+ fl:{car:['c','비대상성 심부전·서맥 시 회피'],ren:['c','신배설 — 신부전 시 감량'],dm:['c','저혈당 증상 은폐 가능']},
+ se:'서맥·저혈압·무기력, 기관지수축(고용량). 급단 시 반동 — 점감 필요.',lab:[['혈당·지질','저혈당 증상(빈맥) 은폐']]},
+{id:'digoxin',n:'디곡신',en:'Digoxin',al:['digoxin','디곡신','라녹신','lanoxin'],cl:'강심배당체',tg:['digoxin'],
+ d:{dog:'0.0025–0.005 mg/kg BID (치료역 협소 — 농도 모니터 필수)',cat:'거의 사용 안 함'},dd:[0.005,0.01],dc:null,
+ fl:{ren:['a','신배설 — 신부전 시 축적·중독. 감량 및 농도 모니터 필수'],car:['c','방실차단 시 금기']},
+ se:'중독 증상: 식욕부진·구토(조기 징후) → 부정맥. 저칼륨혈증·고칼슘혈증에서 독성 증가.',
+ lab:[['전해질','저K·저Mg·고Ca 시 중독 위험 — 병용 이뇨제 있으면 전해질 필수 모니터'],['기타','혈중농도 목표 0.8–1.2 ng/mL(투약 8시간 후 채혈)']]},
+{id:'sildenafil',n:'실데나필',en:'Sildenafil',al:['sildenafil','실데나필','비아그라','viagra','레바티오'],cl:'PDE5 억제제',tg:[],
+ d:{dog:'1–3 mg/kg BID~TID',cat:'근거 제한'},dd:[2,9],dc:null,
+ fl:{car:['c','전신 저혈압 주의']},se:'저혈압·홍조·GI 장애. 질산염 제제와 병용 금기.',lab:[]},
+{id:'clopidogrel',n:'클로피도그렐',en:'Clopidogrel',al:['clopidogrel','클로피도그렐','플라빅스','plavix','플라비톨'],cl:'항혈소판제',tg:['antiplatelet'],
+ d:{dog:'1–2 mg/kg SID',cat:'18.75 mg/마리 SID'},dd:[1,2],dc:null,
+ fl:{gi:['c','출혈 병력 시 주의'],hep:['c','간에서 활성화되는 전구약물']},
+ se:'구토(고양이 — 쓴맛, 캡슐 투여 권장), 출혈 경향. 수술 5–7일 전 중단 고려.',
+ lab:[['응고·혈소판','혈소판 응집능 저하 — 출혈시간 연장']]},
+{id:'phenobarbital',n:'페노바르비탈',en:'Phenobarbital',al:['phenobarbital','페노바르비탈','페노바비탈','루미날','하이페노'],cl:'항경련제',tg:['inducer'],
+ d:{dog:'2–3 mg/kg BID 시작 (농도 목표 15–35 µg/mL)',cat:'1.5–2.5 mg/kg BID'},dd:[4,6],dc:[3,5],
+ fl:{hep:['a','간독성·간대사 — 간질환 시 회피(레베티라세탐 등 대체)'],preg:['c','태아 영향']},
+ se:'다음다뇨·다식·진정(초기), 간독성(장기 — 담즙산 정기검사), 드물게 혈액이상(호중구·혈소판 감소). 강력한 CYP 유도제 — 병용약 농도 저하.',
+ lab:[['간효소','ALP·ALT·GGT 상승(효소 유도 — 담즙산 검사로 실질 손상 감별)'],['내분비','T4·fT4 저하, TSH 경미 상승 — 갑상선기능저하 오진 주의'],['혈당·지질','중성지방 상승'],['CBC','드물게 혈구감소'],['기타','혈중농도 모니터: 정기 채혈(투약 직전 trough)']]},
+{id:'kbr',n:'브롬화칼륨',en:'Potassium Bromide',al:['potassium bromide','kbr','브롬화칼륨','포타슘브로마이드'],cl:'항경련제',tg:[],
+ d:{dog:'30–40 mg/kg SID (단독 시), 농도 목표 1–3 mg/mL',cat:'사용 금기'},dd:[20,50],dc:null,catContra:'고양이 금기 — 치명적 기관지천식 유발',
+ fl:{ren:['c','신배설 — 신부전 시 축적, 감량'],},
+ se:'진정·후지 무력(브롬중독), 다식·췌장염 위험. 염분 섭취 변화가 농도에 영향(고염식 → 배설 증가).',
+ lab:[['전해질','Cl 위양성 상승(분석기가 Br을 Cl로 측정) — 고Cl혈증으로 오인 주의']]},
+{id:'levetiracetam',n:'레베티라세탐',en:'Levetiracetam',al:['levetiracetam','레베티라세탐','케프라','keppra','큐팜'],cl:'항경련제',tg:[],
+ d:{dog:'20 mg/kg TID (서방형 30 mg/kg BID)',cat:'20 mg/kg TID'},dd:[60,60],dc:[60,60],
+ fl:{ren:['c','신배설 — 신부전 시 감량 또는 간격 연장']},
+ se:'진정·실조(경미, 일과성). 간독성 없어 간질환 환자에 선호.',lab:[]},
+{id:'zonisamide',n:'조니사미드',en:'Zonisamide',al:['zonisamide','조니사미드','엑세그란','excegran'],cl:'항경련제',tg:[],
+ d:{dog:'5–10 mg/kg BID (페노바르비탈 병용 시 고용량)',cat:'5–10 mg/kg SID'},dd:[10,20],dc:[5,10],
+ fl:{hep:['c','드물게 특이체질성 간독성'],ren:['c','설폰아미드계 — 결정뇨 가능']},
+ se:'진정·실조·식욕부진, 드물게 간독성·KCS. 탄산탈수효소 억제 — 대사성 산증 가능.',
+ lab:[['내분비','T4 저하 가능'],['전해질','경미한 대사성 산증(HCO3 저하) 가능'],['간효소','ALT 상승 시 중단 고려']]},
+{id:'gabapentin',n:'가바펜틴',en:'Gabapentin',al:['gabapentin','가바펜틴','뉴론틴','neurontin','가바틴'],cl:'진통·항경련제',tg:[],
+ d:{dog:'10–20 mg/kg BID~TID',cat:'진통 5–10 mg/kg BID~TID · 진정목적 50–100 mg/마리'},dd:[20,60],dc:[10,30],
+ fl:{ren:['c','신배설 — CKD 시 감량(고양이 CKD 10 mg/kg 이하로)']},
+ se:'진정·실조(용량 의존). 사람용 액상제제는 자일리톨 함유 가능 — 개에서 확인 필수. 급단 시 반동 발작.',
+ lab:[['기타','요단백 시험지 위양성 보고(일부 반정량 검사)']]},
+{id:'pregabalin',n:'프레가발린',en:'Pregabalin',al:['pregabalin','프레가발린','리리카','lyrica'],cl:'진통·항경련제',tg:[],
+ d:{dog:'2–4 mg/kg BID~TID',cat:'1–2 mg/kg BID'},dd:[4,12],dc:[2,4],
+ fl:{ren:['c','신배설 — 감량']},se:'진정·실조.',lab:[]},
+{id:'tramadol',n:'트라마돌',en:'Tramadol',al:['tramadol','트라마돌','트리돌','울트람','ultram'],cl:'진통제(중추성)',tg:['serotonergic','opioid'],
+ d:{dog:'2–5 mg/kg BID~TID (경구 효능 논란)',cat:'1–2 mg/kg BID'},dd:[4,15],dc:[2,4],
+ fl:{sz:['c','경련 역치 저하'],hep:['c','간대사'],ren:['c','신부전 시 감량']},
+ se:'진정 또는 흥분(고양이 동공산대·이상행동), 세로토닌성 — SSRI·트라조돈·미르타자핀 병용 시 세로토닌 증후군 위험.',lab:[]},
+{id:'buprenorphine',n:'부프레노르핀',en:'Buprenorphine',al:['buprenorphine','부프레노르핀','베트ergesic','buprenex'],cl:'진통제(부분 µ작용제)',tg:['opioid'],
+ d:{dog:'0.01–0.03 mg/kg q6–12h',cat:'0.01–0.03 mg/kg 구강점막 q6–8h'},dd:null,dc:null,
+ fl:{hep:['c','간대사 — 감량']},se:'진정, 고양이 다행감·동공산대. 천장 효과 — 심한 통증엔 순수 µ작용제 고려.',lab:[]},
+{id:'amantadine',n:'아만타딘',en:'Amantadine',al:['amantadine','아만타딘','피케이멜즈'],cl:'진통보조(NMDA 길항)',tg:[],
+ d:{dog:'3–5 mg/kg SID',cat:'3–5 mg/kg SID'},dd:[3,5],dc:[3,5],
+ fl:{ren:['c','신배설 — 감량'],sz:['c','경련 역치 저하 가능']},se:'초조·GI 장애(초기, 일과성).',lab:[]},
+{id:'fluoxetine',n:'플루옥세틴',en:'Fluoxetine',al:['fluoxetine','플루옥세틴','프로작','prozac','레콘실','reconcile','푸로작'],cl:'SSRI',tg:['serotonergic','ssri'],
+ d:{dog:'1–2 mg/kg SID',cat:'0.5–1 mg/kg SID'},dd:[1,2],dc:[0.5,1],
+ fl:{sz:['c','경련 역치 저하'],dm:['c','혈당 변동 가능'],hep:['c','간대사 — 감량']},
+ se:'식욕부진(특히 고양이)·진정·초조, 효과 판정에 4주 이상. 급단 금지(점감). 다른 세로토닌성 약물과 병용 주의.',lab:[]},
+{id:'trazodone',n:'트라조돈',en:'Trazodone',al:['trazodone','트라조돈','트리티코','desyrel'],cl:'진정·항불안(SARI)',tg:['serotonergic'],
+ d:{dog:'3–7 mg/kg PRN 또는 BID~TID',cat:'50 mg/마리 PRN (이동장 진정)'},dd:[3,14],dc:null,
+ fl:{hep:['c','간대사'],car:['c','드물게 부정맥·QT']},
+ se:'진정·실조·저혈압, 역설적 흥분 가능. 세로토닌성 병용 주의.',lab:[]},
+{id:'cyclosporine',n:'사이클로스포린',en:'Cyclosporine',al:['cyclosporine','ciclosporin','사이클로스포린','아토피카','atopica','싸이폴','cypol','사이폴엔'],cl:'면역억제제(칼시뉴린 억제)',tg:['pgp_sub','immunosup'],
+ d:{dog:'아토피 5 mg/kg SID → 반응 시 감량 · 면역매개질환 5 mg/kg BID',cat:'아토피 7 mg/kg SID'},dd:[5,10],dc:[7,7],
+ fl:{dm:['c','혈당 상승 가능'],ren:['c','고용량 장기 시 신독성(사람만큼 흔하진 않음)'],},
+ se:'구토·설사(초기 흔함 — 냉동 투여·식사와 함께로 완화), 잇몸 증식, 다모, 고양이 톡소플라즈마 재활성화 위험(외출묘 주의). 감염 감수성 증가.',
+ lab:[['혈당·지질','혈당 상승 가능'],['기타','혈중농도 측정 시 채혈 시점(trough) 준수 · 아졸 병용 시 농도 급상승'],['CBC','감염 모니터']]},
+{id:'azathioprine',n:'아자티오프린',en:'Azathioprine',al:['azathioprine','아자티오프린','이무란','imuran','아자프린'],cl:'면역억제제',tg:['immunosup','myelo'],
+ d:{dog:'2 mg/kg SID 1–2주 → 0.5–1 mg/kg EOD',cat:'사용 금기'},dd:[0.5,2],dc:null,catContra:'고양이 금기 — 치명적 골수억제',
+ fl:{hep:['c','간독성 — 간수치 모니터']},
+ se:'골수억제(CBC 2주마다 → 안정 후 월 1회), 간독성, 췌장염. 효과 발현까지 2–5주.',
+ lab:[['CBC','백혈구·혈소판 감소(골수억제) — 정기 CBC 필수'],['간효소','ALT 상승'],['기타','췌장 리파아제 상승 가능']]},
+{id:'mycophenolate',n:'미코페놀레이트',en:'Mycophenolate',al:['mycophenolate','미코페놀레이트','셀셉트','cellcept','마이렙트'],cl:'면역억제제',tg:['immunosup'],
+ d:{dog:'10 mg/kg BID',cat:'10 mg/kg BID (근거 제한)'},dd:[20,20],dc:[20,20],
+ fl:{ren:['c','신부전 시 활성대사체 축적 가능']},
+ se:'설사·구토(주 부작용, 용량 의존), 골수억제(드묾).',lab:[['CBC','정기 모니터']]},
+{id:'chlorambucil',n:'클로람부실',en:'Chlorambucil',al:['chlorambucil','클로람부실','류케란','leukeran'],cl:'알킬화제',tg:['immunosup','myelo'],
+ d:{dog:'0.1–0.2 mg/kg SID~EOD',cat:'2 mg/마리 q48–72h (소세포림프종·IBD)'},dd:null,dc:null,
+ fl:{},se:'골수억제(누적), 구토, 고양이 드물게 가역성 신경증상. 세포독성 — 조제 시 장갑 착용.',
+ lab:[['CBC','호중구·혈소판 감소 — 2–4주마다 CBC']]},
+{id:'oclacitinib',n:'오클라시티닙',en:'Oclacitinib',al:['oclacitinib','오클라시티닙','아포퀠','apoquel','아포켈'],cl:'JAK 억제제',tg:['immunosup'],
+ d:{dog:'0.4–0.6 mg/kg BID 14일 → 이후 SID',cat:'적응외(근거 제한)'},dd:[0.4,1.2],dc:null,
+ fl:{young:['a','12개월 미만 금기(모낭충증·감염 위험)']},
+ se:'감염 감수성 증가(모낭충·요로감염), 장기 사용 시 종양 발생 감시. 구토·설사.',
+ lab:[['CBC','백혈구 감소 가능 — 장기 투여 시 정기 CBC·요검사']]},
+{id:'methimazole',n:'메티마졸',en:'Methimazole',al:['methimazole','thiamazole','메티마졸','티아마졸','안티로이드','felimazole','펠리마졸'],cl:'항갑상선제',tg:[],
+ d:{dog:'—',cat:'1.25–2.5 mg/마리 BID 시작 → T4로 조절'},dd:null,dc:null,
+ fl:{ren:['c','갑상선기능 정상화 후 숨은 CKD 현성화 — 치료 전후 신수치 비교 필수'],hep:['c','간독성 시 중단']},
+ se:'식욕부진·구토(초기), 안면 소양증(찰과상), 간독성, 혈액이상(호중구·혈소판 감소), 드물게 중증 무과립구증. 치료 후 GFR 감소로 CKD 드러남.',
+ lab:[['내분비','T4 저하(목표), 과량 시 의인성 갑상선저하 — TSH 상승'],['CBC','호중구·혈소판 감소, ANA·Coombs 양성 가능'],['간효소','ALT·ALP 상승'],['신장·요','치료 후 BUN·Cr 상승(숨은 CKD 현성화 — 약물 신독성 아님)']]},
+{id:'levothyroxine',n:'레보티록신',en:'Levothyroxine',al:['levothyroxine','레보티록신','씬지로이드','synthroid','레보틸'],cl:'갑상선호르몬',tg:[],
+ d:{dog:'0.02 mg/kg BID 또는 0.04 mg/kg SID',cat:'0.02–0.05 mg/마리/day'},dd:null,dc:null,
+ fl:{car:['c','심질환 시 저용량 시작 점증'],dm:['c','인슐린 요구량 변화']},
+ se:'과량 시 갑상선중독증(다음다뇨·빈맥·체중감소·과활동).',
+ lab:[['내분비','재검 T4는 투약 4–6시간 후 채혈 — 시점 어긋나면 판독 왜곡'],['기타','수크랄페이트·제산제·철분과 흡수 간섭 — 간격 투여']]},
+{id:'trilostane',n:'트릴로스탄',en:'Trilostane',al:['trilostane','트릴로스탄','베토릴','vetoryl'],cl:'부신효소억제제',tg:[],
+ d:{dog:'1–2 mg/kg SID 식사와 함께 (BID 분할도 사용)',cat:'적응외'},dd:[1,2],dc:null,
+ fl:{ren:['c','신부전 동반 시 신중'],},
+ se:'식욕부진·구토·무기력(코티솔 과억제 징후 — 즉시 중단·확인), 의인성 애디슨, 드물게 부신괴사.',
+ lab:[['내분비','ACTH 자극검사로 모니터 — 투약 후 2–4시간(프로토콜에 따라 3–4주차, 이후 정기). 검사 시점 어긋나면 판독 불가'],['전해질','K 상승·Na 저하(애디슨양) — 정기 전해질'],['신장·요','질소혈증 발생 시 코티솔 과억제 의심']]},
+{id:'insulin',n:'인슐린(글라진 등)',en:'Insulin',al:['insulin','인슐린','글라진','glargine','란투스','lantus','캐닌슐린','caninsulin','프로진크','prozinc','디터머','detemir'],cl:'혈당강하제',tg:['insulin'],
+ d:{dog:'개 0.25–0.5 U/kg BID 시작',cat:'글라진 0.25–0.5 U/kg BID(최대 시작 2–3 U/마리)'},dd:null,dc:null,
+ fl:{ren:['c','신부전 시 인슐린 청소 감소 — 저혈당 위험']},
+ se:'저혈당(무력·경련·혼수 — 응급), 소모기 효과. 스테로이드 병용 시 요구량 급증.',
+ lab:[['혈당·지질','혈당곡선·프룩토사민으로 모니터'],['전해질','K 세포내 이동 — 저칼륨혈증 가능(특히 케톤산증 치료 시)']]},
+{id:'theophylline',n:'테오필린',en:'Theophylline',al:['theophylline','테오필린','아미노필린','aminophylline'],cl:'기관지확장제',tg:['theophylline'],
+ d:{dog:'서방형 10 mg/kg BID',cat:'서방형 15–19 mg/kg SID (저녁)'},dd:[10,20],dc:[15,19],
+ fl:{car:['c','빈맥성 부정맥 유발 가능'],sz:['c','경련 역치 저하'],hep:['c','간대사 — 감량']},
+ se:'빈맥·흥분·GI 장애. 치료역 좁음 — 플루오로퀴놀론 병용 시 중독 위험.',lab:[]},
+{id:'ursodiol',n:'우르소디올',en:'Ursodiol',al:['ursodiol','ursodeoxycholic','우르소디올','우루사','urso'],cl:'담즙산제',tg:[],
+ d:{dog:'10–15 mg/kg SID (분할 가능, 식사와)',cat:'10–15 mg/kg SID'},dd:[10,15],dc:[10,15],
+ fl:{},se:'드물게 설사. 담도 완전폐색 시 금기.',
+ lab:[['기타','담즙산 검사(bile acids) 결과 상승 — 검사 목적 시 휴약 필요']]},
+{id:'silymarin',n:'실리마린/SAMe',en:'Silymarin·SAMe',al:['silymarin','실리마린','same','데나마린','denamarin','denosyl','밀크시슬','legalon','레가론'],cl:'간보조제',tg:[],
+ d:{dog:'제품 표기 기준(데나마린: 체중구간별 1일 1회 공복)',cat:'제품 표기 기준'},dd:null,dc:null,
+ fl:{},se:'드물게 GI 장애. 공복 투여가 흡수에 유리.',lab:[]},
+{id:'calcitriol',n:'칼시트리올',en:'Calcitriol',al:['calcitriol','칼시트리올','로칼트롤','rocaltrol'],cl:'활성 비타민D',tg:[],
+ d:{dog:'CKD: 2.5–3.5 ng/kg SID 공복 (인 조절 후 시작)',cat:'동일 기준'},dd:null,dc:null,
+ fl:{ren:['c','고인혈증 상태에서 시작 금지 — Ca×P > 60–70이면 연조직 석회화 위험']},
+ se:'고칼슘혈증(과량) — 식욕부진·다음다뇨 시 즉시 Ca 확인.',
+ lab:[['전해질','iCa 정기 모니터(시작 후 1–2주, 이후 월 1회) · Ca×P 곱 감시'],['신장·요','고칼슘 시 신손상 가속']]},
+{id:'alho',n:'수산화알루미늄',en:'Aluminum Hydroxide',al:['aluminum hydroxide','수산화알루미늄','암포젤','amphojel','알루민'],cl:'인결합제·제산제',tg:['binder'],
+ d:{dog:'30–90 mg/kg/day 분할, 반드시 식사와 함께',cat:'30–90 mg/kg/day 분할'},dd:[30,90],dc:[30,90],
+ fl:{ren:['c','장기 고용량 시 알루미늄 축적(신경증상·소적혈구증) — 증상 시 감량']},
+ se:'변비. 식사와 분리 투여 시 인결합 효과 없음.',
+ lab:[['전해질','P 저하(치료 목표) — 4–6주마다 P 확인'],['CBC','장기 축적 시 소적혈구성 빈혈'],['기타','병용 경구약(퀴놀론·독시·레보티록신) 흡수 방해 — 2시간 간격']]},
+{id:'sevelamer',n:'세벨라머',en:'Sevelamer',al:['sevelamer','세벨라머','렌벨라','renvela','렌아겔'],cl:'인결합제(비알루미늄)',tg:['binder'],
+ d:{dog:'30–40 mg/kg TID 식사와 함께(참고)',cat:'동일 기준(근거 제한)'},dd:null,dc:null,
+ fl:{},se:'변비·GI 장애, 지용성 비타민 흡수 저하 가능.',
+ lab:[['전해질','P 저하(목표)'],['기타','병용 경구약 흡수 방해 가능 — 간격 투여']]},
+{id:'kcitrate',n:'구연산칼륨',en:'Potassium Citrate',al:['potassium citrate','구연산칼륨','우로시트','urocit'],cl:'칼륨보충·요알칼리화',tg:['ksupp'],
+ d:{dog:'40–75 mg/kg BID',cat:'40–75 mg/kg BID'},dd:[80,150],dc:[80,150],
+ fl:{ren:['c','핍뇨성 신부전·고칼륨혈증 시 금기']},
+ se:'GI 자극. 요 pH 상승 — 스트루바이트 소인 시 모니터.',
+ lab:[['전해질','K 상승 — RAAS 차단제·스피로놀락톤 병용 시 필수 모니터'],['신장·요','요 pH 상승']]},
+{id:'bicarb',n:'중탄산나트륨',en:'Sodium Bicarbonate',al:['sodium bicarbonate','중탄산나트륨','탄산수소나트륨','베이킹소다'],cl:'알칼리화제',tg:[],
+ d:{dog:'8–12 mg/kg q8–12h (CKD 산증)',cat:'동일 기준'},dd:[16,36],dc:[16,36],
+ fl:{car:['c','나트륨 부하 — 심부전 시 신중']},
+ se:'과량 시 대사성 알칼리증·저칼륨. Na 부하.',
+ lab:[['전해질','HCO3·TCO2 상승(목표), 알칼리증 시 iCa 저하·K 저하'],['신장·요','요 pH 상승']]},
+{id:'darbepoetin',n:'다르베포에틴',en:'Darbepoetin',al:['darbepoetin','다르베포에틴','아라네스프','aranesp','네스프'],cl:'조혈자극제(ESA)',tg:[],
+ d:{dog:'1 µg/kg SC 주 1회 → PCV 따라 조절',cat:'1 µg/kg SC 주 1회'},dd:null,dc:null,
+ fl:{car:['c','고혈압 악화 가능 — 혈압 모니터']},
+ se:'고혈압, 드물게 PRCA(순수적혈구무형성증 — 반응 소실 시 의심), 철 결핍 동반 흔함(철분 보충 병행).',
+ lab:[['CBC','PCV 주 1회 → 목표 도달 후 감시 · 망상적혈구로 반응 평가'],['기타','혈압 정기 측정, 철 상태(페리틴·TSAT) 확인']]},
+{id:'ivermectin',n:'이버멕틴',en:'Ivermectin',al:['ivermectin','이버멕틴','아이버멕틴'],cl:'구충제(macrocyclic lactone)',tg:['pgp_sub'],
+ d:{dog:'심장사상충 예방 0.006–0.012 mg/kg 월 1회 · 치료요법은 고용량(변이 확인 후)',cat:'예방 0.024 mg/kg 월 1회'},dd:null,dc:null,
+ fl:{mdr1:['a','MDR1 변이견 — 예방용량 초과 시 신경독성(침흘림·실조·혼수). 고용량 요법 금기']},
+ se:'과량·MDR1 변이 시 신경독성. 미세사상충 대량 사멸 반응 주의.',lab:[]},
+{id:'milbemycin',n:'밀베마이신',en:'Milbemycin',al:['milbemycin','밀베마이신','인터셉터','interceptor','넥스가드스펙트라','milbemax','밀베맥스'],cl:'구충제',tg:['pgp_sub'],
+ d:{dog:'예방 0.5–0.99 mg/kg 월 1회',cat:'2 mg/kg 월 1회'},dd:null,dc:null,
+ fl:{mdr1:['c','예방용량은 MDR1 변이견에도 안전 — 고용량(모낭충 치료 등)만 주의']},
+ se:'예방용량에서 부작용 드묾.',lab:[]},
+{id:'cetirizine',n:'세티리진',en:'Cetirizine',al:['cetirizine','세티리진','지르텍','zyrtec'],cl:'항히스타민제(2세대)',tg:['antihist'],
+ d:{dog:'1 mg/kg SID (또는 5–10 mg/마리)',cat:'5 mg/마리 SID'},dd:[0.5,2],dc:null,
+ fl:{ren:['c','신배설 — 감량']},se:'진정(드묾)·구토.',
+ lab:[['기타','피내 알레르기 검사 억제 — 검사 전 7일 이상 휴약']]},
+{id:'chlorpheniramine',n:'클로르페니라민',en:'Chlorpheniramine',al:['chlorpheniramine','클로르페니라민','페니라민'],cl:'항히스타민제(1세대)',tg:['antihist'],
+ d:{dog:'4–8 mg/마리 BID~TID',cat:'2 mg/마리 BID'},dd:null,dc:null,
+ fl:{},se:'진정·항콜린 작용(구갈·요저류).',
+ lab:[['기타','피내검사 전 7일 휴약']]},
+{id:'diphenhydramine',n:'디펜히드라민',en:'Diphenhydramine',al:['diphenhydramine','디펜히드라민','베나드릴','benadryl'],cl:'항히스타민제(1세대)',tg:['antihist'],
+ d:{dog:'2–4 mg/kg BID~TID',cat:'1–2 mg/kg BID'},dd:[4,12],dc:[2,4],
+ fl:{},se:'진정, 고양이 역설적 흥분 가능.',lab:[['기타','피내검사 전 휴약']]},
+{id:'butorphanol',n:'부토르파놀',en:'Butorphanol',al:['butorphanol','부토르파놀','토부제식','torbugesic'],cl:'진해·진통제',tg:['opioid'],
+ d:{dog:'진해 0.5–1 mg/kg BID~TID',cat:'0.2–0.8 mg/kg'},dd:[1,3],dc:null,
+ fl:{hep:['c','간대사']},se:'진정. 진통 지속시간 짧음 — 진통 목적으론 제한적.',lab:[]},
+{id:'fenbendazole',n:'펜벤다졸',en:'Fenbendazole',al:['fenbendazole','펜벤다졸','파나쿠어','panacur'],cl:'구충제',tg:[],
+ d:{dog:'50 mg/kg SID 3–5일',cat:'50 mg/kg SID 5일'},dd:[50,50],dc:[50,50],
+ fl:{},se:'드물게 구토, 매우 드물게 골수억제(장기 고용량).',lab:[]}
+];
+
+/* ================= 상호작용 규칙 =================
+ a,b: {tag:'..'} 또는 {id:'..'} / sev: contra|major|moderate|info */
+const RULES=[
+{a:{tag:'nsaid'},b:{tag:'nsaid'},sev:'contra',t:'NSAID 이중 투여',w:'GI 궤양·천공 및 신독성 위험이 가산됩니다.',x:'하나만 사용. 전환 시 세척기간(washout) 확보(통상 5–7일, 아스피린은 더 길게).'},
+{a:{tag:'nsaid'},b:{tag:'steroid'},sev:'contra',t:'NSAID + 글루코코르티코이드',w:'GI 궤양·천공 위험이 급격히 증가하는 대표적 금기 조합입니다.',x:'병용 금지. 전환 시 세척기간 확보. 이미 병용 중이면 즉시 하나 중단 및 위장관 평가.'},
+{a:{tag:'nsaid'},b:{tag:'acei'},sev:'major',t:'NSAID + ACE 억제제',w:'프로스타글란딘 억제로 신관류 저하 — 신독성 위험 증가, 항고혈압 효과 감소.',x:'가급적 회피. 불가피하면 수화 유지·신수치 단기 재검.'},
+{a:{tag:'nsaid'},b:{tag:'arb'},sev:'major',t:'NSAID + ARB',w:'신관류 저하로 급성 신손상 위험 증가.',x:'가급적 회피. 병용 시 신수치·혈압 모니터.'},
+{a:{tag:'nsaid'},b:{tag:'loop'},sev:'major',t:'NSAID + 루프이뇨제',w:'이뇨 효과 감소 + 신독성 증가. RAAS 차단제까지 더해지면 triple whammy.',x:'회피 권장. 병용 시 탈수 방지·신수치 모니터.'},
+{a:{tag:'nsaid'},b:{tag:'thiazide'},sev:'moderate',t:'NSAID + 티아지드',w:'이뇨·강압 효과 감소, 신기능 저하 위험.',x:'신수치·혈압 모니터.'},
+{a:{tag:'nsaid'},b:{tag:'ag'},sev:'major',t:'NSAID + 아미노글리코시드',w:'신독성이 가산되는 고위험 조합.',x:'회피. 불가피하면 수화 유지, 매일 요검사·신수치.'},
+{a:{tag:'nsaid'},b:{tag:'antiplatelet'},sev:'major',t:'NSAID + 항혈소판제',w:'GI 출혈 위험 증가(혈소판 기능 + 점막 손상).',x:'회피 권장. 병용 시 흑색변·PCV 감시.'},
+{a:{id:'aspirin'},b:{id:'clopidogrel'},sev:'info',t:'아스피린 + 클로피도그렐',w:'혈전 고위험 예(FATE 등)에서 의도적으로 병용하기도 하나 출혈 위험은 증가.',x:'의도된 병용인지 확인. 출혈 징후 모니터.'},
+{a:{tag:'loop'},b:{tag:'ag'},sev:'major',t:'루프이뇨제 + 아미노글리코시드',w:'이독성·신독성이 모두 증가.',x:'회피. 불가피하면 최단기간, 신수치·청력 반응 감시.'},
+{a:{tag:'acei'},b:{tag:'arb'},sev:'major',t:'ACE 억제제 + ARB 병용',w:'이중 RAAS 차단 — 고칼륨혈증·저혈압·신기능 악화 위험.',x:'통상 권장되지 않음. 난치성 단백뇨에서 시도 시 K·Cr 집중 모니터.'},
+{a:{tag:'acei'},b:{tag:'ksparing'},sev:'moderate',t:'ACE 억제제 + 스피로놀락톤',w:'심부전에서 표준적으로 병용되나 고칼륨혈증 위험.',x:'K·신수치 정기 모니터(시작 1주 후, 이후 정기).'},
+{a:{tag:'arb'},b:{tag:'ksparing'},sev:'moderate',t:'ARB + 스피로놀락톤',w:'고칼륨혈증 위험.',x:'K 정기 모니터.'},
+{a:{tag:'acei'},b:{tag:'ksupp'},sev:'major',t:'ACE 억제제 + 칼륨 보충제',w:'고칼륨혈증 위험 증가.',x:'K 모니터 필수. CKD에선 특히 주의.'},
+{a:{tag:'arb'},b:{tag:'ksupp'},sev:'major',t:'ARB + 칼륨 보충제',w:'고칼륨혈증 위험 증가.',x:'K 모니터 필수.'},
+{a:{tag:'ksparing'},b:{tag:'ksupp'},sev:'major',t:'스피로놀락톤 + 칼륨 보충제',w:'고칼륨혈증 고위험.',x:'원칙적 회피. 병용 시 K 집중 모니터.'},
+{a:{id:'digoxin'},b:{id:'diltiazem'},sev:'major',t:'디곡신 + 딜티아젬',w:'디곡신 혈중농도 상승 + 방실전도 억제 가산.',x:'디곡신 감량 고려, 농도·ECG 모니터.'},
+{a:{id:'digoxin'},b:{tag:'loop'},sev:'major',t:'디곡신 + 루프이뇨제',w:'저칼륨·저마그네슘혈증이 디곡신 중독 위험을 높임.',x:'전해질 정기 모니터, 식욕부진·구토 시 중독 의심.'},
+{a:{id:'digoxin'},b:{id:'spironolactone'},sev:'moderate',t:'디곡신 + 스피로놀락톤',w:'디곡신 청소 감소로 농도 상승 가능, 면역측정 교차반응.',x:'농도 모니터 시 참고.'},
+{a:{id:'digoxin'},b:{tag:'azole'},sev:'major',t:'디곡신 + 아졸계 항진균제',w:'P-gp 억제로 디곡신 농도 상승.',x:'디곡신 감량·농도 모니터.'},
+{a:{tag:'fq'},b:{tag:'theophylline'},sev:'major',t:'플루오로퀴놀론 + 테오필린',w:'테오필린 대사 억제 — 농도 30% 이상 상승, 빈맥·경련 위험.',x:'테오필린 30–50% 감량 또는 병용 회피.'},
+{a:{tag:'theophylline'},b:{tag:'inducer'},sev:'moderate',t:'테오필린 + 페노바르비탈',w:'효소 유도로 테오필린 농도 저하 — 효과 감소.',x:'반응 감소 시 용량 재조정.'},
+{a:{tag:'azole'},b:{id:'cyclosporine'},sev:'major',t:'아졸계 + 사이클로스포린',w:'CYP3A4·P-gp 억제로 사이클로스포린 농도 수배 상승. (비용 절감 목적의 의도적 병용 프로토콜도 존재)',x:'의도된 병용인지 확인. 의도적이면 사이클로스포린 감량 프로토콜·농도 모니터, 아니면 회피.'},
+{a:{tag:'azole'},b:{id:'cisapride'},sev:'contra',t:'아졸계 + 시사프라이드',w:'시사프라이드 대사 억제 → QT 연장·치명적 부정맥 위험.',x:'병용 금기.'},
+{a:{tag:'azole'},b:{tag:'inducer'},sev:'moderate',t:'아졸계 + 페노바르비탈',w:'아졸 농도 저하(효소 유도) — 항진균 실패 가능. 간독성도 가산.',x:'치료 반응·간수치 모니터.'},
+{a:{id:'cyclosporine'},b:{tag:'inducer'},sev:'moderate',t:'사이클로스포린 + 페노바르비탈',w:'사이클로스포린 농도 저하 — 면역억제 실패 가능.',x:'농도 모니터·용량 조정.'},
+{a:{id:'omeprazole'},b:{id:'itraconazole'},sev:'moderate',t:'PPI + 이트라코나졸(캡슐)',w:'위산 저하로 이트라코나졸 캡슐 흡수 감소.',x:'액제 사용 또는 병용 재검토.'},
+{a:{id:'omeprazole'},b:{id:'clopidogrel'},sev:'moderate',t:'오메프라졸 + 클로피도그렐',w:'클로피도그렐 활성화(CYP2C19) 감소 가능 — 수의 임상 근거는 제한적.',x:'대안으로 파모티딘 고려 가능.'},
+{a:{tag:'binder'},b:{tag:'fq'},sev:'moderate',t:'제산제·결합제 + 플루오로퀴놀론',w:'다가 양이온 킬레이트로 항생제 흡수 크게 감소.',x:'최소 2시간(가능하면 퀴놀론 먼저) 간격 투여.'},
+{a:{tag:'binder'},b:{tag:'tetracycline'},sev:'moderate',t:'제산제·결합제 + 독시사이클린',w:'킬레이트로 흡수 감소.',x:'2시간 이상 간격 투여.'},
+{a:{tag:'binder'},b:{id:'levothyroxine'},sev:'moderate',t:'제산제·결합제 + 레보티록신',w:'흡수 감소로 조절 실패 가능.',x:'2–4시간 간격 투여, T4 재검으로 확인.'},
+{a:{tag:'h2'},b:{id:'sucralfate'},sev:'info',t:'산분비억제제 + 수크랄페이트',w:'수크랄페이트는 산성에서 활성화 — 동시 투여 시 효과 감소 가능.',x:'수크랄페이트를 30–60분 먼저 투여.'},
+{a:{tag:'ppi'},b:{id:'sucralfate'},sev:'info',t:'PPI + 수크랄페이트',w:'동시 투여 시 수크랄페이트 효과 감소 가능.',x:'투여 간격 분리.'},
+{a:{id:'tramadol'},b:{tag:'ssri'},sev:'major',t:'트라마돌 + SSRI',w:'세로토닌 증후군 위험(흥분·진전·고체온·빈맥).',x:'회피 권장. 병용 시 저용량 시작, 증상 교육.'},
+{a:{tag:'serotonergic'},b:{tag:'serotonergic'},sev:'moderate',t:'세로토닌성 약물 병용',w:'세로토닌 증후군 위험이 가산됩니다.',x:'저용량 시작·증상(초조, 진전, 빈맥, 고체온) 모니터.'},
+{a:{id:'ondansetron'},b:{id:'tramadol'},sev:'moderate',t:'온단세트론 + 트라마돌',w:'트라마돌 진통효과 감소 가능 + 세로토닌성 상호작용.',x:'진통 효과 재평가, 대체 항구토제 고려.'},
+{a:{id:'cisapride'},b:{id:'ondansetron'},sev:'moderate',t:'시사프라이드 + 온단세트론',w:'QT 연장 위험 가산.',x:'심질환 개체에서 회피 고려.'},
+{a:{tag:'myelo'},b:{tag:'myelo'},sev:'major',t:'골수억제제 병용',w:'골수억제가 가산되어 중증 혈구감소 위험.',x:'원칙적 회피(순차 사용). 병용 시 CBC 집중 모니터.'},
+{a:{tag:'sulfa'},b:{id:'azathioprine'},sev:'moderate',t:'설파계 + 아자티오프린',w:'골수억제 위험 가산.',x:'CBC 정기 모니터.'},
+{a:{tag:'immunosup'},b:{tag:'immunosup'},sev:'moderate',t:'면역억제제 다중 병용',w:'감염 감수성이 크게 증가(의도적 병용 프로토콜도 흔함).',x:'의도된 조합인지 확인. 감염 징후·CBC 모니터, 요배양 정기 고려.'},
+{a:{tag:'steroid'},b:{tag:'immunosup'},sev:'info',t:'스테로이드 + 면역억제제',w:'면역매개질환의 표준 병용이나 감염·의인성 쿠싱 위험은 증가.',x:'감염 징후 모니터, 스테로이드 조기 점감 계획.'},
+{a:{tag:'insulin'},b:{tag:'steroid'},sev:'major',t:'인슐린 + 글루코코르티코이드',w:'인슐린 저항 유발 — 혈당 조절 붕괴.',x:'가능하면 스테로이드 회피, 불가피하면 혈당곡선 재평가·인슐린 증량.'},
+{a:{tag:'steroid'},b:{tag:'loop'},sev:'moderate',t:'스테로이드 + 루프이뇨제',w:'저칼륨혈증 위험 가산.',x:'전해질 모니터.'},
+{a:{id:'diltiazem'},b:{id:'atenolol'},sev:'major',t:'딜티아젬 + 아테놀롤',w:'서맥·방실차단·심근수축력 저하 가산.',x:'HCM 병용 사례는 있으나 심박수·ECG 집중 모니터. 저혈압·서맥 시 감량.'},
+{a:{id:'amlodipine'},b:{id:'diltiazem'},sev:'moderate',t:'암로디핀 + 딜티아젬',w:'칼슘채널차단제 중복 — 저혈압 위험.',x:'혈압 모니터, 중복 처방 여부 확인.'},
+{a:{tag:'acei'},b:{id:'amlodipine'},sev:'info',t:'ACE 억제제 + 암로디핀',w:'고혈압에서 일반적인 병용 — 상승적 강압 효과.',x:'저혈압 증상 모니터.'},
+{a:{id:'ivermectin'},b:{tag:'azole'},sev:'major',t:'이버멕틴 + 아졸계',w:'P-gp 억제로 이버멕틴 중추 침투 증가 — 신경독성 위험(고용량 요법 시 특히).',x:'고용량 이버멕틴 요법과 병용 회피.'},
+{a:{id:'ivermectin'},b:{id:'cyclosporine'},sev:'moderate',t:'이버멕틴 + 사이클로스포린',w:'P-gp 경합 — 이버멕틴 신경독성 위험 증가.',x:'고용량 요법 시 회피.'},
+{a:{id:'loperamide'},b:{tag:'azole'},sev:'moderate',t:'로페라마이드 + 아졸계',w:'P-gp 억제로 중추 이행 증가 — 진정·신경증상.',x:'병용 주의, MDR1 변이 시 회피.'},
+{a:{id:'trilostane'},b:{tag:'ksparing'},sev:'major',t:'트릴로스탄 + 스피로놀락톤',w:'알도스테론 억제 가산 — 고칼륨혈증 위험.',x:'회피 권장. 병용 시 전해질 집중 모니터.'},
+{a:{id:'trilostane'},b:{tag:'acei'},sev:'moderate',t:'트릴로스탄 + ACE 억제제',w:'고칼륨혈증 위험 가산.',x:'K 정기 모니터.'},
+{a:{id:'calcitriol'},b:{id:'digoxin'},sev:'moderate',t:'칼시트리올 + 디곡신',w:'고칼슘혈증 발생 시 디곡신 독성 감수성 증가.',x:'Ca·디곡신 농도 모니터.'},
+{a:{id:'kbr'},b:{tag:'loop'},sev:'moderate',t:'브롬화칼륨 + 이뇨제',w:'염소 배설 증가로 브롬 배설도 증가 — 항경련 농도 저하 가능.',x:'발작 재발 시 KBr 농도 확인.'},
+{a:{id:'metoclopramide'},b:{id:'trazodone'},sev:'moderate',t:'메토클로프라미드 + 트라조돈',w:'세로토닌성 상호작용 가능.',x:'증상 모니터.'},
+{a:{id:'azithromycin'},b:{id:'cisapride'},sev:'major',t:'아지스로마이신 + 시사프라이드',w:'QT 연장 위험.',x:'회피 권장.'},
+{a:{tag:'opioid'},b:{tag:'opioid'},sev:'moderate',t:'오피오이드 병용',w:'부프레노르핀(부분작용제)은 다른 오피오이드 효과를 감쇄시킬 수 있음. 진정 가산.',x:'조합 의도 확인, 진정 정도 모니터.'}
+];
+
+/* ================= 매칭·분석 ================= */
+const $=id=>document.getElementById(id);
+let species='dog';
+$('spDog').onclick=()=>{species='dog';$('spDog').classList.add('on');$('spCat').classList.remove('on');};
+$('spCat').onclick=()=>{species='cat';$('spCat').classList.add('on');$('spDog').classList.remove('on');};
+
+const FLAGS=[['f_ren','ren','신질환(CKD/AKI)'],['f_hep','hep','간질환'],['f_car','car','심장질환'],['f_gi','gi','위장 궤양·출혈 병력'],['f_preg','preg','임신·수유'],['f_young','young','성장기'],['f_sz','sz','발작 병력'],['f_dm','dm','당뇨'],['f_mdr1','mdr1','MDR1 변이'],['f_dehy','dehy','탈수·저혈량']];
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function findDrugs(text){
+  const lower=text.toLowerCase(); const found=[];
+  for(const d of DB){
+    let hitLine=null;
+    for(const a of d.al){
+      const needle=a.toLowerCase();
+      const idx=lower.indexOf(needle);
+      if(idx<0) continue;
+      if(/^[a-z]/.test(needle)){ // 영문은 단어 경계 확인
+        const re=new RegExp('(^|[^a-z])'+needle.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^a-z])','i');
+        if(!re.test(lower)) continue;
+      }
+      const lines=text.split(/\n/);
+      hitLine=lines.find(L=>L.toLowerCase().includes(needle))||null;
+      break;
+    }
+    if(hitLine!==null) found.push({d,line:hitLine});
+  }
+  return found;
+}
+
+const FREQ={sid:1,qd:1,q24h:1,bid:2,q12h:2,tid:3,q8h:3,qid:4,q6h:4,eod:0.5,q48h:0.5};
+function parseFreq(line){
+  const l=line.toLowerCase();
+  let m=l.match(/\b(sid|qd|bid|tid|qid|eod)\b/); if(m) return {n:FREQ[m[1]],s:m[1].toUpperCase()};
+  m=l.match(/q\s*(\d+)\s*h/); if(m){const h=+m[1]; if(h>0) return {n:+(24/h).toFixed(2),s:'q'+h+'h'};}
+  m=line.match(/(?:하루|1일|일)\s*(\d+)\s*회/); if(m) return {n:+m[1],s:'하루 '+m[1]+'회'};
+  m=line.match(/(\d+)\s*회\s*\/\s*일/); if(m) return {n:+m[1],s:m[1]+'회/일'};
+  return null;
+}
+function parseDose(line){
+  let m=line.match(/(\d+(?:[.,]\d+)?)\s*(?:mg|㎎)\s*\/\s*kg/i);
+  if(m) return {v:parseFloat(m[1].replace(',','.')),perKg:true};
+  m=line.match(/(\d+(?:[.,]\d+)?)\s*(?:mg|㎎)(?![a-z\/])/i);
+  if(m) return {v:parseFloat(m[1].replace(',','.')),perKg:false};
+  return null;
+}
+
+function analyze(){
+  const text=$('rx').value.trim();
+  const out=$('out');
+  if(!text){out.innerHTML='<div class="notice">처방 내용을 입력해 주세요.</div>';return;}
+  const wt=parseFloat($('wt').value)||null;
+  const flags=FLAGS.filter(([el])=>$(el).checked);
+  const hits=findDrugs(text);
+  const drugs=hits.map(h=>h.d);
+
+  /* --- 상호작용 --- */
+  const matched=[]; const seen=new Set();
+  const has=(d,sel)=> sel.id? d.id===sel.id : d.tg.includes(sel.tag);
+  for(const r of RULES){
+    for(let i=0;i<drugs.length;i++)for(let j=0;j<drugs.length;j++){
+      if(i===j) continue;
+      const A=drugs[i],B=drugs[j];
+      if(has(A,r.a)&&has(B,r.b)){
+        const key=r.t+'|'+[A.id,B.id].sort().join('+');
+        if(seen.has(key)) continue; seen.add(key);
+        matched.push({r,A,B});
+      }
+    }
+  }
+  // 동일 약물쌍에 대해 세부 규칙(id 지정)이 있으면 일반 태그 규칙 중복 억제: 심각도 낮은 세로토닌 일반 규칙 제거
+  const pairSev={};
+  for(const m of matched){const k=[m.A.id,m.B.id].sort().join('+');(pairSev[k]=pairSev[k]||[]).push(m);}
+  const finals=[];
+  for(const k in pairSev){
+    const arr=pairSev[k]; const ord={contra:0,major:1,moderate:2,info:3};
+    arr.sort((x,y)=>ord[x.r.sev]-ord[y.r.sev]);
+    const kept=[];
+    for(const m of arr){
+      if(kept.some(K=>K.r.t==='세로토닌성 약물 병용'&&m.r.t==='세로토닌성 약물 병용')) continue;
+      if(m.r.t==='세로토닌성 약물 병용'&&kept.length) continue; // 더 구체적 규칙 존재 시 생략
+      kept.push(m);
+    }
+    finals.push(...kept);
+  }
+  const ord={contra:0,major:1,moderate:2,info:3};
+  finals.sort((x,y)=>ord[x.r.sev]-ord[y.r.sev]);
+
+  // triple whammy
+  const hasT=t=>drugs.some(d=>d.tg.includes(t));
+  const triple = hasT('nsaid')&&(hasT('acei')||hasT('arb'))&&(hasT('loop')||hasT('thiazide'));
+
+  const nSpecies=(species==='cat')?drugs.filter(d=>d.catContra).length:0;
+  const nContra=finals.filter(m=>m.r.sev==='contra').length+(triple?1:0)+nSpecies;
+  const nMajor=finals.filter(m=>m.r.sev==='major').length;
+  const nMod=finals.filter(m=>m.r.sev==='moderate').length;
+
+  let h='';
+  /* 요약 */
+  h+='<div class="sumbar">'
+   +`<div class="sumcell c-drug"><div class="n">${drugs.length}</div><div class="t">인식된 약물</div></div>`
+   +`<div class="sumcell c-contra"><div class="n">${nContra}</div><div class="t">금기 조합</div></div>`
+   +`<div class="sumcell c-major"><div class="n">${nMajor}</div><div class="t">중대 주의</div></div>`
+   +`<div class="sumcell c-moderate"><div class="n">${nMod}</div><div class="t">주의·모니터</div></div>`
+   +'</div>';
+
+  /* 인식 약물 */
+  h+='<div class="sect"><h3>① 인식된 약물</h3>';
+  if(!drugs.length){h+='<p class="empty">인식된 약물이 없습니다. 성분명(한글/영문) 또는 주요 상품명으로 입력해 보세요.</p>';}
+  else{
+    h+='<div class="chips">'+drugs.map(d=>`<span class="chip">${esc(d.n)}<small>${esc(d.cl)}</small></span>`).join('')+'</div>';
+    h+='<p class="hint">⚠ 목록에 없는 처방 약물은 분석에서 빠져 있습니다 — 반드시 원 처방과 대조하세요.</p>';
+  }
+  h+='</div>';
+
+  /* 상호작용 */
+  h+='<div class="sect"><h3>② 약물 상호작용</h3>';
+  if(triple){
+    h+=`<div class="card sev-contra"><h4><span class="badge contra">금기 수준</span> Triple Whammy — NSAID + RAAS 차단제 + 이뇨제</h4>
+    <p class="why">세 계열 동시 투여는 급성 신손상의 대표적 고위험 조합입니다. 특히 탈수·CKD 동반 시 위험이 큽니다.</p>
+    <p class="act">→ NSAID 제외를 우선 검토. 불가피하면 수화 확보 후 최단기간, 신수치 48–72시간 내 재검.</p></div>`;
+  }
+  if(!finals.length&&!triple){h+='<p class="empty">등록된 상호작용 규칙에 해당하는 조합이 없습니다. (DB 미등재 약물 간 상호작용은 별도 확인 필요)</p>';}
+  const sevKo={contra:'금기',major:'중대',moderate:'주의',info:'참고'};
+  for(const m of finals){
+    h+=`<div class="card sev-${m.r.sev}"><h4><span class="badge ${m.r.sev}">${sevKo[m.r.sev]}</span> ${esc(m.r.t)} <span class="klass">(${esc(m.A.n)} + ${esc(m.B.n)})</span></h4>
+    <p class="why">${esc(m.r.w)}</p><p class="act">→ ${esc(m.r.x)}</p></div>`;
+  }
+  h+='</div>';
+
+  /* 환자 상태 */
+  h+='<div class="sect"><h3>③ 환자 상태별 주의</h3>';
+  let anyFlag=false;
+  // 축종 금기
+  for(const d of drugs){
+    if(species==='cat'&&d.catContra){anyFlag=true;
+      h+=`<div class="card sev-contra"><h4><span class="badge contra">축종 금기</span> ${esc(d.n)}</h4><p class="why">${esc(d.catContra)}</p></div>`;}
+  }
+  for(const [el,key,label] of flags){
+    const av=drugs.filter(d=>d.fl&&d.fl[key]&&d.fl[key][0]==='a');
+    const ca=drugs.filter(d=>d.fl&&d.fl[key]&&d.fl[key][0]==='c');
+    if(av.length||ca.length){anyFlag=true;
+      h+=`<div class="card sev-${av.length?'major':'moderate'}"><h4>${esc(label)}</h4>`;
+      for(const d of av) h+=`<p class="flagline"><b class="avoid">회피 권장</b> — <b>${esc(d.n)}</b>: ${esc(d.fl[key][1])}</p>`;
+      for(const d of ca) h+=`<p class="flagline"><b class="caution">주의</b> — <b>${esc(d.n)}</b>: ${esc(d.fl[key][1])}</p>`;
+      h+='</div>';}
+  }
+  if(!anyFlag) h+='<p class="empty">'+(flags.length?'체크된 상태에서 특별히 회피·주의로 등록된 약물이 없습니다.':'기저 상태를 체크하면 해당 상태에서의 회피·주의 약물을 표시합니다.')+'</p>';
+  h+='</div>';
+
+  /* 용량 체크 */
+  h+='<div class="sect"><h3>④ 용량 체크</h3>';
+  if(!drugs.length){h+='<p class="empty">—</p>';}
+  else{
+    h+='<div class="tblwrap"><table><thead><tr><th>약물</th><th>파싱 결과</th><th>계산값</th><th>참고 범위(1일)</th><th>판정</th></tr></thead><tbody>';
+    for(const hit of hits){
+      const d=hit.d; const range=species==='dog'?d.dd:d.dc;
+      const refTxt=species==='dog'?d.d.dog:d.d.cat;
+      const dose=parseDose(hit.line); const fq=parseFreq(hit.line);
+      let parsed='—',calc='—',verdict='<span class="vd na">판정 불가</span>';
+      if(dose){
+        parsed=dose.v+(dose.perKg?' mg/kg':' mg')+(fq?' × '+fq.s:'');
+        let perKgDose=null;
+        if(dose.perKg) perKgDose=dose.v;
+        else if(wt) perKgDose=dose.v/wt;
+        if(perKgDose!=null){
+          if(fq){
+            const daily=perKgDose*fq.n;
+            calc=daily.toFixed(2)+' mg/kg/day';
+            if(range){
+              if(daily>range[1]*1.05) verdict='<span class="vd high">범위 초과</span>';
+              else if(daily<range[0]*0.95) verdict='<span class="vd low">범위 미만</span>';
+              else verdict='<span class="vd ok">범위 내</span>';
+            } else verdict='<span class="vd na">자동판정 미지원</span>';
+          } else {
+            calc=perKgDose.toFixed(2)+' mg/kg/회';
+            verdict='<span class="vd na">횟수 미확인</span>';
+          }
+        } else verdict='<span class="vd na">체중 필요</span>';
+      }
+      h+=`<tr><td><b>${esc(d.n)}</b></td><td class="num">${esc(parsed)}</td><td class="num">${esc(calc)}</td><td>${esc(refTxt||'—')}</td><td>${verdict}</td></tr>`;
+    }
+    h+='</tbody></table></div><p class="hint">참고 범위는 일반적 적응증 기준입니다. 적응증·제형·프로토콜에 따라 정상적으로 벗어날 수 있으므로 "범위 초과/미만"은 재확인 신호로만 사용하세요.</p>';
+  }
+  h+='</div>';
+
+  /* 검사 간섭 */
+  h+='<div class="sect"><h3>⑤ 검사 결과 간섭·왜곡</h3>';
+  const byCat={};
+  for(const d of drugs) for(const [cat,txt] of (d.lab||[])) (byCat[cat]=byCat[cat]||[]).push({d,txt});
+  const catOrder=['간효소','신장·요','전해질','CBC','내분비','혈당·지질','응고·혈소판','기타'];
+  const cats=catOrder.filter(c=>byCat[c]);
+  if(!cats.length) h+='<p class="empty">등록된 검사 간섭 정보가 없습니다.</p>';
+  else{
+    h+='<div class="tblwrap"><table><thead><tr><th>검사 영역</th><th>영향</th><th>원인 약물</th></tr></thead><tbody>';
+    for(const c of cats) for(const e of byCat[c])
+      h+=`<tr><td><b>${esc(c)}</b></td><td>${esc(e.txt)}</td><td>${esc(e.d.n)}</td></tr>`;
+    h+='</tbody></table></div><p class="hint">검사 의뢰·판독 시 위 약물 투여 이력을 함께 고려하세요. 내분비 검사(ACTH 자극, LDDST, T4, 피내검사)는 휴약 기간이 특히 중요합니다.</p>';
+  }
+  h+='</div>';
+
+  /* 부작용·모니터링 */
+  h+='<div class="sect"><h3>⑥ 부작용 · 모니터링 포인트</h3>';
+  for(const d of drugs){
+    h+=`<details class="dz"><summary>${esc(d.n)} <span class="klass">${esc(d.cl)}</span></summary><div class="body">
+    <p>${esc(d.se||'등록된 정보 없음')}</p>
+    <p class="hint">용량 참고 — 개: ${esc(d.d.dog||'—')} / 고양이: ${esc(d.d.cat||'—')}</p></div></details>`;
+  }
+  if(!drugs.length) h+='<p class="empty">—</p>';
+  h+='</div>';
+
+  out.innerHTML=h;
+  out.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+$('go').onclick=analyze;
+$('clr').onclick=()=>{$('rx').value='';$('out').innerHTML='<div class="notice">입력이 지워졌습니다.</div>';};
+$('ex1').onclick=()=>{species='dog';$('spDog').classList.add('on');$('spCat').classList.remove('on');
+  $('wt').value=5;$('f_ren').checked=true;$('f_car').checked=true;
+  $('rx').value='베트메딘 1.25 mg BID\n푸로세미드 10 mg BID\n베나제프릴 2.5 mg SID\n스피로놀락톤 6.25 mg BID\n멜록시캄 0.5 mg SID\n파모티딘 2.5 mg BID';analyze();};
+$('ex2').onclick=()=>{species='dog';$('spDog').classList.add('on');$('spCat').classList.remove('on');
+  $('wt').value=8;
+  $('rx').value='프레드니솔론 4 mg BID\n카프로펜 25 mg BID\n트라마돌 20 mg TID\n플루옥세틴 10 mg SID\n오메프라졸 8 mg SID\n이트라코나졸 40 mg SID';analyze();};
+$('rx').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter')analyze();});
+</script>

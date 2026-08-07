@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#F2F4F8",
-  "theme_color": "#2B3A5E",
+  "background_color": "#F4F5F8",
+  "theme_color": "#212E51",
   "categories": [
     "medical",
     "productivity",

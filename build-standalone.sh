@@ -22,8 +22,10 @@ src = pathlib.Path('vet-calculator.html').read_text(encoding='utf-8')
 
 # logo.png(또는 logo.svg)가 있으면 헤더의 기본 마크를 실제 로고로 교체한다.
 # 외부 파일 참조 없이 data URI로 심어 단일 파일로도 동작하게 한다.
-logo = next((p for p in (pathlib.Path('logo.svg'), pathlib.Path('logo.png'))
-             if p.exists()), None)
+# logo-mark.png는 make-icons.py가 로고에서 심볼만 잘라낸 것. 헤더 마크는 34px
+# 정사각형이라 글자가 읽히지 않으므로 심볼 버전을 우선한다.
+logo = next((p for p in (pathlib.Path('logo.svg'), pathlib.Path('logo-mark.png'),
+                         pathlib.Path('logo.png')) if p.exists()), None)
 if logo:
     mime = mimetypes.guess_type(logo.name)[0] or 'image/png'
     b64 = base64.b64encode(logo.read_bytes()).decode('ascii')
@@ -47,8 +49,8 @@ DESC = ('시그니처 동물의료센터 수의사를 위한 임상 계산기. �
 
 PWA_HEAD = '''<meta name="description" content="{d}">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#2B3A5E" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E121B" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#212E51" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1019" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="시그니처 동물의료센터 · 수의 임상 계산기">
 <meta property="og:description" content="{d}">
