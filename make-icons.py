@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """PWA 아이콘 생성기.
 
-앱의 액센트색(딥 페트롤 틸)에 발자국 마크를 얹은 아이콘을 만든다.
+센터 CI 색(네이비 바탕 + 골드 마크)으로 아이콘을 만든다. 폴더에 logo.png가
+있으면 발자국 대신 그 로고를 쓰고 바탕색도 로고 배경에서 읽어온다.
 아이콘 모양이나 색을 바꾸려면 아래 상수만 수정하고 다시 실행:
 
     python3 make-icons.py
@@ -13,8 +14,9 @@ import pathlib
 
 from PIL import Image, ImageDraw
 
-TEAL = (12, 107, 102)      # --accent (라이트 테마)
-MINT = (99, 211, 198)      # 펄스 라인
+NAVY = (43, 58, 94)        # 센터 CI 네이비 #2B3A5E — 아이콘 바탕
+GOLD = (195, 161, 123)     # 센터 CI 골드 #C3A17B — 마크
+MINT = (216, 190, 156)     # 펄스 라인(밝은 골드)
 WHITE = (255, 255, 255)
 SS = 4                     # 슈퍼샘플링 배율
 
@@ -77,10 +79,10 @@ def place_logo(img, s, safe):
     img.alpha_composite(logo, (int((s - logo.width) / 2), int((s - logo.height) / 2)))
 
 
-def build(px, maskable=False, simple=False, bg=None, mark=WHITE):
+def build(px, maskable=False, simple=False, bg=None, mark=GOLD):
     """simple=True면 파형을 빼고 발자국만 크게 — 32px 이하에서 뭉개지지 않는다.
     폴더에 logo.png가 있으면 발자국 대신 그 로고를 쓰고, 로고 배경색을 바탕으로 삼는다."""
-    bg = bg or logo_bg(TEAL)
+    bg = bg or logo_bg(NAVY)
     s = px * SS
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -116,10 +118,10 @@ def main():
         ("favicon-32.png", build(32, simple=True)),
         ("favicon-16.png", build(16, simple=True)),
     ]
-    bg = logo_bg(TEAL)
+    bg = logo_bg(NAVY)
     print("로고 소스:", "logo.png" if LOGO.exists() else "없음 — 기본 발자국 마크 사용")
     print("아이콘 바탕: #%02X%02X%02X%s" % (bg[0], bg[1], bg[2],
-          " (로고 배경에서 추출)" if bg != TEAL else " (기본값)"))
+          " (로고 배경에서 추출)" if bg != NAVY else " (CI 네이비)"))
     for name, im in outputs:
         im.convert("RGB").save(name) if name == "apple-touch-icon.png" else im.save(name)
         print("생성:", name, im.size)

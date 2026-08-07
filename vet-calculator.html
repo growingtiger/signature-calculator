@@ -6,24 +6,29 @@
 :root {
   color-scheme: light dark;
 
-  --bg:        #F2F4F3;
+  /* 센터 CI — 네이비 #2B3A5E, 골드 #C3A17B.
+     액센트는 네이비 계열로 통일하고, 골드는 라벨·이브로우 같은 비의미 요소에만 쓴다.
+     골드를 상태색으로 쓰면 '주의' 앰버와 혼동될 수 있어 의도적으로 분리했다. */
+  --bg:        #F2F4F8;
   --surface:   #FFFFFF;
-  --surface-2: #E8EDEC;
-  --ink:       #10181A;
-  --ink-2:     #48575A;
-  --ink-3:     #7A8A8C;
-  --line:      #D6DEDD;
-  --line-2:    #C2CDCB;
-  --accent:    #0C6B66;
-  --accent-2:  #084F4B;
-  --accent-soft:#E2EEEC;
+  --surface-2: #E8ECF3;
+  --ink:       #141A26;
+  --ink-2:     #49546B;
+  --ink-3:     #7B869C;
+  --line:      #DBE0EA;
+  --line-2:    #C5CCDB;
+  --accent:    #2B3A5E;
+  --accent-2:  #1A2540;
+  --accent-soft:#E6EAF3;
+  --gold:      #8A6A3C;
+  --gold-soft: #F3EBDE;
   --good:      #2C7A55;
   --good-soft: #E3F0E9;
-  --warn:      #915E0C;
-  --warn-soft: #F7EDDA;
+  --warn:      #8E4D0D;
+  --warn-soft: #FAEEE0;
   --crit:      #A63A32;
   --crit-soft: #F7E5E3;
-  --shadow:    0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.28);
+  --shadow:    0 1px 2px rgba(20,26,38,.05), 0 8px 24px -16px rgba(20,26,38,.28);
 
   --f-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
   --f-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -36,20 +41,23 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:        #0C1112;
-    --surface:   #141B1C;
-    --surface-2: #1B2425;
-    --ink:       #E7EDEC;
-    --ink-2:     #9FB0AF;
-    --ink-3:     #6D7F7E;
-    --line:      #242F2E;
-    --line-2:    #33413F;
-    --accent:    #3FBFB2;
-    --accent-2:  #6FD8CB;
-    --accent-soft:#11292A;
+    /* 다크에서는 네이비가 바탕이 되므로 액센트를 같은 계열의 밝은 청보라로 올린다 */
+    --bg:        #0E121B;
+    --surface:   #161C28;
+    --surface-2: #1E2533;
+    --ink:       #E7EBF3;
+    --ink-2:     #9EA9BE;
+    --ink-3:     #6D788E;
+    --line:      #252E3E;
+    --line-2:    #354052;
+    --accent:    #8FA6DA;
+    --accent-2:  #B2C1E9;
+    --accent-soft:#182033;
+    --gold:      #C9A87F;
+    --gold-soft: #241D14;
     --good:      #55B487;
     --good-soft: #12261D;
-    --warn:      #D3A24A;
+    --warn:      #D9954A;
     --warn-soft: #2A2114;
     --crit:      #E3796F;
     --crit-soft: #2C1917;
@@ -59,19 +67,21 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg:#0C1112; --surface:#141B1C; --surface-2:#1B2425; --ink:#E7EDEC; --ink-2:#9FB0AF;
-  --ink-3:#6D7F7E; --line:#242F2E; --line-2:#33413F; --accent:#3FBFB2; --accent-2:#6FD8CB;
-  --accent-soft:#11292A; --good:#55B487; --good-soft:#12261D; --warn:#D3A24A; --warn-soft:#2A2114;
+  --bg:#0E121B; --surface:#161C28; --surface-2:#1E2533; --ink:#E7EBF3; --ink-2:#9EA9BE;
+  --ink-3:#6D788E; --line:#252E3E; --line-2:#354052; --accent:#8FA6DA; --accent-2:#B2C1E9;
+  --accent-soft:#182033; --gold:#C9A87F; --gold-soft:#241D14;
+  --good:#55B487; --good-soft:#12261D; --warn:#D9954A; --warn-soft:#2A2114;
   --crit:#E3796F; --crit-soft:#2C1917;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
 }
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg:#F2F4F3; --surface:#FFFFFF; --surface-2:#E8EDEC; --ink:#10181A; --ink-2:#48575A;
-  --ink-3:#7A8A8C; --line:#D6DEDD; --line-2:#C2CDCB; --accent:#0C6B66; --accent-2:#084F4B;
-  --accent-soft:#E2EEEC; --good:#2C7A55; --good-soft:#E3F0E9; --warn:#915E0C; --warn-soft:#F7EDDA;
+  --bg:#F2F4F8; --surface:#FFFFFF; --surface-2:#E8ECF3; --ink:#141A26; --ink-2:#49546B;
+  --ink-3:#7B869C; --line:#DBE0EA; --line-2:#C5CCDB; --accent:#2B3A5E; --accent-2:#1A2540;
+  --accent-soft:#E6EAF3; --gold:#8A6A3C; --gold-soft:#F3EBDE;
+  --good:#2C7A55; --good-soft:#E3F0E9; --warn:#8E4D0D; --warn-soft:#FAEEE0;
   --crit:#A63A32; --crit-soft:#F7E5E3;
-  --shadow:0 1px 2px rgba(16,24,26,.05), 0 8px 24px -16px rgba(16,24,26,.28);
+  --shadow:0 1px 2px rgba(20,26,38,.05), 0 8px 24px -16px rgba(20,26,38,.28);
 }
 
 body {
@@ -107,7 +117,7 @@ body {
 }
 .brand-text span {
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .13em;
-  text-transform: uppercase; color: var(--ink-3);
+  text-transform: uppercase; color: var(--gold);
 }
 .top-tools { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .search {
@@ -235,7 +245,7 @@ body {
 .sec-head h2 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.015em; }
 .sec-head span {
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--ink-3); margin-left: auto;
+  text-transform: uppercase; color: var(--gold); margin-left: auto;
 }
 
 /* ---------- calculator card ---------- */
@@ -433,7 +443,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
   <div class="shell">
     <div class="top-a">
       <div class="brand">
-        <span class="brand-mark" id="brandMark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#0C6B66"></rect><g fill="#FFFFFF"><ellipse cx="50" cy="56.44" rx="16.28" ry="13.32"></ellipse><ellipse cx="29.65" cy="34.24" rx="6.29" ry="8.33" transform="rotate(-24 29.65 34.24)"></ellipse><ellipse cx="42.97" cy="26.1" rx="6.29" ry="8.33" transform="rotate(-8 42.97 26.1)"></ellipse><ellipse cx="57.03" cy="26.1" rx="6.29" ry="8.33" transform="rotate(8 57.03 26.1)"></ellipse><ellipse cx="70.35" cy="34.24" rx="6.29" ry="8.33" transform="rotate(24 70.35 34.24)"></ellipse></g></svg></span>
+        <span class="brand-mark" id="brandMark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#2B3A5E"></rect><g fill="#C3A17B"><ellipse cx="50" cy="56.44" rx="16.28" ry="13.32"></ellipse><ellipse cx="29.65" cy="34.24" rx="6.29" ry="8.33" transform="rotate(-24 29.65 34.24)"></ellipse><ellipse cx="42.97" cy="26.1" rx="6.29" ry="8.33" transform="rotate(-8 42.97 26.1)"></ellipse><ellipse cx="57.03" cy="26.1" rx="6.29" ry="8.33" transform="rotate(8 57.03 26.1)"></ellipse><ellipse cx="70.35" cy="34.24" rx="6.29" ry="8.33" transform="rotate(24 70.35 34.24)"></ellipse></g></svg></span>
         <span class="brand-text">
           <b>시그니처 동물의료센터</b>
           <span>Veterinary Clinical Calculators</span>

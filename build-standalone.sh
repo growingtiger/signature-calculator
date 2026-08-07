@@ -47,8 +47,8 @@ DESC = ('시그니처 동물의료센터 수의사를 위한 임상 계산기. �
 
 PWA_HEAD = '''<meta name="description" content="{d}">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#0C6B66" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0D1213" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#2B3A5E" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E121B" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="시그니처 동물의료센터 · 수의 임상 계산기">
 <meta property="og:description" content="{d}">
