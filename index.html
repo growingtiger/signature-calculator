@@ -2,13 +2,24 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등 29종을 종과 체중 한 번 입력으로 계산합니다.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등을 종과 체중 한 번 입력으로 계산합니다.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0C6B66" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1213" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="시그니처 동물의료센터 · 수의 임상 계산기">
-<meta property="og:description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등 29종을 종과 체중 한 번 입력으로 계산합니다.">
+<meta property="og:description" content="시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, 영양, 신장·투석 등을 종과 체중 한 번 입력으로 계산합니다.">
+<meta property="og:image" content="icon-512.png">
 <meta name="twitter:card" content="summary">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="수의 계산기">
 <title>시그니처 동물의료센터 · 수의 임상 계산기</title>
 
 <style>
@@ -2327,6 +2338,18 @@ footer b { color: var(--ink-2); font-weight: 600; }
   document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
 
   renderChips();
+})();
+</script>
+
+<script>
+(function () {
+  if (!("serviceWorker" in navigator)) return;
+  var okHost = location.protocol === "https:" || location.hostname === "localhost"
+            || location.hostname === "127.0.0.1";
+  if (!okHost) return;
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
 })();
 </script>
 </body>
