@@ -12,10 +12,34 @@ set -e
 cd "$(dirname "$0")"
 
 python3 - <<'PY'
+import base64
 import hashlib
+import mimetypes
 import pathlib
+import re
 
 src = pathlib.Path('vet-calculator.html').read_text(encoding='utf-8')
+
+# logo.png(또는 logo.svg)가 있으면 헤더의 기본 마크를 실제 로고로 교체한다.
+# 외부 파일 참조 없이 data URI로 심어 단일 파일로도 동작하게 한다.
+logo = next((p for p in (pathlib.Path('logo.svg'), pathlib.Path('logo.png'))
+             if p.exists()), None)
+if logo:
+    mime = mimetypes.guess_type(logo.name)[0] or 'image/png'
+    b64 = base64.b64encode(logo.read_bytes()).decode('ascii')
+    img = ('<img src="data:%s;base64,%s" alt="시그니처 동물의료센터 로고">' % (mime, b64))
+    new_src, n = re.subn(
+        r'(<span class="brand-mark"[^>]*>).*?(</span>)',
+        lambda m: m.group(1) + img + m.group(2),
+        src, count=1, flags=re.S)
+    if n:
+        src = new_src
+        print('로고 삽입: %s (%.1f KB)' % (logo.name, len(b64) * 3 / 4 / 1024))
+    else:
+        print('경고: brand-mark 자리를 찾지 못해 로고를 넣지 못했습니다')
+else:
+    print('로고 없음 — 기본 마크 사용 (logo.png를 이 폴더에 두면 자동 반영)')
+
 head, body = src.split('</style>', 1)
 
 DESC = ('시그니처 동물의료센터 수의사를 위한 임상 계산기. 수액·응급, 전해질, 약물 용량, '

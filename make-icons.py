@@ -9,6 +9,8 @@
 4배 크기로 그린 뒤 축소해 가장자리를 부드럽게 처리한다.
 """
 
+import pathlib
+
 from PIL import Image, ImageDraw
 
 TEAL = (12, 107, 102)      # --accent (라이트 테마)
@@ -48,8 +50,23 @@ def pulse(draw, size, cx, cy, w, color, weight):
     draw.line(pts, fill=color, width=int(weight), joint="curve")
 
 
+LOGO = pathlib.Path(__file__).with_name("logo.png")
+
+
+def place_logo(img, s, safe):
+    """logo.png를 정사각 캔버스 가운데에 비율을 유지해 얹는다.
+    safe는 로고가 차지할 최대 폭·높이 비율(마스커블은 잘림을 고려해 작게)."""
+    logo = Image.open(LOGO).convert("RGBA")
+    box = s * safe
+    ratio = min(box / logo.width, box / logo.height)
+    logo = logo.resize((max(1, int(logo.width * ratio)),
+                        max(1, int(logo.height * ratio))), Image.LANCZOS)
+    img.alpha_composite(logo, (int((s - logo.width) / 2), int((s - logo.height) / 2)))
+
+
 def build(px, maskable=False, simple=False, bg=TEAL, mark=WHITE):
-    """simple=True면 파형을 빼고 발자국만 크게 — 32px 이하에서 뭉개지지 않는다."""
+    """simple=True면 파형을 빼고 발자국만 크게 — 32px 이하에서 뭉개지지 않는다.
+    폴더에 logo.png가 있으면 발자국 대신 그 로고를 사용한다."""
     s = px * SS
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -58,12 +75,14 @@ def build(px, maskable=False, simple=False, bg=TEAL, mark=WHITE):
     if maskable:
         # 마스커블은 어떤 모양으로 잘려도 되도록 배경을 꽉 채우고 마크를 안쪽에 둔다
         d.rectangle([0, 0, s, s], fill=bg)
-        mark_scale, mark_cy = 0.44, 0.44
+        mark_scale, mark_cy, safe = 0.44, 0.44, 0.56
     else:
         d.rounded_rectangle([0, 0, s, s], radius=s * 0.22, fill=bg)
-        mark_scale, mark_cy = 0.56, 0.43
+        mark_scale, mark_cy, safe = 0.56, 0.43, 0.70
 
-    if simple:
+    if LOGO.exists():
+        place_logo(img, s, safe)
+    elif simple:
         paw(d, s, s / 2, s * 0.52, 0.74, mark)
     else:
         paw(d, s, s / 2, s * mark_cy, mark_scale, mark)
@@ -83,6 +102,7 @@ def main():
         ("favicon-32.png", build(32, simple=True)),
         ("favicon-16.png", build(16, simple=True)),
     ]
+    print("로고 소스:", "logo.png" if LOGO.exists() else "없음 — 기본 발자국 마크 사용")
     for name, im in outputs:
         im.convert("RGB").save(name) if name == "apple-touch-icon.png" else im.save(name)
         print("생성:", name, im.size)

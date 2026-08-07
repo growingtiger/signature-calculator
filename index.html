@@ -118,12 +118,16 @@ body {
   display: flex; align-items: center; gap: 16px;
   padding: 12px 0 11px;
 }
-.brand { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.brand b {
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+/* 로고 자리. logo.png를 두면 빌드 스크립트가 이 안의 내용을 로고 이미지로 바꾼다. */
+.brand-mark { flex: none; width: 34px; height: 34px; display: block; }
+.brand-mark svg, .brand-mark img { width: 100%; height: 100%; display: block; border-radius: 8px; object-fit: contain; }
+.brand-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.brand-text b {
   font-size: 15px; font-weight: 650; letter-spacing: -.012em;
   white-space: nowrap;
 }
-.brand span {
+.brand-text span {
   font-family: var(--f-mono); font-size: 10px; letter-spacing: .13em;
   text-transform: uppercase; color: var(--ink-3);
 }
@@ -453,8 +457,11 @@ footer b { color: var(--ink-2); font-weight: 600; }
   <div class="shell">
     <div class="top-a">
       <div class="brand">
-        <b>시그니처 동물의료센터</b>
-        <span>Veterinary Clinical Calculators</span>
+        <span class="brand-mark" id="brandMark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#0C6B66"></rect><g fill="#FFFFFF"><ellipse cx="50" cy="56.44" rx="16.28" ry="13.32"></ellipse><ellipse cx="29.65" cy="34.24" rx="6.29" ry="8.33" transform="rotate(-24 29.65 34.24)"></ellipse><ellipse cx="42.97" cy="26.1" rx="6.29" ry="8.33" transform="rotate(-8 42.97 26.1)"></ellipse><ellipse cx="57.03" cy="26.1" rx="6.29" ry="8.33" transform="rotate(8 57.03 26.1)"></ellipse><ellipse cx="70.35" cy="34.24" rx="6.29" ry="8.33" transform="rotate(24 70.35 34.24)"></ellipse></g></svg></span>
+        <span class="brand-text">
+          <b>시그니처 동물의료센터</b>
+          <span>Veterinary Clinical Calculators</span>
+        </span>
       </div>
       <div class="top-tools">
         <div class="search">
@@ -1609,7 +1616,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
         })() },
       { k: "dose", label: "목표 용량", unit: "", def: CRI_PRESETS[CRI_DEFAULT].dose, step: 0.1 },
       { k: "unit", label: "용량 단위", type: "select", def: CRI_PRESETS[CRI_DEFAULT].unit, options: CRI_UNITS.map(function (u) { return { v: u.v, t: u.t }; }) },
-      { k: "conc", label: "제제 농도", unit: "mg/mL · 역가 약물은 U/mL", def: CRI_PRESETS[CRI_DEFAULT].conc, step: 0.05 },
+      { k: "conc", label: "제제 농도", unit: "mg/mL 또는 U/mL", def: CRI_PRESETS[CRI_DEFAULT].conc, step: 0.05 },
       { k: "bag", label: "희석백 용량", unit: "mL", def: 54, step: 1 },
       { k: "rate", label: "목표 수액 속도", unit: "mL/hr", def: 3, step: 1 }
     ],
