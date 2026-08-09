@@ -620,6 +620,19 @@ footer b { color: var(--ink-2); font-weight: 600; }
         ["warn", "과도한 혈관수축으로 말초·장간막 허혈, 요량 감소, 간효소 상승이 나타날 수 있습니다. 사지 관류와 요량을 함께 감시하고 혈압이 회복되면 서서히 감량하십시오."],
         ["info", "산증 상태에서도 효과가 유지되는 것이 카테콜아민과의 차이입니다. 이 계산기는 역가(U) 기준으로 계산하므로 제제 농도를 U/mL로 입력하십시오."]
       ] },
+    vasofix:  { label: "바소프레신 (고정 0.04 U/마리/min)", dose: 0.04, unit: "uanmin", conc: 20, bag: 54, rate: 3,
+      hint: "0.04 U/마리/min 고정 · 20 U/mL 원액 · 54 mL 백 · 3 mL/hr",
+      warns: [
+        ["info", "체중과 무관한 마리당 고정용량 프로토콜입니다. 소형 환자일수록 체중당 용량이 높아지므로, 아래 '체중당 시간 용량'을 확인하고 반응에 따라 감량을 검토하십시오."],
+        ["warn", "과도한 혈관수축으로 말초·장간막 허혈, 요량 감소가 나타날 수 있습니다. 사지 관류와 요량을 감시하고 혈압이 회복되면 서서히 감량하십시오."]
+      ] },
+    cytarabine: { label: "시타라빈 (Ara-C · 300 mg/m² 총량)", dose: 300, unit: "mgm2bag", conc: 20, bag: 100, rate: 12,
+      hint: "300 mg/m² 총량을 백에 희석 · 20 mg/mL 원액 · 100 mL 백 · 12 mL/hr",
+      warns: [
+        ["warn", "세포독성 항암제입니다. 조제·투여 시 장갑 등 보호구를 착용하고, 유출 시 세포독성 유출 프로토콜을 따르십시오. 투여 후 48시간 배설물 취급에도 주의가 필요합니다."],
+        ["warn", "골수억제가 나타날 수 있습니다. 투여 5–10일 후 CBC 확인을 권장합니다."],
+        ["info", "총량이 백 전체에 들어가므로 주입 시간은 백 용량 ÷ 수액 속도로 결정됩니다. 기본값(100 mL ÷ 12 mL/hr)은 약 8.3시간 주입입니다."]
+      ] },
     dilt:     { label: "딜티아젬",     dose: 5,    unit: "mcgkgmin", conc: 5,    hint: "1–10 µg/kg/min · 5 mg/mL" },
     furo:     { label: "푸로세미드",   dose: 0.5,  unit: "mgkghr",   conc: 10,   hint: "0.1–1 mg/kg/hr · 10 mg/mL" },
     fentanyl: { label: "펜타닐",       dose: 3,    unit: "mcgkghr",  conc: 0.05, hint: "2–5 µg/kg/hr · 50 µg/mL" },
@@ -638,16 +651,22 @@ footer b { color: var(--ink-2); font-weight: 600; }
     { v: "mgkghr",   t: "mg/kg/hr" },
     { v: "mgkgday",  t: "mg/kg/day" },
     { v: "mukgmin",  t: "mU/kg/min" },
-    { v: "ukghr",    t: "U/kg/hr" }
+    { v: "ukghr",    t: "U/kg/hr" },
+    { v: "uanmin",   t: "U/마리/min (체중 무관)" },
+    { v: "mgm2bag",  t: "mg/m² (총량을 백에 희석)" }
   ];
-  var ACTIVITY_UNITS = { mukgmin: 1, ukghr: 1 };
+  var ACTIVITY_UNITS = { mukgmin: 1, ukghr: 1, uanmin: 1 };
+  // 체표면적(m²). 상단 칩과 동일식 — K × (g)^(2/3) / 10^4, K: 개 10.1 · 고양이 10.0
+  function bsaM2(bw) { return (isDog() ? 10.1 : 10.0) * Math.pow(bw * 1000, 2 / 3) / 10000; }
   // 반환값 단위: 질량 기반이면 mg/hr, 역가 기반이면 U/hr
+  // mgm2bag(총량 방식)은 시간당 환산이 백 용량·속도에 의존하므로 compute에서 별도 처리한다.
   function doseToPerHr(dose, unit, bw) {
     if (unit === "mcgkgmin") return dose * bw * 60 / 1000;
     if (unit === "mcgkghr")  return dose * bw / 1000;
     if (unit === "mgkghr")   return dose * bw;
     if (unit === "mukgmin")  return dose * bw * 60 / 1000;
     if (unit === "ukghr")    return dose * bw;
+    if (unit === "uanmin")   return dose * 60;   // 마리당 고정용량 — 체중 미사용
     return dose * bw / 24; // mgkgday
   }
 
@@ -1667,7 +1686,12 @@ footer b { color: var(--ink-2); font-weight: 600; }
     hook: function (k, v, set) {
       if (k === "preset") {
         var p = CRI_PRESETS[v.preset];
-        if (p && v.preset !== "custom") { set("dose", p.dose); set("unit", p.unit); set("conc", p.conc); }
+        if (p && v.preset !== "custom") {
+          set("dose", p.dose); set("unit", p.unit); set("conc", p.conc);
+          // 원내 규격 백·속도가 정해진 프로토콜은 함께 채운다
+          if (p.bag) set("bag", p.bag);
+          if (p.rate) set("rate", p.rate);
+        }
       }
     },
     compute: function (v) {
@@ -1678,10 +1702,19 @@ footer b { color: var(--ink-2); font-weight: 600; }
       var act = !!ACTIVITY_UNITS[v.unit];       // 역가(U) 기반 약물인가
       var B = act ? "U" : "mg";                 // 총량 단위
       var Bm = act ? "mU" : "µg";               // 1/1000 단위
-      var mgHr = doseToPerHr(dose, v.unit, bw);
-      var neatRate = mgHr / conc;
+      var isTotal = v.unit === "mgm2bag";       // 총량(BSA) 방식 — 백 전체에 총 용량을 희석
+      if (isTotal && (!ok(bag) || !ok(rate))) return { flags: [F("info", "총량 방식은 희석백 용량과 수액 속도가 필요합니다.")] };
       var hoursPerBag = bag / rate;
-      var drugMg = mgHr * hoursPerBag;
+      var bsa = bsaM2(bw);
+      var mgHr, drugMg;
+      if (isTotal) {
+        drugMg = dose * bsa;                    // 백에 넣을 총량 = mg/m² × BSA
+        mgHr = drugMg / hoursPerBag;
+      } else {
+        mgHr = doseToPerHr(dose, v.unit, bw);
+        drugMg = mgHr * hoursPerBag;
+      }
+      var neatRate = mgHr / conc;
       var drugML = drugMg / conc;
       var finalConc = drugMg / bag;
       var unitTxt = (CRI_UNITS.filter(function (u) { return u.v === v.unit; })[0] || {}).t || "";
@@ -1693,17 +1726,25 @@ footer b { color: var(--ink-2); font-weight: 600; }
       if (drugML > bag * 0.2) flags.push(F("warn", "약물 부피 " + sf(drugML, 1) + " mL가 백 용량의 20%를 초과합니다. 최종 농도가 크게 달라지므로 동일 부피의 수액을 먼저 빼내십시오."));
       if (neatRate < 0.1) flags.push(F("warn", "원액 속도 " + sf(neatRate, 3) + " mL/hr — 대부분의 시린지 펌프 최소 정밀도 이하입니다. 희석 조제를 사용하십시오."));
       else flags.push(F("good", "시린지 펌프로 원액 " + sf(neatRate, 2) + " mL/hr, 또는 희석백을 " + sf(rate, 0) + " mL/hr로 투여합니다."));
-      flags.push(F("info", "희석백 " + sf(bag, 0) + " mL는 " + sf(hoursPerBag, 1) + "시간 지속됩니다. 광분해·산화되는 약물(카테콜아민, 니트로프루시드 등)은 24시간마다 새로 조제하십시오."));
+      if (isTotal) flags.push(F("info", "희석백 " + sf(bag, 0) + " mL를 " + sf(rate, 0) + " mL/hr로 " + sf(hoursPerBag, 1) + "시간에 걸쳐 모두 주입하면 총량 투여가 완료됩니다."));
+      else flags.push(F("info", "희석백 " + sf(bag, 0) + " mL는 " + sf(hoursPerBag, 1) + "시간 지속됩니다. 광분해·산화되는 약물(카테콜아민, 니트로프루시드 등)은 24시간마다 새로 조제하십시오."));
+
+      var rows = [
+        R("목표 용량", sf(dose, 3) + " " + unitTxt, ""),
+        R(act ? "백에 넣을 약물 (역가)" : "백에 넣을 약물 (질량)", sf(drugMg, 2), B),
+        R("희석 후 최종 농도", sf(finalConc, 4), B + "/mL"),
+        R(isTotal ? "총 주입 시간" : "백 지속 시간", sf(hoursPerBag, 1), "hr")
+      ];
+      if (isTotal) {
+        rows.push(R("체표면적 (BSA)", sf(bsa, 3), "m²"));
+        rows.push(R("체표면적당 시간 용량", sf(mgHr / bsa, 1), "mg/m²/hr"));
+      } else {
+        rows.push(R("체중당 시간 용량", sf(mgHr / bw * 1000, 2), Bm + "/kg/hr"));
+      }
 
       return {
         primary: [P("원액 주입 속도", sf(neatRate, 3), "mL/hr"), P("백에 넣을 약물", sf(drugML, 2), "mL"), P("시간당 투여량", sf(mgHr, 3), B + "/hr")],
-        rows: [
-          R("목표 용량", sf(dose, 3) + " " + unitTxt, ""),
-          R(act ? "백에 넣을 약물 (역가)" : "백에 넣을 약물 (질량)", sf(drugMg, 2), B),
-          R("희석 후 최종 농도", sf(finalConc, 4), B + "/mL"),
-          R("백 지속 시간", sf(hoursPerBag, 1), "hr"),
-          R("체중당 시간 용량", sf(mgHr / bw * 1000, 2), Bm + "/kg/hr")
-        ],
+        rows: rows,
         flags: flags
       };
     },
