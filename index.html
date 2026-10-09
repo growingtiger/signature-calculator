@@ -2817,6 +2817,37 @@ footer b { color: var(--ink-2); font-weight: 600; }
   });
   document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
 
+  /* 뒤로가기로 앱이 닫히지 않게 한다 (2026-10-08 원장 골든룰)
+     한 화면짜리라 시작할 때 기록을 하나 깔아 두고, 뒤로가기로 맨 처음까지 내려오면 다시 깔아 그 자리에 머문다.
+     내려가 있으면 맨 위로 올리고, 이미 맨 위면 안내만 띄운다.
+     왼쪽 분류 바로가기(#s-…)로 생긴 기록은 브라우저가 원래대로 오가게 둔다.
+     Artifact 미리보기처럼 기록을 못 건드리는 곳에서는 조용히 넘어간다. */
+  (function () {
+    function backToast(msg) {
+      var t = document.getElementById("backToast");
+      if (!t) {
+        t = document.createElement("div"); t.id = "backToast"; t.setAttribute("role", "status");
+        t.style.cssText = "position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;"
+          + "background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13px;line-height:1.4;"
+          + "box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center";
+        document.body.appendChild(t);
+      }
+      t.textContent = msg; t.style.opacity = "1";
+      clearTimeout(t._h); t._h = setTimeout(function () { t.style.opacity = "0"; }, 1800);
+    }
+    try {
+      history.replaceState({ app: 1, base: 1 }, "");
+      history.pushState({ app: 1 }, "");
+    } catch (e) { return; }
+    window.addEventListener("popstate", function (e) {
+      var st = e.state || {};
+      if (st.app && !st.base) return;
+      if (!st.base && /^#s-/.test(location.hash)) return;
+      try { history.pushState({ app: 1 }, ""); } catch (er) { return; }
+      if (window.scrollY > 80) window.scrollTo({ top: 0, behavior: "smooth" });
+      else backToast("앱을 닫으려면 홈 화면으로 나가 주십시오");
+    });
+  })();
   renderChips();
 })();
 </script>

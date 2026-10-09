@@ -1,8 +1,8 @@
-/* 서비스 워커 템플릿. build-standalone.sh가 2e9223531d18을 index.html 해시로
+/* 서비스 워커 템플릿. build-standalone.sh가 03b6260f51d1을 index.html 해시로
    바꿔 sw.js를 생성한다. 내용이 바뀌면 캐시 이름이 달라져 자동으로 갱신된다.
    이 파일이 아니라 sw.js를 직접 고치면 다음 빌드 때 덮어써진다. */
 
-var CACHE = "sigvet-2e9223531d18";
+var CACHE = "sigvet-03b6260f51d1";
 var ASSETS = [
   "./",
   "./index.html",
