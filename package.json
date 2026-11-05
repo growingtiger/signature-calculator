@@ -1,0 +1,7 @@
+{
+  "name": "signature-calculator",
+  "private": true,
+  "dependencies": {
+    "@vercel/edge": "latest"
+  }
+}

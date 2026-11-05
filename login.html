@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시그니처 동물의료센터 · 로그인</title>
+<meta name="theme-color" content="#202d4f">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+html { font-size:15px; }
+body {
+  font-family:"Pretendard Variable", Pretendard, system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  background:linear-gradient(135deg, #202d4f 0%, #2c4070 100%); color:#1b2837; line-height:1.5;
+}
+.card {
+  width:100%; max-width:380px; background:#fff; border-radius:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.25); padding:34px 30px; text-align:center;
+}
+.logo { height:44px; margin-bottom:12px; }
+h1 { font-size:1.15rem; font-weight:800; letter-spacing:-.02em; }
+h1 small { display:block; font-size:.8rem; font-weight:500; color:#8a93a0; margin-top:2px; }
+p.desc { font-size:.86rem; color:#4a5768; margin:14px 0 18px; }
+input {
+  font:inherit; width:100%; border:1px solid rgba(27,40,55,0.18); border-radius:10px;
+  padding:11px 13px; font-size:1rem; text-align:center; letter-spacing:.1em;
+}
+input:focus { outline:2px solid #2e639e; border-color:transparent; }
+button {
+  font:inherit; cursor:pointer; width:100%; margin-top:12px; border:none; border-radius:10px;
+  padding:11px; font-size:1rem; font-weight:700; color:#1b2837;
+  background:linear-gradient(135deg, #cbb59a, #af9476);
+}
+button:hover { filter:brightness(1.05); }
+button:disabled { opacity:.6; cursor:default; }
+.err { display:none; margin-top:12px; font-size:.85rem; color:#d03b3b; background:rgba(208,59,59,0.08); border-radius:8px; padding:8px; }
+.err.show { display:block; }
+.foot { margin-top:18px; font-size:.76rem; color:#8a93a0; }
+@media (prefers-color-scheme: dark) {
+  .card { background:#171c23; color:#f2f4f7; }
+  h1 { color:#f2f4f7; }
+  p.desc { color:#b9c1cc; }
+  input { background:#0f1216; color:#f2f4f7; border-color:rgba(255,255,255,0.15); }
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <img class="logo" src="logo-mark.png" alt="">
+  <h1>직원 로그인<small>시그니처 동물의료센터</small></h1>
+  <p class="desc">병원 공통 비밀번호를 입력해 주세요.<br>한 번 로그인하면 이 기기에서는 계속 유지됩니다.</p>
+  <form id="form">
+    <input type="password" id="pw" placeholder="비밀번호" autocomplete="current-password" autofocus>
+    <button type="submit" id="btn">들어가기</button>
+  </form>
+  <div class="err" id="err"></div>
+  <div class="foot">비밀번호를 모르면 병원 관리자에게 문의해 주세요.</div>
+  <div class="foot" style="margin-top:8px">이 프로그램의 목적은 진료를 보조하거나 수의사의 판단에 영향을 주는 것이 아니라, 병원 행정 업무의 자동화와 기록의 디지털화·전산화입니다. 진단과 치료 판단은 수의사가 합니다.</div>
+</div>
+<script>
+"use strict";
+const form = document.getElementById("form");
+const btn = document.getElementById("btn");
+const err = document.getElementById("err");
+
+function nextPath() {
+  const n = new URLSearchParams(location.search).get("next") || "/";
+  // 우리 사이트 안의 경로만 허용 (외부 주소로 튕기는 것 방지)
+  return (n.startsWith("/") && !n.startsWith("//")) ? n : "/";
+}
+
+form.addEventListener("submit", async ev => {
+  ev.preventDefault();
+  err.classList.remove("show");
+  btn.disabled = true; btn.textContent = "확인 중…";
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password: document.getElementById("pw").value })
+    });
+    const j = await res.json();
+    if (j && j.ok) { location.replace(nextPath()); return; }
+    err.textContent = (j && j.error === "wrong")
+      ? "비밀번호가 맞지 않습니다. 다시 확인해 주세요."
+      : "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    err.classList.add("show");
+  } catch (e) {
+    err.textContent = "인터넷 연결을 확인한 뒤 다시 시도해 주세요.";
+    err.classList.add("show");
+  }
+  btn.disabled = false; btn.textContent = "들어가기";
+});
+</script>
+</body>
+</html>

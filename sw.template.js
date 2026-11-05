@@ -42,8 +42,11 @@ self.addEventListener("fetch", function (e) {
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put("./index.html", copy); });
+        // 로그인 화면으로 넘어간 응답(비밀번호 문지기)은 계산기 캐시에 넣지 않는다
+        if (res.ok && res.type === "basic" && !/login\.html/.test(res.url) && !/login\.html/.test(req.url)) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put("./index.html", copy); });
+        }
         return res;
       }).catch(function () {
         return caches.match("./index.html").then(function (r) {
