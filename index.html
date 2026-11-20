@@ -1426,7 +1426,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
       { k: "na", label: "측정 Na", unit: "mEq/L", def: 135, step: 1 },
       { k: "glu", label: "혈당", unit: "mg/dL", def: 500, step: 10 },
       { k: "f", label: "보정 계수", type: "select", def: "1.6",
-        options: [{ v: "1.6", t: "1.6 (일반)" }, { v: "2.4", t: "2.4 (혈당 400 mg/dL 초과 시)" }] }
+        options: [{ v: "1.6", t: "1.6 (일반)" }, { v: "2.4", t: "2.4 (Hillier 1999 전체 평균)" }] }
     ],
     compute: function (v) {
       var na = num(v.na), glu = num(v.glu), f = parseFloat(v.f);
@@ -1448,7 +1448,7 @@ footer b { color: var(--ink-2); font-weight: 600; }
         flags: flags
       };
     },
-    note: "혈당이 400 mg/dL를 넘으면 1.6보다 2.4 계수가 실제 값에 더 근접한다는 보고가 있습니다. 심한 고지혈증·고단백혈증에서도 가성 저나트륨혈증이 발생할 수 있습니다."
+    note: "보정 Na = 측정 Na + 계수 × (혈당 − 100) ÷ 100. 사람 연구(Hillier 1999)에서 100 mg/dL당 평균 감소폭은 2.4 mEq/L였고, 400 mg/dL 이하에서는 1.6으로도 잘 맞았고, 400 mg/dL 초과에서는 4.0이 더 근접했습니다. 심한 고지혈증·고단백혈증에서도 가성 저나트륨혈증이 발생할 수 있습니다."
   });
 
   CALCS.push({
